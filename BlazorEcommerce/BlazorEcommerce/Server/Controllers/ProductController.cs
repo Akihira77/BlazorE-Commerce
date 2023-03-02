@@ -1,5 +1,4 @@
-﻿using BlazorEcommerce.Server.Data;
-using Microsoft.AspNetCore.Http;
+﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers;
@@ -7,17 +6,43 @@ namespace BlazorEcommerce.Server.Controllers;
 [ApiController]
 public class ProductController : ControllerBase
 {
-	private readonly AppDbContext _db;
+	private readonly IUnitOfWork _unitOfWork;
 
-	public ProductController(AppDbContext db)
+	public ProductController(IUnitOfWork unitOfWork)
     {
-		_db = db;
+		_unitOfWork = unitOfWork;
 	}
 
 	[HttpGet("Get-all-products")]
-	public async Task<ActionResult<List<Product>>> GetAllProducts()
+	public async Task<ActionResult<ServiceResponse<IEnumerable<Product>>>> GetAllProducts()
 	{
-		var products = await _db.Products.ToListAsync();
-		return Ok(products);
+		var result = await _unitOfWork.Product.GetAll();
+		var response = new ServiceResponse<IEnumerable<Product>>()
+		{
+			Data = result,
+			Message = "Product List"
+		};
+		return Ok(response);
+	}
+
+	[HttpGet("Get-product/{id}")]
+	public async Task<ActionResult<ServiceResponse<Product>>> GetProduct(int id)
+	{
+		var response = new ServiceResponse<Product>()
+		{
+			Success = false,
+			Message = $"Sorry but this product does not exist.",
+		};
+		
+		var result = await _unitOfWork.Product.GetFirstOrDefault((p => p.Id == id));
+
+		if (result != null)
+		{
+			response.Success = true;
+			response.Data = result;
+			response.Message = $"Get product {id} is success";
+		}
+		
+		return Ok(response);
 	}
 }

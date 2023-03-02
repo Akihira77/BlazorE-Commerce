@@ -1,35 +1,35 @@
-﻿@inject HttpClient Http
-<ul class="list-unstyled">
-	@foreach(var item in Products)
-	{
-		<li class="media my-3">
-			<div class="media-img-wrapper mr-2">
-				<a href="#">
-					<img class="media-img" src="@item.ImageUrl" alt="@item.Title" />
-				</a>
-			</div>
-			<div class="media-body">
-				<a href="#">
-					<h4 class="mb-0">@item.Title</h4>
-				</a>
-				<p>@item.Description</p>
-				<h5 class="price">
-					$@item.Price
-				</h5>
-			</div>
-		</li>
-	}
-</ul>
+﻿@inject IProductRepository productRepository
 
+@if (productRepository.Products == null 
+|| !productRepository.Products.Any())
+{
+	<span>Loading Products...</span>
+} else {
+	<ul class="list-unstyled">
+		@foreach(var item in productRepository.Products)
+		{
+			<li class="media my-3">
+				<div class="media-img-wrapper mr-2">
+					<a href="/product/@item.Id">
+						<img class="media-img" src="@item.ImageUrl" alt="@item.Title" />
+					</a>
+				</div>
+				<div class="media-body">
+					<a href="/product/@item.Id">
+						<h4 class="mb-0">@item.Title</h4>
+					</a>
+					<p>@item.Description</p>
+					<h5 class="price">
+						$@item.Price
+					</h5>
+				</div>
+			</li>
+		}
+	</ul>
+}
 @code {
-	private static List<Product> Products = new();
-
 	protected override async Task OnInitializedAsync()
 	{
-		var result = await Http.GetFromJsonAsync<List<Product>>("api/v1/Product/Get-all-products");
-		if (result != null)
-		{
-			Products = result;
-		}
+		await productRepository.GetProducts();
 	}
 }
