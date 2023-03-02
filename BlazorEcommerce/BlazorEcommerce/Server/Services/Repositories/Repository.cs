@@ -6,45 +6,59 @@ namespace BlazorEcommerce.Server.Services.Repositories;
 
 public class Repository<T> : IRepository<T> where T : class
 {
-	private readonly AppDbContext _db;
-	internal DbSet<T> dbSet;
+	//private readonly AppDbContext _db;
+	internal DbSet<T> _dbSet;
 	public Repository(AppDbContext db)
     {
-		_db = db;
-		this.dbSet = db.Set<T>();
+		//_db = db;
+		_dbSet = db.Set<T>();
 
 	}
     public async Task Add(T entity)
 	{
-		await dbSet.AddAsync(entity);
+		await _dbSet.AddAsync(entity);
 	}
 
-	public async Task<IEnumerable<T>> GetAll(Expression<Func<T, bool>>? filter = null)
+	public async Task<IEnumerable<T>> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
 	{
-		IQueryable<T> query = dbSet;
-		
+		IQueryable<T> query = _dbSet;
+
 		if (filter != null)
 		{
 			query = query.Where(filter);
 		}
 
-		return await query.ToListAsync();
+        if(includeProperties != null)
+        {
+            foreach(var property in includeProperties.Split(",", StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(property);
+            }
+        }
+        return await query.ToListAsync();
 	}
 
-	public async Task<T> GetFirstOrDefault(Expression<Func<T, bool>> filter, bool track = true)
+	public async Task<T> GetFirstOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null, bool track = true)
 	{
-		IQueryable<T> query = (track ? dbSet : dbSet.AsNoTracking());
+		IQueryable<T> query = (track ? _dbSet : _dbSet.AsNoTracking());
 
+		if (includeProperties != null)
+		{
+			foreach(var property in includeProperties.Split(",", StringSplitOptions.RemoveEmptyEntries))
+			{
+				query = query.Include(property);
+			}
+		} 
 		return await query.FirstOrDefaultAsync(filter);
 	}
 
 	public void Remove(T entity)
 	{
-		dbSet.Remove(entity);
+		_dbSet.Remove(entity);
 	}
 
 	public void RemoveRange(IEnumerable<T> entities)
 	{
-		dbSet.RemoveRange(entities);
+		_dbSet.RemoveRange(entities);
 	}
 }

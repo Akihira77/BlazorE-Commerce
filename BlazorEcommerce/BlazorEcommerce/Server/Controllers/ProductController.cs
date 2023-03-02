@@ -45,4 +45,18 @@ public class ProductController : ControllerBase
 		
 		return Ok(response);
 	}
+
+    [HttpGet("Get-products-from/{url}")]
+    public async Task<ActionResult<ServiceResponse<IEnumerable<Product>>>> GetProductsBy(string url)
+    {
+        var result = await _unitOfWork.Product
+			.GetAll((p => p.Category.Url.ToLower() == url.ToLower()));
+
+        var response = new ServiceResponse<IEnumerable<Product>>()
+        {
+            Data = result,
+            Message = "Product List"
+        };
+        return Ok(response);
+    }
 }
