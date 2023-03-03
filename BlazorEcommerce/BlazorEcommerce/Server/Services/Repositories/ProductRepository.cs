@@ -12,7 +12,24 @@ public class ProductRepository : Repository<Product>, IProductRepository
 		_db = db;
 	}
 
-	public void Update(Product obj)
+    public async Task<Product> GetProduct(int id)
+    {
+        return await _db.Products
+                .Include(p => p.Variants)
+                .ThenInclude(p => p.ProductType)
+                .FirstOrDefaultAsync(p => p.Id == id);
+    }
+
+    public async Task<IEnumerable<Product>> GetProductsByCategory(string? categoryUrl = null)
+    {
+		return await _db.Products
+				.Where(p => p.Category.Url == categoryUrl)
+				.Include(p => p.Variants)
+				.ThenInclude(p => p.ProductType)
+				.ToListAsync();
+    }
+
+    public void Update(Product obj)
 	{
 		_db.Products.Update(obj);
 	}

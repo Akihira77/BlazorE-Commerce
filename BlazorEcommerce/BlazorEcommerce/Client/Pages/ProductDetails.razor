@@ -13,7 +13,29 @@
 		<div class="media-body">
 			<h2 class="mb-0">@product.Title</h2>
 			<p>@product.Description</p>
-			<h4 class="price">$@product.Price</h4>
+			@if(product.Variants.Any())
+			{
+				<div class="mb-3">
+					<select class="form-select" @bind="currentTypeId">
+						@foreach(var variant in product.Variants)
+						{
+							<option value="@variant.ProductTypeId">
+								@variant.ProductType.Name
+							</option>
+						}
+					</select>
+				</div>
+			}
+
+			@if (GetSelectedVariant() != null)
+			{
+				var price = GetSelectedVariant();
+				@if (price.OriginalPrice >= price.Price)
+				{
+					<h6 class="text-muted original-price">$@price.OriginalPrice</h6>
+				}
+				<h4 class="price">$@price.Price</h4>
+			}
 		</div>
 	</div>
 }
@@ -21,6 +43,7 @@
 @code {
 	private Product? product = null;
 	private string message = "Loading product...";
+	private int currentTypeId = 1;
 
 	[Parameter]
 	public int Id { get; set; }
@@ -33,6 +56,18 @@
 		if (result.Success)
 		{
 			product = result.Data;
+			var variants = product.Variants.ToList();
+			if (product.Variants.Any())
+			{
+				currentTypeId = variants[0].ProductTypeId;
+			}
 		}
 	}
+
+	private ProductVariant GetSelectedVariant()
+	{
+		var variant = product.Variants.FirstOrDefault(v => v.ProductTypeId == currentTypeId);
+		return variant;
+	}
+
 }

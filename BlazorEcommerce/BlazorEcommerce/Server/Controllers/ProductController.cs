@@ -16,7 +16,7 @@ public class ProductController : ControllerBase
 	[HttpGet("Get-all-products")]
 	public async Task<ActionResult<ServiceResponse<IEnumerable<Product>>>> GetAllProducts()
 	{
-		var result = await _unitOfWork.Product.GetAll();
+		var result = await _unitOfWork.Product.GetAll(includeProperties: "Variants");
 		var response = new ServiceResponse<IEnumerable<Product>>()
 		{
 			Data = result,
@@ -34,7 +34,8 @@ public class ProductController : ControllerBase
 			Message = $"Sorry but this product does not exist.",
 		};
 		
-		var result = await _unitOfWork.Product.GetFirstOrDefault((p => p.Id == id));
+		var result = await _unitOfWork.Product
+				.GetProduct(id);
 
 		if (result != null)
 		{
@@ -46,11 +47,12 @@ public class ProductController : ControllerBase
 		return Ok(response);
 	}
 
-    [HttpGet("Get-products-from/{url}")]
-    public async Task<ActionResult<ServiceResponse<IEnumerable<Product>>>> GetProductsBy(string url)
+    [HttpGet("Get-products-from/{categoryUrl}")]
+    public async Task<ActionResult<ServiceResponse<IEnumerable<Product>>>> GetProductsBy(string categoryUrl)
     {
         var result = await _unitOfWork.Product
-			.GetAll((p => p.Category.Url.ToLower() == url.ToLower()));
+				.GetAll((p => p.Category.Url.ToLower().Equals(categoryUrl)) 
+						,includeProperties: "Variants");
 
         var response = new ServiceResponse<IEnumerable<Product>>()
         {
