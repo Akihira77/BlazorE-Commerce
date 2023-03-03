@@ -61,4 +61,30 @@ public class ProductController : ControllerBase
         };
         return Ok(response);
     }
+
+	[HttpGet("search-products/{searchText}")]
+	public async Task<ActionResult<ServiceResponse<IEnumerable<Product>>>> SearchProducts(string searchText)
+	{
+		var result = await _unitOfWork.Product.SearchProducts(searchText);
+
+		var response = new ServiceResponse<IEnumerable<Product>>()
+		{
+			Data = result,
+			Message = "Product List"
+		};
+		return Ok(response);
+	}
+
+	[HttpGet("search-suggestion/{searchText}")]
+	public async Task<ActionResult<ServiceResponse<IEnumerable<string>>>> SearchProductsSuggestion(string searchText)
+	{
+		var result = _unitOfWork.Product.GetProductSearchSuggestion(searchText);
+
+		var response = new ServiceResponse<IEnumerable<string>>()
+		{
+			Data = result,
+			Message = "Product suggestion List"
+		};
+		return Ok(response);
+	}
 }

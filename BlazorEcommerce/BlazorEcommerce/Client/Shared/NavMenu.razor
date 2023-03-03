@@ -26,6 +26,12 @@
         }
     </nav>
 </div>
+@if(NavMenuCssClass != "collapse")
+{
+    <div class="nav-item px-3">
+        <Search />
+    </div>
+}
 
 @code {
     private bool collapseNavMenu = true;

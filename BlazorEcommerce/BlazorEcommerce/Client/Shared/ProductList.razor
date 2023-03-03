@@ -4,7 +4,7 @@
 @if (productRepository.Products == null 
 || !productRepository.Products.Any())
 {
-	<span>Loading Products...</span>
+	<span>@productRepository.Message</span>
 } else {
 	<ul class="list-unstyled">
 		@foreach(var item in productRepository.Products)
