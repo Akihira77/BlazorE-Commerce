@@ -1,4 +1,4 @@
-﻿using BlazorEcommerce.Shared;
+﻿using BlazorEcommerce.Shared.Models;
 using static System.Net.WebRequestMethods;
 
 namespace BlazorEcommerce.Client.Services.CategoryService;

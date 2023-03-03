@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BlazorEcommerce.Shared;
+namespace BlazorEcommerce.Shared.Models;
 public class Category
 {
     [Key]

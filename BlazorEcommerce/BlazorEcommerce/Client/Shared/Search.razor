@@ -41,7 +41,8 @@
 
 	public void SearchProucts()
 	{
-		navigationManager.NavigateTo($"search/{searchText}");
+		navigationManager.NavigateTo($"search/{searchText}/1");
+		searchText = "";
 	}
 
 	public async Task HandleSearch(KeyboardEventArgs keyArgs)

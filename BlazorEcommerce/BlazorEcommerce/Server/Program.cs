@@ -1,3 +1,4 @@
+global using BlazorEcommerce.Shared.Models;
 global using BlazorEcommerce.Shared;
 global using Microsoft.EntityFrameworkCore;
 

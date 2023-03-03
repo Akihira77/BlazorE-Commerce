@@ -27,6 +27,15 @@
 			</li>
 		}
 	</ul>
+	for(int i = 1; i <= productRepository.PageCount; i++)
+	{
+		<a class="btn 
+			@(i == productRepository.CurrentPage ? "btn-info" : "btn-outline-info") 
+			page-selection"
+			href="/search/@productRepository.LastSearchText/@i">
+			@i
+		</a>
+	}
 }
 @code {
 	protected override void OnInitialized()

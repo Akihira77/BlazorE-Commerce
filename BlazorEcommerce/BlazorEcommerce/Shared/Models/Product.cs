@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BlazorEcommerce.Shared;
+namespace BlazorEcommerce.Shared.Models;
 public class Product
 {
     [Key]
@@ -12,6 +12,8 @@ public class Product
     [ForeignKey("CategoryId")]
     public Category Category { get; set; }
     public int CategoryId { get; set; }
+
+    public bool Featured { get; set; } = false;
 
     public IEnumerable<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
 }

@@ -1,4 +1,5 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+using BlazorEcommerce.Shared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

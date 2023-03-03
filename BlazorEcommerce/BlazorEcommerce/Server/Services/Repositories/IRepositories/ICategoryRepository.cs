@@ -1,4 +1,6 @@
-﻿namespace BlazorEcommerce.Server.Services.Repositories.IRepositories;
+﻿using BlazorEcommerce.Shared.Models;
+
+namespace BlazorEcommerce.Server.Services.Repositories.IRepositories;
 
 public interface ICategoryRepository : IRepository<Category>
 {

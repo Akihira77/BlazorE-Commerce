@@ -1,5 +1,6 @@
 ﻿using BlazorEcommerce.Server.Data;
 using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+using BlazorEcommerce.Shared.Dto;
 using Microsoft.EntityFrameworkCore.Query;
 
 namespace BlazorEcommerce.Server.Services.Repositories;
@@ -67,11 +68,26 @@ public class ProductRepository : Repository<Product>, IProductRepository
 		return result;
 	}
 
-	public async Task<IEnumerable<Product>> SearchProducts(string searchText)
+	public async Task<ProductSearchDto> SearchProducts(string searchText, int page)
 	{
-		var obj = FindProductsBySearch(searchText);
+		var pageResults = 5f;
+		var pageCount = Math.Ceiling(FindProductsBySearch(searchText).Count() / pageResults);
 
-		return await obj.ToListAsync();
+		var obj = await _db.Products
+			.Where(p => p.Title.ToLower().Contains(searchText.ToLower())
+			|| p.Description.ToLower().Contains(searchText.ToLower()))
+			.Include(p => p.Variants)
+			.Skip((page - 1) * (int)pageResults)
+			.Take((int)pageResults)
+			.ToListAsync();
+
+		var data = new ProductSearchDto()
+		{
+			Products = obj,
+			CurrentPage = page,
+			Pages = (int)pageCount
+		};
+		return data;
 	}
 
 	private IIncludableQueryable<Product, IEnumerable<ProductVariant>> FindProductsBySearch(string searchText)

@@ -1,4 +1,6 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+using BlazorEcommerce.Shared.Dto;
+using BlazorEcommerce.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers;
@@ -62,15 +64,15 @@ public class ProductController : ControllerBase
         return Ok(response);
     }
 
-	[HttpGet("search-products/{searchText}")]
-	public async Task<ActionResult<ServiceResponse<IEnumerable<Product>>>> SearchProducts(string searchText)
+	[HttpGet("search-products/{searchText}/{page}")]
+	public async Task<ActionResult<ServiceResponse<ProductSearchDto>>> SearchProducts(string searchText, int page = 1)
 	{
-		var result = await _unitOfWork.Product.SearchProducts(searchText);
+		var result = await _unitOfWork.Product.SearchProducts(searchText, page);
 
-		var response = new ServiceResponse<IEnumerable<Product>>()
+		var response = new ServiceResponse<ProductSearchDto>()
 		{
 			Data = result,
-			Message = "Product List"
+			Message = "Product search List"
 		};
 		return Ok(response);
 	}
@@ -87,4 +89,17 @@ public class ProductController : ControllerBase
 		};
 		return Ok(response);
 	}
+
+	[HttpGet("featured")]
+	public async Task<ActionResult<ServiceResponse<IEnumerable<Product>>>> GetFeaturedProducts()
+	{
+		var result = await _unitOfWork.Product.GetAll((p => p.Featured), includeProperties: "Variants");
+
+        var response = new ServiceResponse<IEnumerable<Product>>()
+        {
+            Data = result,
+            Message = "Product featured List"
+        };
+        return Ok(response);
+    }
 }
