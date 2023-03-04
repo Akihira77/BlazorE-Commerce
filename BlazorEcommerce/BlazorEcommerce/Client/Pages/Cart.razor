@@ -1,0 +1,99 @@
+﻿@page "/cart"
+@inject ICartService cartService
+@inject IBlazorHistoryService blazorHistory
+
+<PageTitle>Shopping Cart</PageTitle>
+
+<h3>Shopping Cart</h3>
+
+@if(!cartProducts.Any())
+{
+	<span>@message</span>
+} else
+{
+	<div>
+		@foreach(var product in cartProducts)
+		{
+			<div class="container">
+				<div class="image-wrapper">
+					<img 
+						src="@product.ImageUrl"
+						alt="@product.Title"
+						class="image"/>
+				</div>
+				<div class="name">
+					<h5>
+						<a class="title" href="/product/@product.ProductId">
+							@product.Title
+						</a>
+					</h5>
+					<span>@product.ProductType</span>
+					<div class="d-flex gap-3 mt-2">
+						<input class="form-control input-quantity"
+						   type="number"
+						   value="@product.Quantity"
+							   @onchange="@((ChangeEventArgs e) => UpdateQuantity(product, e))"
+						   min="1" />
+						<button class="btn btn-outline-danger"
+						@onclick="@(() => RemoveProductFromCart(product.ProductId, product.ProductTypeId))">
+							<i class="oi oi-trash"></i>
+						</button>
+					</div>
+				</div>
+				<div class="cart-product-price">
+					@product.Quantity * $@product.Price
+				</div>
+			</div>
+		}
+		<div class="cart-product-price">
+			<button class="btn btn-success btn-back px-4 mr-2" @onclick="Back">
+				Back
+			</button>
+
+			Total : $@cartProducts.Sum(product => product.Price * product.Quantity)
+		</div>
+		
+	</div>
+}
+
+@code {
+	List<CartProductDto> cartProducts = new();
+	string message = "Loading cart...";
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadCart();
+	}
+
+	private async Task Back()
+	{
+		await blazorHistory.Back();
+	}
+
+	private async Task RemoveProductFromCart(int productId, int productTypeId)
+	{
+		await cartService.RemoveProductFromCart(productId, productTypeId);
+		await LoadCart();
+	}
+
+	private async Task LoadCart()
+	{
+		if(!(await cartService.GetCartItems()).Any())
+		{
+			message = "Your cart is empty";
+		} else
+		{
+			var carts = await cartService.GetCartProducts();
+			cartProducts = carts.ToList();
+		}
+	}
+
+	private async Task UpdateQuantity(CartProductDto product, ChangeEventArgs e)
+	{
+		var quantity = int.Parse(e.Value.ToString());
+		if (quantity > 0) {
+			await cartService.UpdateQuantity(product, quantity);
+		}
+		await LoadCart();
+	}
+}

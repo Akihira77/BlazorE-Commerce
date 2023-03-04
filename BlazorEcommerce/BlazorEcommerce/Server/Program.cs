@@ -1,6 +1,8 @@
 global using BlazorEcommerce.Shared.Models;
 global using BlazorEcommerce.Shared;
+global using BlazorEcommerce.Shared.Dto;
 global using Microsoft.EntityFrameworkCore;
+
 
 using BlazorEcommerce.Server.Data;
 using BlazorEcommerce.Server.Services.Repositories;

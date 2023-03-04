@@ -3,12 +3,12 @@ using static System.Net.WebRequestMethods;
 
 namespace BlazorEcommerce.Client.Services.CategoryService;
 
-public class CategoryRepository : ICategoryRepository
+public class CategoryService : ICategoryService
 {
 	private readonly HttpClient _http;
 	public IEnumerable<Category> Categories { get; set; } = new List<Category>();
 
-    public CategoryRepository(HttpClient http)
+    public CategoryService(HttpClient http)
     {
 		_http = http;
 	}

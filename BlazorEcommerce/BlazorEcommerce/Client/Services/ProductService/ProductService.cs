@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace BlazorEcommerce.Client.Services.Repositories;
 
-public class ProductRepository : IProductRepository
+public class ProductService : IProductService
 {
     private readonly HttpClient _http;
     public event Action ProductsChanged;
@@ -15,7 +15,7 @@ public class ProductRepository : IProductRepository
     public string LastSearchText { get; set; } = string.Empty;
     public IEnumerable<Product> Products { get; set; } = new List<Product>();
 
-    public ProductRepository(HttpClient http)
+    public ProductService(HttpClient http)
     {
         _http = http;
     }

@@ -1,8 +1,6 @@
-﻿using BlazorEcommerce.Shared.Models;
+﻿namespace BlazorEcommerce.Client.Services.ProductService;
 
-namespace BlazorEcommerce.Client.Services.ProductService;
-
-public interface IProductRepository
+public interface IProductService
 {
     event Action ProductsChanged;
     IEnumerable<Product> Products { get; set; }
@@ -10,6 +8,7 @@ public interface IProductRepository
     int CurrentPage { get; set; }
     int PageCount { get; set; }
     string LastSearchText { get; set; }
+    //string LastPage { get; set; }
     Task GetProducts(string? url = null);
     Task <ServiceResponse<Product>> GetProduct (int id);
     Task SearchProducts(string searchText, int page);

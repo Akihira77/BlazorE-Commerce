@@ -2,7 +2,7 @@
 
 namespace BlazorEcommerce.Client.Services.CategoryService;
 
-public interface ICategoryRepository
+public interface ICategoryService
 {
 	IEnumerable<Category> Categories { get; set; }
 	Task GetCategories();
