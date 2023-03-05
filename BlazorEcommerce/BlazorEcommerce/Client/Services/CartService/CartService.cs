@@ -75,15 +75,17 @@ public class CartService : ICartService
 		} 
 
 		var cartItem = carts
-			.Find(x => x.ProductId == productId && x.ProductTypeId == productTypeId);
+			.FirstOrDefault(x => x.ProductId == productId 
+							&& x.ProductTypeId == productTypeId);
 		if(cartItem != null)
 		{
 			carts.Remove(cartItem);
 			await _localStorage.SetItemAsync("cart", carts);
+			OnChange.Invoke();
 		}
 	}
 
-	public async Task UpdateQuantity(CartProductDto product, int quantity, char? opt = null)
+	public async Task UpdateQuantity(CartProductDto product, int quantity)
 	{
 		var carts = await _localStorage.GetItemAsync<List<CartItem>>("cart");
 		if (carts == null)
@@ -91,28 +93,13 @@ public class CartService : ICartService
 			return;
 		}
 
-		var cartItem = carts.Find(c => c.ProductId == product.ProductId
+		var cartItem = carts.FirstOrDefault(c => c.ProductId == product.ProductId
 							&& c.ProductTypeId == product.ProductTypeId);
 		if(cartItem != null)
 		{
-			if(opt == '+')
-			{
-				cartItem.Quantity++;
-			} else if(opt == '-')
-			{
-				if(cartItem.Quantity > 1)
-				{
-					cartItem.Quantity--;
-				} else
-				{
-					await RemoveProductFromCart(cartItem.ProductId, cartItem.ProductTypeId);
-					return;
-				} 
-			} else if (opt == null && quantity > 0)
-			{
-				cartItem.Quantity = quantity;
-			}
+			cartItem.Quantity = quantity;
 			await _localStorage.SetItemAsync("cart", carts);
+			OnChange.Invoke();
 		}
 	}
 }

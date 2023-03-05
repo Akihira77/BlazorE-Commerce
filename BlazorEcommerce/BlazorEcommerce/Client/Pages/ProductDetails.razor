@@ -1,5 +1,5 @@
 ﻿@page "/product/{id:int}"
-@using Blazorise
+@inject ISnackbar snackbar
 @inject IProductService productService
 @inject ICartService cartService
 @inject IBlazorHistoryService blazorHistory
@@ -9,17 +9,16 @@
 	<span>@message</span>
 } else
 {
-	<SnackbarStack @ref="snackbarStack" />
-	<div class="media">
+	<div class="media container pb-5">
 		<div class="media-img-wrapper mr-2">
 			<img class="media-img" src="@product.ImageUrl" alt="@product.Title" />
 		</div>
-		<div class="media-body">
+		<div class="ms-1 media-body">
 			<h2 class="mb-0">@product.Title</h2>
-			<p>@product.Description</p>
+			<p class="ms-1 mt-2">@product.Description</p>
 			@if(product.Variants.Any())
 			{
-				<div class="mb-3">
+				<div class="mb-3 mt-2">
 					<select class="form-select" @bind="currentTypeId">
 						@foreach(var variant in product.Variants)
 						{
@@ -40,20 +39,25 @@
 				}
 				<h4 class="price">$@price.Price</h4>
 			}
-			<Button 
-				Color="Color.Primary" 
-				Clicked="@AddToCart"
-			>
-				<i class="oi oi-cart"></i>
-				&nbsp;&nbsp;&nbsp;Add to Cart
-			</Button>
-@*			<button class="btn btn-primary" @onclick="AddToCart">
-				<i class="oi oi-cart"></i>
-				&nbsp;&nbsp;&nbsp;Add to Cart
-			</button>*@
-			<button class="btn btn-success" @onclick="Back">
-				Back
-			</button>
+			<div class="action mt-5">
+				<MudButton 
+					Variant="Variant.Outlined" 
+					Color="Color.Success" 
+					@onclick="Back"
+					Class="me-2"
+				>
+					Back
+				</MudButton>
+
+				<MudButton 
+					Variant="Variant.Outlined" 
+					Color="Color.Info" 
+					@onclick="@(() => AddToCart(product.Title))">
+					<i class="oi oi-cart"></i>
+					&nbsp;&nbsp;&nbsp;Add to Cart
+				</MudButton>
+
+			</div>
 		</div>
 	</div>
 }
@@ -66,8 +70,6 @@
 
 	[Parameter]
 	public int Id { get; set; }
-
-	SnackbarStack snackbarStack;
 
 	protected override async Task OnParametersSetAsync()
 	{
@@ -91,7 +93,7 @@
 		return variant;
 	}
 
-	private async Task AddToCart()
+	private async Task AddToCart(string title)
 	{
 		var productVariant = GetSelectedVariant();
 		var cartItem = new CartItem
@@ -102,7 +104,9 @@
 
 		await cartService.AddToCart(cartItem);
 
-		await snackbarStack.PushAsync("Success added item to cart!", SnackbarColor.Success);
+		snackbar.Configuration.SnackbarVariant = Variant.Text;
+		snackbar.Configuration.MaxDisplayedSnackbars = 2;
+		snackbar.Add($"Added {title} ({GetSelectedVariant().ProductType.Name}) to cart", Severity.Success);
 	}
 
 	private async Task Back()

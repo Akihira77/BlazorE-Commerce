@@ -6,7 +6,7 @@
 
 <h3>Shopping Cart</h3>
 
-@if(!cartProducts.Any())
+@if(cartProducts == null || !cartProducts.Any())
 {
 	<span>@message</span>
 } else
@@ -23,7 +23,7 @@
 				</div>
 				<div class="name">
 					<h5>
-						<a class="title" href="/product/@product.ProductId">
+						<a class="text-decoration-underline text-primary" href="/product/@product.ProductId">
 							@product.Title
 						</a>
 					</h5>
@@ -57,7 +57,7 @@
 }
 
 @code {
-	List<CartProductDto> cartProducts = new();
+	IEnumerable<CartProductDto>? cartProducts;
 	string message = "Loading cart...";
 
 	protected override async Task OnInitializedAsync()
@@ -81,10 +81,11 @@
 		if(!(await cartService.GetCartItems()).Any())
 		{
 			message = "Your cart is empty";
+			cartProducts = null;
 		} else
 		{
 			var carts = await cartService.GetCartProducts();
-			cartProducts = carts.ToList();
+			cartProducts = carts;
 		}
 	}
 

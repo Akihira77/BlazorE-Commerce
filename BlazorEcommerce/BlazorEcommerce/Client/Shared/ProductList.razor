@@ -15,12 +15,12 @@
 						<img class="media-img" src="@item.ImageUrl" alt="@item.Title" />
 					</a>
 				</div>
-				<div class="media-body">
-					<a href="/product/@item.Id">
+				<div class="media-body d-flex flex-column">
+					<a class="mb-1 text-decoration-underline text-primary" href="/product/@item.Id">
 						<h4 class="mb-0">@item.Title</h4>
 					</a>
 					<p>@item.Description</p>
-					<h5 class="price">
+					<h5 class="price mt-auto">
 						@GetPriceText(item)
 					</h5>
 				</div>

@@ -7,5 +7,5 @@ public interface ICartService
 	Task<IEnumerable<CartItem>> GetCartItems();
 	Task<IEnumerable<CartProductDto>> GetCartProducts();
 	Task RemoveProductFromCart(int productId, int productTypeId);
-	Task UpdateQuantity(CartProductDto product, int quantity, char? opt = null);
+	Task UpdateQuantity(CartProductDto product, int quantity);
 }

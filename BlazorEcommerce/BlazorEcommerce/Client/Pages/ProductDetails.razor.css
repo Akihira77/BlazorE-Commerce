@@ -28,4 +28,10 @@
 		width : 100%;
 		height: auto;
 	}
+	
+	.action {
+		display : flex;
+		flex-direction : row;
+		justify-content : flex-end;
+	}
 }

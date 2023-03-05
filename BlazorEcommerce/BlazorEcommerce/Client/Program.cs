@@ -12,9 +12,8 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using BlazorEcommerce.Client.Services.Repositories;
 using Blazored.LocalStorage;
 using BlazorEcommerce.Client.Services.CartService;
-using Blazorise;
-using Blazorise.Bootstrap;
-using Blazorise.Icons.FontAwesome;
+using MudBlazor;
+using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -26,9 +25,17 @@ builder.Services.AddBlazorHistoryService();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddMudServices(config =>
+{
+	config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopRight;
 
-builder.Services
-	.AddBlazorise()
-	.AddBootstrapProviders()
-	.AddFontAwesomeIcons();
+	config.SnackbarConfiguration.PreventDuplicates = true;
+	config.SnackbarConfiguration.NewestOnTop = true;
+	config.SnackbarConfiguration.ShowCloseIcon = true;
+	config.SnackbarConfiguration.VisibleStateDuration = 3000;
+	config.SnackbarConfiguration.HideTransitionDuration = 500;
+	config.SnackbarConfiguration.ShowTransitionDuration = 500;
+	config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+});
+
 await builder.Build().RunAsync();

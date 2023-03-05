@@ -1,4 +1,8 @@
-﻿.media-img {
+﻿.media-body {
+	height : 190px;
+}
+
+.media-img {
 	max-height : 200px;
 	max-width : 200px;
 	border-radius : 6px;
