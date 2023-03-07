@@ -3,6 +3,8 @@
 @inject IProductService productService
 @inject ICartService cartService
 @inject IBlazorHistoryService blazorHistory
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navigationManager
 
 @if (product == null)
 {
@@ -49,14 +51,25 @@
 					Back
 				</MudButton>
 
-				<MudButton 
-					Variant="Variant.Outlined" 
-					Color="Color.Info" 
-					@onclick="@(() => AddToCart(product.Title))">
-					<i class="oi oi-cart"></i>
-					&nbsp;&nbsp;&nbsp;Add to Cart
-				</MudButton>
-
+				<AuthorizeView>
+					<Authorized>
+						<MudButton 
+								Variant="Variant.Outlined" 
+								Color="Color.Info" 
+								@onclick="@(() => AddToCart(product.Title))">
+							<i class="oi oi-cart"></i>
+							&nbsp;&nbsp;&nbsp;Add to Cart
+						</MudButton>
+					</Authorized>
+					<NotAuthorized>
+						<MudButton Variant="Variant.Outlined"
+							   Color="Color.Info"
+							   @onclick="@(() => navigationManager.NavigateTo("/login"))">
+							<i class="oi oi-cart"></i>
+							&nbsp;&nbsp;&nbsp;Add to Cart
+						</MudButton>
+					</NotAuthorized>
+				</AuthorizeView>
 			</div>
 		</div>
 	</div>

@@ -1,17 +1,19 @@
-global using BlazorEcommerce.Shared;
-global using BlazorEcommerce.Shared.Models;
-global using BlazorEcommerce.Shared.Dto;
-global using System.Net.Http.Json;
-global using BlazorEcommerce.Client.Services.ProductService;
+global using BlazorEcommerce.Client.Services.AuthService;
+global using BlazorEcommerce.Client.Services.CartService;
 global using BlazorEcommerce.Client.Services.CategoryService;
+global using BlazorEcommerce.Client.Services.ProductService;
+global using BlazorEcommerce.Shared;
+global using BlazorEcommerce.Shared.Dto;
+global using BlazorEcommerce.Shared.Models;
 global using BlazorHistory;
-
+global using Microsoft.AspNetCore.Components.Authorization;
+global using System.Net.Http.Json;
 using BlazorEcommerce.Client;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using BlazorEcommerce.Client.Services.Repositories;
 using Blazored.LocalStorage;
-using BlazorEcommerce.Client.Services.CartService;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.Components.WebAssembly.Services;
 using MudBlazor;
 using MudBlazor.Services;
 
@@ -22,9 +24,14 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazorHistoryService();
+
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<LazyAssemblyLoader>();
+
+
 builder.Services.AddMudServices(config =>
 {
 	config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopRight;
@@ -37,5 +44,10 @@ builder.Services.AddMudServices(config =>
 	config.SnackbarConfiguration.ShowTransitionDuration = 500;
 	config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
+
+// authorization
+builder.Services.AddOptions();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
 await builder.Build().RunAsync();

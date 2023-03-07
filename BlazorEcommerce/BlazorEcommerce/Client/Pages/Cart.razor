@@ -1,60 +1,63 @@
 ﻿@page "/cart"
 @inject ICartService cartService
 @inject IBlazorHistoryService blazorHistory
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navigationManager
+@attribute [Authorize]
 
 <PageTitle>Shopping Cart</PageTitle>
 
 <h3>Shopping Cart</h3>
 
-@if(cartProducts == null || !cartProducts.Any())
-{
-	<span>@message</span>
-} else
-{
-	<div>
-		@foreach(var product in cartProducts)
-		{
-			<div class="container">
-				<div class="image-wrapper">
-					<img 
-						src="@product.ImageUrl"
-						alt="@product.Title"
-						class="image"/>
-				</div>
-				<div class="name">
-					<h5>
-						<a class="text-decoration-underline text-primary" href="/product/@product.ProductId">
-							@product.Title
-						</a>
-					</h5>
-					<span>@product.ProductType</span>
-					<div class="d-flex gap-3 mt-2">
-						<input class="form-control input-quantity"
-						   type="number"
-						   value="@product.Quantity"
-							   @onchange="@((ChangeEventArgs e) => UpdateQuantity(product, e))"
-						   min="1" />
-						<button class="btn btn-outline-danger"
-						@onclick="@(() => RemoveProductFromCart(product.ProductId, product.ProductTypeId))">
-							<i class="oi oi-trash"></i>
-						</button>
+	@if(cartProducts == null || !cartProducts.Any())
+	{
+		<span>@message</span>
+	} else
+	{
+		<div>
+			@foreach(var product in cartProducts)
+			{
+				<div class="container">
+					<div class="image-wrapper">
+						<img 
+							src="@product.ImageUrl"
+							alt="@product.Title"
+							class="image"/>
+					</div>
+					<div class="name">
+						<h5>
+							<a class="text-decoration-underline text-primary" href="/product/@product.ProductId">
+								@product.Title
+							</a>
+						</h5>
+						<span>@product.ProductType</span>
+						<div class="d-flex gap-3 mt-2">
+							<input class="form-control input-quantity"
+							   type="number"
+							   value="@product.Quantity"
+								   @onchange="@((ChangeEventArgs e) => UpdateQuantity(product, e))"
+							   min="1" />
+							<button class="btn btn-outline-danger"
+							@onclick="@(() => RemoveProductFromCart(product.ProductId, product.ProductTypeId))">
+								<i class="oi oi-trash"></i>
+							</button>
+						</div>
+					</div>
+					<div class="cart-product-price">
+						@product.Quantity * $@product.Price
 					</div>
 				</div>
-				<div class="cart-product-price">
-					@product.Quantity * $@product.Price
-				</div>
-			</div>
-		}
-		<div class="cart-product-price">
-			<button class="btn btn-success btn-back px-4 mr-2" @onclick="Back">
-				Back
-			</button>
+			}
+			<div class="cart-product-price">
+				<button class="btn btn-success btn-back px-4 mr-2" @onclick="Back">
+					Back
+				</button>
 
-			Total : $@cartProducts.Sum(product => product.Price * product.Quantity)
-		</div>
+				Total : $@cartProducts.Sum(product => product.Price * product.Quantity)
+			</div>
 		
-	</div>
-}
+		</div>
+	}
 
 @code {
 	IEnumerable<CartProductDto>? cartProducts;

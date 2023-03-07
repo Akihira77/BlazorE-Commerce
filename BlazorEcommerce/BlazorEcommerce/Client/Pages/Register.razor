@@ -1,0 +1,84 @@
+﻿@page "/register"
+@inject IAuthService authService
+@inject NavigationManager navigationManager
+
+<PageTitle>Register</PageTitle>
+
+<EditForm class="container d-flex flex-column" Model="user" OnValidSubmit="HandleRegistration">
+	<DataAnnotationsValidator />
+
+	<div class="mb-3">
+		<label for="email">Email</label>
+		<InputText id="email" @bind-Value="user.Email" class="form-control"/>
+		<ValidationMessage For="() => user.Email"/>
+	</div>
+	<div class="mb-3">
+		<label for="password">Password</label>
+		<div class="mt-1 input-group">
+			<InputText type="@txtType" id="password"
+					   @bind-Value="user.Password" class="form-control" />
+			<button type="button" class="input-group-text oi oi-eye top-0" @onclick="ShowPassword"></button>
+		</div>
+	</div>
+	<ValidationMessage For="() => user.Password" />
+	<div class="mb-3">
+		<label for="confirmPassword">Confirm Password</label>
+		<div class="mt-1 input-group">
+			<InputText type="@txtConfirmType" id="confirmPassword"
+					   @bind-Value="user.ConfirmPassword" class="form-control" />
+			<button type="button" class="input-group-text oi oi-eye top-0" @onclick="ShowConfirmPassword"></button>
+		</div>
+	</div>
+	<ValidationMessage For="() => user.ConfirmPassword" />
+
+	<div class="ms-auto">
+		<button 
+			type="button" 
+			class="mr-3 btn btn-primary" 
+			@onclick="@(() => navigationManager.NavigateTo("/login"))">
+			Login
+		</button>
+		<button type="submit" class="btn btn-primary">Register</button>
+	</div>
+	<div class="@messageCssClass">
+		<span>@message</span>
+	</div>
+</EditForm>
+
+@code {
+	UserRegister user = new UserRegister();
+
+	string message = string.Empty;
+	string messageCssClass = string.Empty;
+	string txtType = "password";
+	string txtConfirmType = "password";
+
+	async Task HandleRegistration()
+	{
+		var result = await authService.Register(user);
+		message = result.Message;
+		messageCssClass = result.Success ? "text-success" : "text-danger";
+	}
+
+	private void ShowPassword()
+	{
+		if(txtType == "password")
+		{
+			txtType = "text";
+		} else
+		{
+			txtType = "password";
+		}
+	}
+
+	private void ShowConfirmPassword()
+	{
+		if(txtConfirmType == "password")
+		{
+			txtConfirmType = "text";
+		} else
+		{
+			txtConfirmType = "password";
+		}
+	}
+}

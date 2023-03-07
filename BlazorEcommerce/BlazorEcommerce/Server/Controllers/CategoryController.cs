@@ -1,6 +1,4 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
-using BlazorEcommerce.Shared.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers;
@@ -11,7 +9,7 @@ public class CategoryController : ControllerBase
 	private readonly IUnitOfWork _unitOfWork;
 
 	public CategoryController(IUnitOfWork unitOfWork)
-    {
+	{
 		_unitOfWork = unitOfWork;
 	}
 

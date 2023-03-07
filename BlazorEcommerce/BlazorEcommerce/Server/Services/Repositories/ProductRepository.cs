@@ -1,6 +1,5 @@
 ﻿using BlazorEcommerce.Server.Data;
 using BlazorEcommerce.Server.Services.Repositories.IRepositories;
-using BlazorEcommerce.Shared.Dto;
 using Microsoft.EntityFrameworkCore.Query;
 
 namespace BlazorEcommerce.Server.Services.Repositories;
@@ -14,22 +13,22 @@ public class ProductRepository : Repository<Product>, IProductRepository
 		_db = db;
 	}
 
-    public async Task<Product> GetProduct(int id)
-    {
-        return await _db.Products
-                .Include(p => p.Variants)
-                .ThenInclude(p => p.ProductType)
-                .FirstOrDefaultAsync(p => p.Id == id);
-    }
+	public async Task<Product> GetProduct(int id)
+	{
+		return await _db.Products
+				.Include(p => p.Variants)
+				.ThenInclude(p => p.ProductType)
+				.FirstOrDefaultAsync(p => p.Id == id);
+	}
 
-    public async Task<IEnumerable<Product>> GetProductsByCategory(string? categoryUrl = null)
-    {
+	public async Task<IEnumerable<Product>> GetProductsByCategory(string? categoryUrl = null)
+	{
 		return await _db.Products
 				.Where(p => p.Category.Url == categoryUrl)
 				.Include(p => p.Variants)
 				.ThenInclude(p => p.ProductType)
 				.ToListAsync();
-    }
+	}
 
 	public List<string> GetProductSearchSuggestion(string searchText)
 	{
@@ -37,14 +36,14 @@ public class ProductRepository : Repository<Product>, IProductRepository
 
 		List<string> result = new();
 
-		foreach (var item in obj)
+		foreach(var item in obj)
 		{
-			if (item.Title.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+			if(item.Title.Contains(searchText, StringComparison.OrdinalIgnoreCase))
 			{
 				result.Add(item.Title);
 			}
 
-			if (item.Description != null)
+			if(item.Description != null)
 			{
 				var punctuation = item.Description
 					.Where(char.IsPunctuation)
@@ -56,13 +55,13 @@ public class ProductRepository : Repository<Product>, IProductRepository
 
 				foreach(var word in words)
 				{
-					if (word.Contains(searchText, StringComparison.OrdinalIgnoreCase)
+					if(word.Contains(searchText, StringComparison.OrdinalIgnoreCase)
 						&& !result.Contains(word))
 					{
 						result.Add(word);
-					} 
+					}
 				}
-			} 
+			}
 		}
 
 		return result;

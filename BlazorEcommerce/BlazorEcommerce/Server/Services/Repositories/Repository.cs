@@ -9,12 +9,12 @@ public class Repository<T> : IRepository<T> where T : class
 	//private readonly AppDbContext _db;
 	internal DbSet<T> _dbSet;
 	public Repository(AppDbContext db)
-    {
+	{
 		//_db = db;
 		_dbSet = db.Set<T>();
 
 	}
-    public async Task Add(T entity)
+	public async Task Add(T entity)
 	{
 		await _dbSet.AddAsync(entity);
 	}
@@ -23,32 +23,32 @@ public class Repository<T> : IRepository<T> where T : class
 	{
 		IQueryable<T> query = _dbSet;
 
-		if (filter != null)
+		if(filter != null)
 		{
 			query = query.Where(filter);
 		}
 
-        if(includeProperties != null)
-        {
-            foreach(var property in includeProperties.Split(",", StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(property);
-            }
-        }
-        return await query.ToListAsync();
+		if(includeProperties != null)
+		{
+			foreach(var property in includeProperties.Split(",", StringSplitOptions.RemoveEmptyEntries))
+			{
+				query = query.Include(property);
+			}
+		}
+		return await query.ToListAsync();
 	}
 
 	public async Task<T> GetFirstOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null, bool track = true)
 	{
 		IQueryable<T> query = (track ? _dbSet : _dbSet.AsNoTracking());
 
-		if (includeProperties != null)
+		if(includeProperties != null)
 		{
 			foreach(var property in includeProperties.Split(",", StringSplitOptions.RemoveEmptyEntries))
 			{
 				query = query.Include(property);
 			}
-		} 
+		}
 		return await query.FirstOrDefaultAsync(filter);
 	}
 

@@ -1,5 +1,4 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers;
@@ -10,7 +9,7 @@ public class CartController : ControllerBase
 	private readonly IUnitOfWork _unitOfWork;
 
 	public CartController(IUnitOfWork unitOfWork)
-    {
+	{
 		_unitOfWork = unitOfWork;
 	}
 

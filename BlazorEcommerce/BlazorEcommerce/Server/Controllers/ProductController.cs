@@ -1,6 +1,4 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
-using BlazorEcommerce.Shared.Dto;
-using BlazorEcommerce.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers;
@@ -11,7 +9,7 @@ public class ProductController : ControllerBase
 	private readonly IUnitOfWork _unitOfWork;
 
 	public ProductController(IUnitOfWork unitOfWork)
-    {
+	{
 		_unitOfWork = unitOfWork;
 	}
 
@@ -35,34 +33,34 @@ public class ProductController : ControllerBase
 			Success = false,
 			Message = $"Sorry but this product does not exist.",
 		};
-		
+
 		var result = await _unitOfWork.Product
 				.GetProduct(id);
 
-		if (result != null)
+		if(result != null)
 		{
 			response.Success = true;
 			response.Data = result;
 			response.Message = $"Get product {id} is success";
 		}
-		
+
 		return Ok(response);
 	}
 
-    [HttpGet("Get-products-from/{categoryUrl}")]
-    public async Task<ActionResult<ServiceResponse<IEnumerable<Product>>>> GetProductsBy(string categoryUrl)
-    {
-        var result = await _unitOfWork.Product
-				.GetAll((p => p.Category.Url.ToLower().Equals(categoryUrl)) 
-						,includeProperties: "Variants");
+	[HttpGet("Get-products-from/{categoryUrl}")]
+	public async Task<ActionResult<ServiceResponse<IEnumerable<Product>>>> GetProductsBy(string categoryUrl)
+	{
+		var result = await _unitOfWork.Product
+				.GetAll((p => p.Category.Url.ToLower().Equals(categoryUrl))
+						, includeProperties: "Variants");
 
-        var response = new ServiceResponse<IEnumerable<Product>>()
-        {
-            Data = result,
-            Message = "Product List"
-        };
-        return Ok(response);
-    }
+		var response = new ServiceResponse<IEnumerable<Product>>()
+		{
+			Data = result,
+			Message = "Product List"
+		};
+		return Ok(response);
+	}
 
 	[HttpGet("search-products/{searchText}/{page}")]
 	public async Task<ActionResult<ServiceResponse<ProductSearchDto>>> SearchProducts(string searchText, int page = 1)
@@ -95,11 +93,11 @@ public class ProductController : ControllerBase
 	{
 		var result = await _unitOfWork.Product.GetAll((p => p.Featured), includeProperties: "Variants");
 
-        var response = new ServiceResponse<IEnumerable<Product>>()
-        {
-            Data = result,
-            Message = "Product featured List"
-        };
-        return Ok(response);
-    }
+		var response = new ServiceResponse<IEnumerable<Product>>()
+		{
+			Data = result,
+			Message = "Product featured List"
+		};
+		return Ok(response);
+	}
 }

@@ -1,0 +1,65 @@
+﻿@page "/login"
+@inject IAuthService authService
+@inject IBlazorHistoryService blazorHistory
+@inject ILocalStorageService localStorage
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject ISnackbar snackbar
+
+<PageTitle>Login</PageTitle>
+<EditForm class="container d-flex flex-column" Model="user" OnValidSubmit="HandleLogin">
+	<DataAnnotationsValidator />
+
+	<div class="mb-3">
+		<label for="email">Email</label>
+		<InputText id="email" @bind-Value="user.Email" class="form-control" />
+		<ValidationMessage For="() => user.Email" />
+	</div>
+	<div class="mb-3">
+		<label for="password">Password</label>
+		<div class="mt-1 input-group">
+			<InputText type="@txtType" id="password"
+					   @bind-Value="user.Password" class="form-control" />
+			<button type="button" class="input-group-text oi oi-eye top-0" @onclick="ShowPassword"></button>
+		</div>
+	</div>
+	<ValidationMessage For="() => user.Password" />
+
+	<button type="submit" class="ms-auto btn btn-primary">Login</button>
+</EditForm>
+
+@code {
+	private UserLogin user = new UserLogin();
+
+	private string errorMessage = string.Empty;
+	string txtType = "password";
+
+	private async Task HandleLogin()
+	{
+		var result = await authService.Login(user);
+		snackbar.Configuration.SnackbarVariant = Variant.Text;
+		if (result.Success)
+		{
+			errorMessage = string.Empty;
+
+			await localStorage.SetItemAsync("authToken", result.Data);
+			await authenticationStateProvider.GetAuthenticationStateAsync();
+			await blazorHistory.Back();
+
+			snackbar.Add($"Welcome {user.Email}", Severity.Success);
+		} else
+		{
+			snackbar.Add($"Wrong password", Severity.Error);
+		}
+	}
+
+	private void ShowPassword()
+	{
+		if(txtType == "password")
+		{
+			txtType = "text";
+		} else
+		{
+			txtType = "password";
+		}
+	}
+}

@@ -1,0 +1,86 @@
+﻿@page "/profile"
+@attribute [Authorize]
+@inject IAuthService authService
+@inject NavigationManager navigationManager
+
+<AuthorizeView>
+	<h3>Hi! You're logged in with <i>@context.User.Identity.Name</i>.</h3>
+</AuthorizeView>
+
+<div class="container mt-5">
+<h5 class="text-center">Change Password</h5>
+
+	<EditForm class="change-password-form mt-3" Model="request" OnValidSubmit="ChangePassword">
+		<DataAnnotationsValidator />
+
+		<div class="mb-3">
+			<label for="password">New Password</label>
+			<div class="mt-1 input-group">
+				<InputText 
+					type="@txtType" 
+					id="password" 
+					@bind-Value="request.Password" 
+					class="form-control" />
+				<button type="button" class="input-group-text oi oi-eye top-0" @onclick="ShowPassword"></button>
+			</div>
+		</div>
+		<ValidationMessage For="() => request.Password" />
+		<div class="mb-3">
+			<label for="confirmPassword">Confirm Password</label>
+			<div class="mt-1 input-group">
+				<InputText 
+					type="@txtConfirmType"
+					id="confirmPassword" 
+					@bind-Value="request.ConfirmPassword" 
+					class="form-control" />
+				<button type="button" class="input-group-text oi oi-eye top-0" @onclick="ShowConfirmPassword"></button>
+			</div>
+		</div>
+		<ValidationMessage For="() => request.ConfirmPassword" />
+
+		<div class="ms-auto">
+			<button type="submit" class="btn btn-primary">Apply</button>
+		</div>
+		<div class="@messageCssClass">
+			<span>@message</span>
+		</div>
+	</EditForm>
+</div>
+
+@code {
+	UserChangePassword request = new UserChangePassword();
+	string message = string.Empty;
+	string messageCssClass = string.Empty;
+	string txtType = "password";
+	string txtConfirmType = "password";
+
+	private async Task ChangePassword()
+	{
+		var result = await authService.ChangePassword(request);
+
+		message = result.Message;
+		messageCssClass = result.Success ? "text-success" : "text-danger";
+	}
+
+	private void ShowPassword()
+	{
+		if (txtType == "password")
+		{
+			txtType = "text";
+		} else
+		{
+			txtType = "password";
+		}
+	}			
+
+	private void ShowConfirmPassword()
+	{
+		if(txtConfirmType == "password")
+		{
+			txtConfirmType = "text";
+		} else
+		{
+			txtConfirmType = "password";
+		}
+	}
+}

@@ -8,7 +8,7 @@ public class CartRepository : Repository<CartItem>, ICartRepository
 	private readonly AppDbContext _db;
 
 	public CartRepository(AppDbContext db) : base(db)
-    {
+	{
 		_db = db;
 	}
 
@@ -16,13 +16,13 @@ public class CartRepository : Repository<CartItem>, ICartRepository
 	{
 		var result = new List<CartProductDto>();
 
-		foreach (var cartItem in cartItems)
+		foreach(var cartItem in cartItems)
 		{
 			var product = await _db.Products
 					.Where(p => p.Id == cartItem.ProductId)
 					.FirstOrDefaultAsync();
 
-			if (product == null)
+			if(product == null)
 			{
 				continue;
 			}
@@ -33,7 +33,7 @@ public class CartRepository : Repository<CartItem>, ICartRepository
 					.Include(v => v.ProductType)
 					.FirstOrDefaultAsync();
 
-			if (productVariant == null)
+			if(productVariant == null)
 			{
 				continue;
 			}
@@ -49,7 +49,7 @@ public class CartRepository : Repository<CartItem>, ICartRepository
 				Quantity = cartItem.Quantity,
 			};
 
-			result.Add(carProduct);	
+			result.Add(carProduct);
 		}
 		return result.AsEnumerable();
 	}
