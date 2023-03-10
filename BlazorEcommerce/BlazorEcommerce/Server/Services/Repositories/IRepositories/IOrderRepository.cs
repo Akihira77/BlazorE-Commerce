@@ -2,7 +2,7 @@
 
 public interface IOrderRepository : IRepository<Order>
 {
-	Order PlaceOrder(IEnumerable<CartProductDto> cartProducts);
+	Order PlaceOrder(IEnumerable<CartProductDto> cartProducts, int? userId = null);
 	Task<IEnumerable<OrderOverviewDto>> GetOrders();
 	Task<OrderDetailsDto> GetOrderDetails(int orderId);
 }

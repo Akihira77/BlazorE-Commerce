@@ -1,5 +1,5 @@
 ﻿@page "/orders/{orderId:int}"
-@inject IOrderService orderService
+@inject IUnitOfService unitOfService
 @attribute [Authorize]
 
 @if(order == null)
@@ -7,9 +7,9 @@
 	<span>Loading order...</span>
 } else
 {
-	<h3>Order from @order.OrderDate.ToLongDateString()</h3>
+	<h3>Order from @order.OrderDate.ToString("f")</h3>
 
-	<div>
+	<div class="pb-5">
 		@foreach(var product in order.Products)
 		{
 			<div class="container d-flex p-1">
@@ -45,6 +45,6 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		order = await orderService.GetOrderDetails(OrderId);
+		order = await unitOfService.Order.GetOrderDetails(OrderId);
 	}
 }

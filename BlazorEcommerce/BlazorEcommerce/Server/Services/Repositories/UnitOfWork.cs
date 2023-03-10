@@ -1,6 +1,5 @@
 ﻿using BlazorEcommerce.Server.Data;
 using BlazorEcommerce.Server.Services.Repositories.IRepositories;
-using System.Security.Claims;
 
 namespace BlazorEcommerce.Server.Services.Repositories;
 
@@ -13,6 +12,7 @@ public class UnitOfWork : IUnitOfWork
 	public ICartRepository Cart { get; private set; }
 	public IAuthRepository Auth { get; private set; }
 	public IOrderRepository Order { get; private set; }
+	public IPaymentRepository Payment { get; private set; }
 	public UnitOfWork(AppDbContext db, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
 	{
 		_db = db;
@@ -21,6 +21,7 @@ public class UnitOfWork : IUnitOfWork
 		Auth = new AuthRepository(_db, configuration, httpContextAccessor);
 		Cart = new CartRepository(_db, Auth);
 		Order = new OrderRepository(_db, Auth);
+		Payment = new PaymentRepository(Cart, Auth, Order);
 	}
 	public async Task Save() => await _db.SaveChangesAsync();
 }

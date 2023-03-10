@@ -1,9 +1,8 @@
 ﻿@page "/cart"
-@inject ICartService cartService
+@inject IUnitOfService unitOfService
+@inject NavigationManager navigationManager
 @inject IBlazorHistoryService blazorHistory
 @inject AuthenticationStateProvider authenticationStateProvider
-@inject NavigationManager navigationManager
-@inject IOrderService orderService
 @attribute [Authorize]
 
 <PageTitle>Shopping Cart</PageTitle>
@@ -13,10 +12,12 @@
 @if(cartProducts == null || !cartProducts.Any())
 {
 	<span>@message</span>
-} else if (orderPlaced)
+} 
+@*else if (orderPlaced)
 {
 	<span>Thank you for your order! You can check your orders <a href="orders" class="link-primary text-decoration-underline">here</a></span>
-} else
+} *@
+else
 {
 	<div class="pb-5">
 		@foreach(var product in cartProducts)
@@ -60,7 +61,7 @@
 				Back
 			</button >
 			<button class="btn btn-primary px-4 mr-2" @onclick="PlaceOrder">
-				Place Order
+				Checkout
 			</button>
 		</div>
 	</div>
@@ -69,11 +70,11 @@
 @code {
 	IEnumerable<CartProductDto>? cartProducts;
 	string message = "Loading cart...";
-	bool orderPlaced = false;
+	//bool orderPlaced = false;
 
 	protected override async Task OnInitializedAsync()
 	{
-		orderPlaced = false;
+		//orderPlaced = false;
 		await LoadCart();
 	}
 
@@ -84,14 +85,14 @@
 
 	private async Task RemoveItemFromCart(int productId, int productTypeId)
 	{
-		await cartService.RemoveItemFromCart(productId, productTypeId);
+		await unitOfService.Cart.RemoveItemFromCart(productId, productTypeId);
 		await LoadCart();
 	}
 
 	private async Task LoadCart()
 	{
 		//await cartService.GetCartItemsCount();
-		cartProducts = await cartService.GetCartProducts();
+		cartProducts = await unitOfService.Cart.GetCartProducts();
 		if(cartProducts == null || cartProducts.Count() == 0) {
 			message = "Your cart is empty";
 		}
@@ -101,15 +102,19 @@
 	{
 		var quantity = int.Parse(e.Value.ToString());
 		if (quantity > 0) {
-			await cartService.UpdateQuantity(product, quantity);
+			await unitOfService.Cart.UpdateQuantity(product, quantity);
 		}
 		await LoadCart();
 	}
 
 	private async Task PlaceOrder()
 	{
-		await orderService.PlaceOrder();
-		await cartService.GetCartItemsCount();
-		orderPlaced = true;
+		string url = await unitOfService.Order.PlaceOrder();
+		navigationManager.NavigateTo(url);
+
+
+		// because we redirect to stripe page we dont need this 
+		//await cartService.GetCartItemsCount();
+		//orderPlaced = true;
 	}
 }

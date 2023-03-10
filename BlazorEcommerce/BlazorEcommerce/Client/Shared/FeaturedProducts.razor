@@ -1,19 +1,19 @@
-﻿@inject IProductService productRepository
+﻿@inject IUnitOfService unitOfService
 @implements IDisposable
 
 <div>
 	<h2 class="text-center">
-		Top Products of Today
+		Top Products of this Month
 	</h2>
 </div>
 
-@if(!productRepository.Products.Any())
+@if(!unitOfService.Product.Products.Any())
 {
-	<span>@productRepository.Message</span>
+	<span>@unitOfService.Product.Message</span>
 } else
 {
 	<div class="container">
-		@foreach(var product in productRepository.Products)
+		@foreach(var product in unitOfService.Product.Products)
 		{
 			@if(product.Featured)
 			{
@@ -44,11 +44,11 @@
 @code {
 	protected override void OnInitialized()
 	{
-		productRepository.ProductsChanged += StateHasChanged;
+		unitOfService.Product.ProductsChanged += StateHasChanged;
 	}
 
 	public void Dispose()
 	{
-		productRepository.ProductsChanged -= StateHasChanged;
+		unitOfService.Product.ProductsChanged -= StateHasChanged;
 	}
 }

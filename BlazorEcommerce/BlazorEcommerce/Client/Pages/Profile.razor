@@ -1,7 +1,7 @@
 ﻿@page "/profile"
-@attribute [Authorize]
-@inject IAuthService authService
+@inject IUnitOfService unitOfService
 @inject NavigationManager navigationManager
+@attribute [Authorize]
 
 <AuthorizeView>
 	<h3>Hi! You're logged in with <i>@context.User.Identity.Name</i>.</h3>
@@ -56,7 +56,7 @@
 
 	private async Task ChangePassword()
 	{
-		var result = await authService.ChangePassword(request);
+		var result = await unitOfService.Auth.ChangePassword(request);
 
 		message = result.Message;
 		messageCssClass = result.Success ? "text-success" : "text-danger";

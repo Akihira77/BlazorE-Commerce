@@ -1,7 +1,7 @@
 ﻿@page "/"
 @page "/{categoryUrl}"
 @page "/search/{searchText}/{page:int}"
-@inject IProductService productService
+@inject IUnitOfService unitOfService
 
 <PageTitle>My Shop</PageTitle>
 
@@ -27,10 +27,10 @@
 	{
 		if (SearchText != null)
 		{
-			await productService.SearchProducts(SearchText, Page);
+			await unitOfService.Product.SearchProducts(SearchText, Page);
 		} else
 		{
-			await productService.GetProducts(categoryUrl);
+			await unitOfService.Product.GetProducts(categoryUrl);
 		}
 	}
 }

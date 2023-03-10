@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-
-namespace BlazorEcommerce.Client.Services.OrderService;
+﻿namespace BlazorEcommerce.Client.Services.Repository;
 
 public class OrderService : IOrderService
 {
@@ -25,8 +23,11 @@ public class OrderService : IOrderService
 		return result.Data.ToList();
 	}
 
-	public async Task PlaceOrder()
+	public async Task<string> PlaceOrder()
 	{
-		await _http.PostAsync("api/v1/order", null);
+		// await _http.PostAsync("api/v1/order", null);
+		var result = await _http.PostAsync("api/v1/payment/checkout", null);
+		var url = await result.Content.ReadAsStringAsync();
+		return url;
 	}
 }

@@ -1,5 +1,5 @@
 ﻿@page "/register"
-@inject IAuthService authService
+@inject IUnitOfService unitOfService
 @inject NavigationManager navigationManager
 
 <PageTitle>Register</PageTitle>
@@ -55,7 +55,7 @@
 
 	async Task HandleRegistration()
 	{
-		var result = await authService.Register(user);
+		var result = await unitOfService.Auth.Register(user);
 		message = result.Message;
 		messageCssClass = result.Success ? "text-success" : "text-danger";
 	}

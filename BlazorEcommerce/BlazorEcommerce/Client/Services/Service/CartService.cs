@@ -1,6 +1,5 @@
 ﻿using Blazored.LocalStorage;
-
-namespace BlazorEcommerce.Client.Services.CartService;
+namespace BlazorEcommerce.Client.Services.Repository;
 
 public class CartService : ICartService
 {

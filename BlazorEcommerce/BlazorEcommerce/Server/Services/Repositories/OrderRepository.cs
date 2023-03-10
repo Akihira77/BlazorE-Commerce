@@ -83,14 +83,14 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 		return orderOverview.AsEnumerable();
 	}
 
-	public Order PlaceOrder(IEnumerable<CartProductDto> cartProducts)
+	public Order PlaceOrder(IEnumerable<CartProductDto> cartProducts, int? userId = null)
 	{
-		var products = cartProducts.ToList();
-		decimal totalPrice = products.Sum(p => p.Price * p.Quantity);
+		decimal totalPrice = 0;
 
 		var orderItems = new List<OrderItem>();
-		foreach(var product in products)
+		foreach(var product in cartProducts)
 		{
+			totalPrice += (product.Quantity * product.Price);
 			orderItems.Add(new OrderItem
 			{
 				ProductId = product.ProductId,
@@ -102,7 +102,7 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 
 		var order = new Order
 		{
-			UserId = _authRepository.GetUserId(),
+			UserId = ((int)(userId == 0 || userId == null? _authRepository.GetUserId() : userId)),
 			OrderDate = DateTime.Now,
 			TotalPrice = totalPrice,
 			OrderItems = orderItems
