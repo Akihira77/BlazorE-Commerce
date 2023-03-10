@@ -11,13 +11,19 @@ public class AuthRepository : Repository<User>, IAuthRepository
 {
 	private readonly AppDbContext _db;
 	private readonly IConfiguration _configuration;
+	private readonly IHttpContextAccessor _httpContextAccessor;
 
-	public AuthRepository(AppDbContext db, IConfiguration configuration) : base(db)
+	public AuthRepository(AppDbContext db
+		, IConfiguration configuration
+		, IHttpContextAccessor httpContextAccessor) : base(db)
 	{
 		_db = db;
 		_configuration = configuration;
+		_httpContextAccessor = httpContextAccessor;
 	}
 
+	public int GetUserId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+	
 	public async Task<string> Login(string email, string password)
 	{
 		string message = "";

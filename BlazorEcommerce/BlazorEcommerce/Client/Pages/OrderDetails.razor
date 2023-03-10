@@ -1,0 +1,50 @@
+﻿@page "/orders/{orderId:int}"
+@inject IOrderService orderService
+@attribute [Authorize]
+
+@if(order == null)
+{
+	<span>Loading order...</span>
+} else
+{
+	<h3>Order from @order.OrderDate.ToLongDateString()</h3>
+
+	<div>
+		@foreach(var product in order.Products)
+		{
+			<div class="container d-flex p-1">
+				<div class="image-wrapper text-center">
+					<img src="@product.ImageUrl" class="image"/>
+				</div>
+				<div class="name flex-grow-1 p-1">
+					<h5>
+						<a href="/product/@product.ProductId" class="link-primary text-decoration-underline">
+							@product.Title
+						</a>
+					</h5>
+					<span>@product.ProductType</span>
+					<br />
+					<span>Quantity: @product.Quantity</span>
+				</div>
+				<div class="product-price">
+					$@product.TotalPrice
+				</div>
+			</div>
+		}
+		<div class="product-price mt-5 me-5">
+			Total: $@order.TotalPrice
+		</div>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public int OrderId { get; set; }
+
+	OrderDetailsDto order = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		order = await orderService.GetOrderDetails(OrderId);
+	}
+}

@@ -7,4 +7,5 @@ public interface IAuthRepository : IRepository<User>
 	Task<string> Login(string email, string password);
 	Task<User> ChangePassword(int userId, string newPassword);
 	void Update(User user);
+	int GetUserId();
 }

@@ -1,0 +1,26 @@
+﻿/*.container {
+	display : flex;
+	padding : 6px;
+	border : 1px solid;
+	border-color : lightgray;
+	border-radius : 6px;
+	margin-bottom : 10px;
+}*/
+
+.image-wrapper {
+	width : 150px;
+}
+
+.image {
+	max-height : 150px;
+	max-width : 150px;
+}
+
+/*.details {
+	flex-grow : 1;
+	padding : 6px;
+}*/
+
+.order-price {
+	font-size : 1.2em;
+}

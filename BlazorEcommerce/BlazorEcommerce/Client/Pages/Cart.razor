@@ -3,68 +3,77 @@
 @inject IBlazorHistoryService blazorHistory
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
+@inject IOrderService orderService
 @attribute [Authorize]
 
 <PageTitle>Shopping Cart</PageTitle>
 
 <h3>Shopping Cart</h3>
 
-	@if(cartProducts == null || !cartProducts.Any())
-	{
-		<span>@message</span>
-	} else
-	{
-		<div>
-			@foreach(var product in cartProducts)
-			{
-				<div class="container">
-					<div class="image-wrapper">
-						<img 
-							src="@product.ImageUrl"
-							alt="@product.Title"
-							class="image"/>
-					</div>
-					<div class="name">
-						<h5>
-							<a class="text-decoration-underline text-primary" href="/product/@product.ProductId">
-								@product.Title
-							</a>
-						</h5>
-						<span>@product.ProductType</span>
-						<div class="d-flex gap-3 mt-2">
-							<input class="form-control input-quantity"
-							   type="number"
-							   value="@product.Quantity"
-								   @onchange="@((ChangeEventArgs e) => UpdateQuantity(product, e))"
-							   min="1" />
-							<button class="btn btn-outline-danger"
-							@onclick="@(() => RemoveProductFromCart(product.ProductId, product.ProductTypeId))">
-								<i class="oi oi-trash"></i>
-							</button>
-						</div>
-					</div>
-					<div class="cart-product-price">
-						@product.Quantity * $@product.Price
+@if(cartProducts == null || !cartProducts.Any())
+{
+	<span>@message</span>
+} else if (orderPlaced)
+{
+	<span>Thank you for your order! You can check your orders <a href="orders" class="link-primary text-decoration-underline">here</a></span>
+} else
+{
+	<div class="pb-5">
+		@foreach(var product in cartProducts)
+		{
+			<div class="container">
+				<div class="image-wrapper">
+					<img 
+						src="@product.ImageUrl"
+						alt="@product.Title"
+						class="image"/>
+				</div>
+				<div class="name">
+					<h5>
+						<a class="text-decoration-underline text-primary" href="/product/@product.ProductId">
+							@product.Title
+						</a>
+					</h5>
+					<span>@product.ProductType</span>
+					<div class="d-flex gap-3 mt-2">
+						<input class="form-control input-quantity"
+							type="number"
+							value="@product.Quantity"
+								@onchange="@((ChangeEventArgs e) => UpdateQuantity(product, e))"
+							min="1" />
+						<button class="btn btn-outline-danger"
+					@onclick="@(() => RemoveItemFromCart(product.ProductId, product.ProductTypeId))">
+							<i class="oi oi-trash"></i>
+						</button>
 					</div>
 				</div>
-			}
-			<div class="cart-product-price">
-				<button class="btn btn-success btn-back px-4 mr-2" @onclick="Back">
-					Back
-				</button>
-
-				Total : $@cartProducts.Sum(product => product.Price * product.Quantity)
+				<div class="cart-product-price">
+					@product.Quantity * $@product.Price
+				</div>
 			</div>
-		
+		}
+		<div class="cart-product-price">
+			Total : $@cartProducts.Sum(product => product.Price * product.Quantity)
 		</div>
-	}
+		<div class="d-flex justify-content-end mt-5">
+			<button class="btn btn-success px-4 mr-2" @onclick="Back">
+				Back
+			</button >
+			<button class="btn btn-primary px-4 mr-2" @onclick="PlaceOrder">
+				Place Order
+			</button>
+		</div>
+	</div>
+}
 
 @code {
 	IEnumerable<CartProductDto>? cartProducts;
 	string message = "Loading cart...";
+	bool orderPlaced = false;
 
 	protected override async Task OnInitializedAsync()
 	{
+		orderPlaced = false;
 		await LoadCart();
 	}
 
@@ -73,22 +82,18 @@
 		await blazorHistory.Back();
 	}
 
-	private async Task RemoveProductFromCart(int productId, int productTypeId)
+	private async Task RemoveItemFromCart(int productId, int productTypeId)
 	{
-		await cartService.RemoveProductFromCart(productId, productTypeId);
+		await cartService.RemoveItemFromCart(productId, productTypeId);
 		await LoadCart();
 	}
 
 	private async Task LoadCart()
 	{
-		if(!(await cartService.GetCartItems()).Any())
-		{
+		//await cartService.GetCartItemsCount();
+		cartProducts = await cartService.GetCartProducts();
+		if(cartProducts == null || cartProducts.Count() == 0) {
 			message = "Your cart is empty";
-			cartProducts = null;
-		} else
-		{
-			var carts = await cartService.GetCartProducts();
-			cartProducts = carts;
 		}
 	}
 
@@ -99,5 +104,12 @@
 			await cartService.UpdateQuantity(product, quantity);
 		}
 		await LoadCart();
+	}
+
+	private async Task PlaceOrder()
+	{
+		await orderService.PlaceOrder();
+		await cartService.GetCartItemsCount();
+		orderPlaced = true;
 	}
 }

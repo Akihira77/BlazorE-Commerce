@@ -6,5 +6,6 @@ public interface IUnitOfWork
 	ICategoryRepository Category { get; }
 	ICartRepository Cart { get; }
 	IAuthRepository Auth { get; }
+	IOrderRepository Order { get; }
 	Task Save();
 }

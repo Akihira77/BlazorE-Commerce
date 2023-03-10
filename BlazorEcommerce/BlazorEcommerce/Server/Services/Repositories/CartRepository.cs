@@ -6,10 +6,12 @@ namespace BlazorEcommerce.Server.Services.Repositories;
 public class CartRepository : Repository<CartItem>, ICartRepository
 {
 	private readonly AppDbContext _db;
+	private readonly IAuthRepository _authRepository;
 
-	public CartRepository(AppDbContext db) : base(db)
+	public CartRepository(AppDbContext db, IAuthRepository authRepository) : base(db)
 	{
 		_db = db;
+		_authRepository = authRepository;
 	}
 
 	public async Task<IEnumerable<CartProductDto>> GetCartProducts(IEnumerable<CartItem> cartItems)
@@ -52,5 +54,24 @@ public class CartRepository : Repository<CartItem>, ICartRepository
 			result.Add(carProduct);
 		}
 		return result.AsEnumerable();
+	}
+
+	public IEnumerable<CartItem> StoreCartItems(IEnumerable<CartItem> cartItems)
+	{
+		int userId = _authRepository.GetUserId();
+		foreach(var item in cartItems)
+		{
+			item.UserId = userId;
+		}
+
+		return cartItems;
+	}
+
+	public async Task<int> GetCartItemsCount()
+	{
+		int userId = _authRepository.GetUserId();
+		var count = _db.CartItems.Where(ci => ci.UserId == userId).Sum(ci => ci.Quantity);
+
+		return count;
 	}
 }

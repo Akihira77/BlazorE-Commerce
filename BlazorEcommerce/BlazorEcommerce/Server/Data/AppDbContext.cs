@@ -9,6 +9,15 @@ public class AppDbContext : DbContext
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+		modelBuilder.Entity<OrderItem>()
+			.HasKey(oi =>
+			new
+			{
+				oi.OrderId,
+				oi.ProductId,
+				oi.ProductTypeId
+			});
+
 		modelBuilder.Entity<CartItem>()
 			.HasKey(ci =>
 			new
@@ -278,4 +287,6 @@ public class AppDbContext : DbContext
 	public DbSet<ProductVariant> ProductVariants { get; set; }
 	public DbSet<User> Users { get; set; }
 	public DbSet<CartItem> CartItems { get; set; }
+	public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Order> Orders { get; set; }
 }

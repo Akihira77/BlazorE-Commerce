@@ -4,6 +4,7 @@
 @inject ILocalStorageService localStorage
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject ISnackbar snackbar
+@inject ICartService cartService
 
 <PageTitle>Login</PageTitle>
 <EditForm class="container d-flex flex-column" Model="user" OnValidSubmit="HandleLogin">
@@ -43,6 +44,7 @@
 
 			await localStorage.SetItemAsync("authToken", result.Data);
 			await authenticationStateProvider.GetAuthenticationStateAsync();
+			await cartService.StoreCartItems(true);
 			await blazorHistory.Back();
 
 			snackbar.Add($"Welcome {user.Email}", Severity.Success);
