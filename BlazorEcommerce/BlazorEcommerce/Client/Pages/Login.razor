@@ -1,9 +1,10 @@
 ﻿@page "/login"
-@inject IUnitOfService unitOfService
+@inject IAuthService authService
 @inject IBlazorHistoryService blazorHistory
 @inject ILocalStorageService localStorage
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject ISnackbar snackbar
+@inject ICartService cartService
 
 <PageTitle>Login</PageTitle>
 <EditForm class="container d-flex flex-column" Model="user" OnValidSubmit="HandleLogin">
@@ -35,7 +36,7 @@
 
 	private async Task HandleLogin()
 	{
-		var result = await unitOfService.Auth.Login(user);
+		var result = await authService.Login(user);
 		snackbar.Configuration.SnackbarVariant = Variant.Text;
 		if (result.Success)
 		{
@@ -43,7 +44,7 @@
 
 			await localStorage.SetItemAsync("authToken", result.Data);
 			await authenticationStateProvider.GetAuthenticationStateAsync();
-			await unitOfService.Cart.StoreCartItems(true);
+			await cartService.StoreCartItems(true);
 			await blazorHistory.Back();
 
 			snackbar.Add($"Welcome {user.Email}", Severity.Success);

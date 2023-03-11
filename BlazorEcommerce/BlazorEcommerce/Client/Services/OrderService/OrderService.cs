@@ -1,4 +1,4 @@
-﻿namespace BlazorEcommerce.Client.Services.Repository;
+﻿namespace BlazorEcommerce.Client.Services.OrderService;
 
 public class OrderService : IOrderService
 {

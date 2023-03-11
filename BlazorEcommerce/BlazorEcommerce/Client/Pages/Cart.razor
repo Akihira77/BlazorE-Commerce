@@ -1,8 +1,9 @@
 ﻿@page "/cart"
-@inject IUnitOfService unitOfService
-@inject NavigationManager navigationManager
+@inject ICartService cartService
 @inject IBlazorHistoryService blazorHistory
 @inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navigationManager
+@inject IOrderService orderService
 @attribute [Authorize]
 
 <PageTitle>Shopping Cart</PageTitle>
@@ -85,14 +86,14 @@ else
 
 	private async Task RemoveItemFromCart(int productId, int productTypeId)
 	{
-		await unitOfService.Cart.RemoveItemFromCart(productId, productTypeId);
+		await cartService.RemoveItemFromCart(productId, productTypeId);
 		await LoadCart();
 	}
 
 	private async Task LoadCart()
 	{
 		//await cartService.GetCartItemsCount();
-		cartProducts = await unitOfService.Cart.GetCartProducts();
+		cartProducts = await cartService.GetCartProducts();
 		if(cartProducts == null || cartProducts.Count() == 0) {
 			message = "Your cart is empty";
 		}
@@ -102,14 +103,14 @@ else
 	{
 		var quantity = int.Parse(e.Value.ToString());
 		if (quantity > 0) {
-			await unitOfService.Cart.UpdateQuantity(product, quantity);
+			await cartService.UpdateQuantity(product, quantity);
 		}
 		await LoadCart();
 	}
 
 	private async Task PlaceOrder()
 	{
-		string url = await unitOfService.Order.PlaceOrder();
+		string url = await orderService.PlaceOrder();
 		navigationManager.NavigateTo(url);
 
 

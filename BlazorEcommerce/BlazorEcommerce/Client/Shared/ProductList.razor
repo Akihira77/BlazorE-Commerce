@@ -1,13 +1,13 @@
-﻿@inject IUnitOfService unitOfService
+﻿@inject IProductService productService
 @implements IDisposable
 
-@if (unitOfService.Product.Products == null 
-|| !unitOfService.Product.Products.Any())
+@if (productService.Products == null 
+|| !productService.Products.Any())
 {
-	<span>@unitOfService.Product.Message</span>
+	<span>@productService.Message</span>
 } else {
 	<ul class="list-unstyled">
-		@foreach(var item in unitOfService.Product.Products)
+		@foreach(var item in productService.Products)
 		{
 			<li class="media my-3">
 				<div class="media-img-wrapper mr-2">
@@ -27,12 +27,12 @@
 			</li>
 		}
 	</ul>
-	for(int i = 1; i <= unitOfService.Product.PageCount; i++)
+	for(int i = 1; i <= productService.PageCount; i++)
 	{
 		<a class="btn 
-			@(i == unitOfService.Product.CurrentPage ? "btn-info" : "btn-outline-info") 
+			@(i == productService.CurrentPage ? "btn-info" : "btn-outline-info") 
 			page-selection"
-			href="/search/@unitOfService.Product.LastSearchText/@i">
+			href="/search/@productService.LastSearchText/@i">
 			@i
 		</a>
 	}
@@ -40,12 +40,12 @@
 @code {
 	protected override void OnInitialized()
 	{
-		unitOfService.Product.ProductsChanged += StateHasChanged;
+		productService.ProductsChanged += StateHasChanged;
 	}
 
 	public void Dispose()
 	{
-		unitOfService.Product.ProductsChanged -= StateHasChanged;
+		productService.ProductsChanged -= StateHasChanged;
 	}
 
 	private string GetPriceText(Product product)

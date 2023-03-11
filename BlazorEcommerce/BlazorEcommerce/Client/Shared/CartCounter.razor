@@ -1,4 +1,4 @@
-﻿@inject IUnitOfService unitOfService
+﻿@inject ICartService cartService
 @inject ISyncLocalStorageService localStorage
 @implements IDisposable
 
@@ -21,11 +21,11 @@
 
 	protected override void OnInitialized()
 	{
-		unitOfService.Cart.OnChange += StateHasChanged;
+		cartService.OnChange += StateHasChanged;
 	}
 
 	public void Dispose()
 	{
-		unitOfService.Cart.OnChange -= StateHasChanged;
+		cartService.OnChange -= StateHasChanged;
 	}
 }

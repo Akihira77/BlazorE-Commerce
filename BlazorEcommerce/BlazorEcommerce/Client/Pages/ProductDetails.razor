@@ -1,6 +1,7 @@
 ﻿@page "/product/{id:int}"
-@inject IUnitOfService unitOfService
 @inject ISnackbar snackbar
+@inject IProductService productService
+@inject ICartService cartService
 @inject IBlazorHistoryService blazorHistory
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
@@ -85,7 +86,7 @@
 
 	protected override async Task OnParametersSetAsync()
 	{
-		var result = await unitOfService.Product.GetProduct(Id);
+		var result = await productService.GetProduct(Id);
 
 		message = result.Message;
 		if (result.Success)
@@ -114,7 +115,7 @@
 			ProductTypeId = productVariant.ProductTypeId
 		};
 
-		await unitOfService.Cart.AddToCart(cartItem);
+		await cartService.AddToCart(cartItem);
 
 		snackbar.Configuration.SnackbarVariant = Variant.Text;
 		snackbar.Configuration.MaxDisplayedSnackbars = 2;

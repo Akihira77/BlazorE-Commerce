@@ -1,5 +1,5 @@
 ﻿@page "/profile"
-@inject IUnitOfService unitOfService
+@inject IAuthService authService
 @inject NavigationManager navigationManager
 @attribute [Authorize]
 
@@ -56,7 +56,7 @@
 
 	private async Task ChangePassword()
 	{
-		var result = await unitOfService.Auth.ChangePassword(request);
+		var result = await authService.ChangePassword(request);
 
 		message = result.Message;
 		messageCssClass = result.Success ? "text-success" : "text-danger";

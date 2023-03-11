@@ -1,5 +1,5 @@
 ﻿@page "/orders"
-@inject IUnitOfService unitOfService
+@inject IOrderService orderService
 @attribute [Authorize]
 
 @if(orders == null)
@@ -32,6 +32,6 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		orders = await unitOfService.Order.GetOrders();
+		orders = await orderService.GetOrders();
 	}
 }

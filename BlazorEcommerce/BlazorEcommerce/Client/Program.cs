@@ -1,5 +1,8 @@
-global using BlazorEcommerce.Client.Services.Repository;
-global using BlazorEcommerce.Client.Services.Repository.IRepository;
+global using BlazorEcommerce.Client.Services.OrderService;
+global using BlazorEcommerce.Client.Services.AuthService;
+global using BlazorEcommerce.Client.Services.CartService;
+global using BlazorEcommerce.Client.Services.CategoryService;
+global using BlazorEcommerce.Client.Services.ProductService;
 global using BlazorEcommerce.Shared;
 global using BlazorEcommerce.Shared.Dto;
 global using BlazorEcommerce.Shared.Models;
@@ -22,7 +25,12 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazorHistoryService();
-builder.Services.AddScoped<IUnitOfService, UnitOfService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IOrderService, OrderService>();	
+//builder.Services.AddScoped<IUnitOfService, UnitOfService>();
 builder.Services.AddScoped<LazyAssemblyLoader>();
 
 builder.Services.AddMudServices(config =>

@@ -1,4 +1,4 @@
-﻿namespace BlazorEcommerce.Client.Services.Repository.IRepository;
+﻿namespace BlazorEcommerce.Client.Services.CategoryService;
 
 public interface ICategoryService
 {

@@ -1,5 +1,5 @@
 ﻿@page "/order-success"
-@inject IUnitOfService unitOfService
+@inject ICartService cartService
 
 <PageTitle>Thank you!</PageTitle>
 
@@ -10,6 +10,6 @@
 @code {
 	protected override async Task OnInitializedAsync()
 	{
-		await unitOfService.Cart.GetCartItemsCount();
+		await cartService.GetCartItemsCount();
 	}
 }
