@@ -15,28 +15,6 @@ public class OrderController : ControllerBase
 		_unitOfWork = unitOfWork;
 	}
 
-	[HttpPost]
-	public async Task<ActionResult<ServiceResponse<bool>>> PlaceOrder()
-	{
-		var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-		var cartItems = await _unitOfWork.Cart.GetAll((c => c.UserId == userId));
-		var cartProducts = await _unitOfWork.Cart.GetCartProducts(cartItems);
-
-		var order = _unitOfWork.Order.PlaceOrder(cartProducts);
-		await _unitOfWork.Order.Add(order);
-
-		_unitOfWork.Cart.RemoveRange(cartItems);
-		await _unitOfWork.Save();
-
-		var response = new ServiceResponse<bool>
-		{
-			Data = true,
-			Message = "Placing order success"
-		};
-
-		return Ok(response);
-	}
-
 	[HttpGet]
 	public async Task<ActionResult<ServiceResponse<IEnumerable<OrderOverviewDto>>>> GetOrders()
 	{

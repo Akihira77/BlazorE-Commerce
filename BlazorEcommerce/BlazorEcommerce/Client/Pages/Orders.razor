@@ -17,7 +17,7 @@
 			</div>
 			<div class="details flex-grow-1 p-1 d-flex flex-column">
 				<h4>@order.Product</h4>
-				<span>@order.OrderDate.ToLongDateString()</span><br />
+				<span>@order.OrderDate.ToString("f")</span><br />
 				<a class="align-items-bottom link-primary text-decoration-underline" href="orders/@order.Id">Show more...</a>
 			</div>
 			<div class="order-price fw-bold text-end pt-3 pe-3">

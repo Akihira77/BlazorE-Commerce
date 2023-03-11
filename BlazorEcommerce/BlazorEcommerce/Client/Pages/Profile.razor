@@ -1,7 +1,7 @@
 ﻿@page "/profile"
-@attribute [Authorize]
 @inject IAuthService authService
 @inject NavigationManager navigationManager
+@attribute [Authorize]
 
 <AuthorizeView>
 	<h3>Hi! You're logged in with <i>@context.User.Identity.Name</i>.</h3>

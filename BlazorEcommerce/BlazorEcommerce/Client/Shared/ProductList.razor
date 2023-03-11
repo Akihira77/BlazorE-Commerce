@@ -1,13 +1,13 @@
-﻿@inject IProductService productRepository
+﻿@inject IProductService productService
 @implements IDisposable
 
-@if (productRepository.Products == null 
-|| !productRepository.Products.Any())
+@if (productService.Products == null 
+|| !productService.Products.Any())
 {
-	<span>@productRepository.Message</span>
+	<span>@productService.Message</span>
 } else {
 	<ul class="list-unstyled">
-		@foreach(var item in productRepository.Products)
+		@foreach(var item in productService.Products)
 		{
 			<li class="media my-3">
 				<div class="media-img-wrapper mr-2">
@@ -27,12 +27,12 @@
 			</li>
 		}
 	</ul>
-	for(int i = 1; i <= productRepository.PageCount; i++)
+	for(int i = 1; i <= productService.PageCount; i++)
 	{
 		<a class="btn 
-			@(i == productRepository.CurrentPage ? "btn-info" : "btn-outline-info") 
+			@(i == productService.CurrentPage ? "btn-info" : "btn-outline-info") 
 			page-selection"
-			href="/search/@productRepository.LastSearchText/@i">
+			href="/search/@productService.LastSearchText/@i">
 			@i
 		</a>
 	}
@@ -40,12 +40,12 @@
 @code {
 	protected override void OnInitialized()
 	{
-		productRepository.ProductsChanged += StateHasChanged;
+		productService.ProductsChanged += StateHasChanged;
 	}
 
 	public void Dispose()
 	{
-		productRepository.ProductsChanged -= StateHasChanged;
+		productService.ProductsChanged -= StateHasChanged;
 	}
 
 	private string GetPriceText(Product product)

@@ -21,7 +21,7 @@ public class AuthRepository : Repository<User>, IAuthRepository
 		_configuration = configuration;
 		_httpContextAccessor = httpContextAccessor;
 	}
-
+	public string GetUserEmail() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
 	public int GetUserId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
 	
 	public async Task<string> Login(string email, string password)
@@ -128,5 +128,10 @@ public class AuthRepository : Repository<User>, IAuthRepository
 	public void Update(User user)
 	{
 		_db.Users.Update(user);
+	}
+
+	public async Task<User> GetUserByEmail(string email)
+	{
+		return await _db.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
 	}
 }

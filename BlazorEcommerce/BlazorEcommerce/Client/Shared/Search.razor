@@ -1,5 +1,5 @@
 ﻿@inject NavigationManager navigationManager
-@inject IProductService productRepository
+@inject IProductService productService
 
 <div class="input-group">
 	<input 
@@ -52,7 +52,7 @@
 			SearchProucts();
 		} else if (searchText.Length > 1)
 		{
-			var sug = await productRepository.SearchProductSuggestion(searchText);
+			var sug = await productService.SearchProductSuggestion(searchText);
 			suggestions = sug.ToList();
 		}
 	}

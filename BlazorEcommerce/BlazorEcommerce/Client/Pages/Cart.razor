@@ -13,10 +13,12 @@
 @if(cartProducts == null || !cartProducts.Any())
 {
 	<span>@message</span>
-} else if (orderPlaced)
+} 
+@*else if (orderPlaced)
 {
 	<span>Thank you for your order! You can check your orders <a href="orders" class="link-primary text-decoration-underline">here</a></span>
-} else
+} *@
+else
 {
 	<div class="pb-5">
 		@foreach(var product in cartProducts)
@@ -60,7 +62,7 @@
 				Back
 			</button >
 			<button class="btn btn-primary px-4 mr-2" @onclick="PlaceOrder">
-				Place Order
+				Checkout
 			</button>
 		</div>
 	</div>
@@ -69,11 +71,11 @@
 @code {
 	IEnumerable<CartProductDto>? cartProducts;
 	string message = "Loading cart...";
-	bool orderPlaced = false;
+	//bool orderPlaced = false;
 
 	protected override async Task OnInitializedAsync()
 	{
-		orderPlaced = false;
+		//orderPlaced = false;
 		await LoadCart();
 	}
 
@@ -108,8 +110,12 @@
 
 	private async Task PlaceOrder()
 	{
-		await orderService.PlaceOrder();
-		await cartService.GetCartItemsCount();
-		orderPlaced = true;
+		string url = await orderService.PlaceOrder();
+		navigationManager.NavigateTo(url);
+
+
+		// because we redirect to stripe page we dont need this 
+		//await cartService.GetCartItemsCount();
+		//orderPlaced = true;
 	}
 }
