@@ -3,6 +3,7 @@ global using BlazorEcommerce.Client.Services.AuthService;
 global using BlazorEcommerce.Client.Services.CartService;
 global using BlazorEcommerce.Client.Services.CategoryService;
 global using BlazorEcommerce.Client.Services.ProductService;
+global using BlazorEcommerce.Client.Services.AddressService;
 global using BlazorEcommerce.Shared;
 global using BlazorEcommerce.Shared.Dto;
 global using BlazorEcommerce.Shared.Models;
@@ -30,7 +31,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();	
-//builder.Services.AddScoped<IUnitOfService, UnitOfService>();
+builder.Services.AddScoped<IAddressService, AddressService>();	
 builder.Services.AddScoped<LazyAssemblyLoader>();
 
 builder.Services.AddMudServices(config =>

@@ -35,6 +35,7 @@ builder.Services
 			ValidateAudience = false,
 		};
 	});
+builder.Services.AddMemoryCache();
 
 builder.Services.AddHttpContextAccessor();
 

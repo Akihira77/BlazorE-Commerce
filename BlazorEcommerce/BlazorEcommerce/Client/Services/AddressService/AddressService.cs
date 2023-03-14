@@ -1,0 +1,27 @@
+﻿namespace BlazorEcommerce.Client.Services.AddressService;
+
+public class AddressService : IAddressService
+{
+	private readonly HttpClient _http;
+
+	public AddressService(HttpClient http)
+    {
+		_http = http;
+	}
+    public async Task<Address> AddOrUpdateAddress(Address address)
+	{
+		var response = await _http.PostAsJsonAsync("api/v1/address", address);
+
+		return response
+			.Content
+			.ReadFromJsonAsync
+			<ServiceResponse<Address>>().Result.Data;
+	}
+
+	public async Task<Address> GetAddress()
+	{
+		var response = await _http.GetFromJsonAsync<ServiceResponse<Address>>("api/v1/address");
+
+		return response.Data;
+	}
+}

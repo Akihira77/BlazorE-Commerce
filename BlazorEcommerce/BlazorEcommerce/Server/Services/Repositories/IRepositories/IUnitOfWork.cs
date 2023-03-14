@@ -8,5 +8,6 @@ public interface IUnitOfWork
 	IAuthRepository Auth { get; }
 	IOrderRepository Order { get; }
 	IPaymentRepository Payment { get; }
+	IAddressRepository Address { get; }
 	Task Save();
 }

@@ -13,7 +13,8 @@ public class UnitOfWork : IUnitOfWork
 	public IAuthRepository Auth { get; private set; }
 	public IOrderRepository Order { get; private set; }
 	public IPaymentRepository Payment { get; private set; }
-	public UnitOfWork(AppDbContext db, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+    public IAddressRepository Address { get; set; }
+    public UnitOfWork(AppDbContext db, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
 	{
 		_db = db;
 		Product = new ProductRepository(_db);
@@ -22,6 +23,7 @@ public class UnitOfWork : IUnitOfWork
 		Cart = new CartRepository(_db, Auth);
 		Order = new OrderRepository(_db, Auth);
 		Payment = new PaymentRepository(Cart, Auth, Order);
+		Address = new AddressRepository(_db);
 	}
 	public async Task Save() => await _db.SaveChangesAsync();
 }

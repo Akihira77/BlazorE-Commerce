@@ -57,6 +57,10 @@ else
 		<div class="cart-product-price">
 			Total : $@cartProducts.Sum(product => product.Price * product.Quantity)
 		</div>
+		<div>
+			<h5>Delivery Address</h5>
+			<AddressForm />
+		</div>
 		<div class="d-flex justify-content-end mt-5">
 			<button class="btn btn-success px-4 mr-2" @onclick="Back">
 				Back

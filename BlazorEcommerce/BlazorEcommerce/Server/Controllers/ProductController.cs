@@ -1,5 +1,7 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+using BlazorEcommerce.Shared;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BlazorEcommerce.Server.Controllers;
 [Route("api/v1/[controller]")]
@@ -7,10 +9,12 @@ namespace BlazorEcommerce.Server.Controllers;
 public class ProductController : ControllerBase
 {
 	private readonly IUnitOfWork _unitOfWork;
+	private readonly IMemoryCache _memoryCache;
 
-	public ProductController(IUnitOfWork unitOfWork)
+	public ProductController(IUnitOfWork unitOfWork, IMemoryCache memoryCache)
 	{
 		_unitOfWork = unitOfWork;
+		_memoryCache = memoryCache;
 	}
 
 	[HttpGet("Get-all-products")]
@@ -50,15 +54,30 @@ public class ProductController : ControllerBase
 	[HttpGet("Get-products-from/{categoryUrl}")]
 	public async Task<ActionResult<ServiceResponse<IEnumerable<Product>>>> GetProductsBy(string categoryUrl)
 	{
-		var result = await _unitOfWork.Product
-				.GetAll((p => p.Category.Url.ToLower().Equals(categoryUrl))
-						, includeProperties: "Variants");
+		IEnumerable<Product> result;
+		var productsByCategory = _memoryCache.TryGetValue(categoryUrl, out result);
 
 		var response = new ServiceResponse<IEnumerable<Product>>()
 		{
-			Data = result,
-			Message = "Product List"
+			Message = $"Product list by category {categoryUrl}"
 		};
+
+		if(productsByCategory)
+		{
+			response.Message = $"Product list by category {categoryUrl} from cache";
+		} else
+		{
+			result = await _unitOfWork.Product
+					.GetAll((p => p.Category.Url.ToLower().Equals(categoryUrl))
+							, includeProperties: "Variants");
+
+			var cacheEntryOptions = new MemoryCacheEntryOptions()
+			.SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+			_memoryCache.Set(categoryUrl, result, cacheEntryOptions);
+		}
+
+		response.Data = result;
 		return Ok(response);
 	}
 
@@ -91,13 +110,28 @@ public class ProductController : ControllerBase
 	[HttpGet("featured")]
 	public async Task<ActionResult<ServiceResponse<IEnumerable<Product>>>> GetFeaturedProducts()
 	{
-		var result = await _unitOfWork.Product.GetAll((p => p.Featured), includeProperties: "Variants");
+		IEnumerable<Product> result;
 
 		var response = new ServiceResponse<IEnumerable<Product>>()
 		{
-			Data = result,
 			Message = "Product featured List"
 		};
+
+		var featuredProductCache = _memoryCache.TryGetValue(CacheKeys.FeaturedCacheKey, out result);
+
+		if(featuredProductCache)
+		{
+			response.Message = "Product featured cache list";
+		} else
+		{
+			result = await _unitOfWork.Product.GetAll((p => p.Featured), includeProperties: "Variants");
+
+			var cacheEntryOptions = new MemoryCacheEntryOptions()
+						.SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+			_memoryCache.Set(CacheKeys.FeaturedCacheKey, result, cacheEntryOptions);
+		}
+		response.Data = result;
 		return Ok(response);
 	}
 }
