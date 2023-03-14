@@ -1,0 +1,85 @@
+﻿@page "/admin/product-types"
+@inject IProductTypeService productTypeService
+@implements IDisposable
+@attribute [Authorize(Roles = "Admin")]
+
+@foreach(var productType in productTypeService.ProductTypes)
+{
+	@if(productType.Editing)
+	{
+		<EditForm Model="editingProductType" OnSubmit="UpdateProductType">
+			<div class="row">
+				<div class="col">
+					<InputText @bind-Value="editingProductType.Name" class="form-control"></InputText>
+				</div>
+				<div class="col">
+					<button type="submit" class="btn btn-success">
+						<i class="oi oi-cloud-upload"></i>
+					</button>
+					<button class="btn btn-danger" @onclick="CancelEditing">
+						<i class="oi oi-circle-x"></i>
+					</button>
+				</div>
+			</div>
+		</EditForm>
+	} else
+	{
+		<div class="row">
+			<div class="col">
+				@productType.Name
+			</div>
+			<div class="col">
+				<button class="btn btn-primary" @onclick=@(() => EditProductType(productType))>
+					<i class="oi oi-pencil"></i>
+				</button>
+
+			</div>
+		</div>
+	}
+}
+<button class="btn btn-primary my-5" @onclick="CreateNewProductType">
+	<i class="oi oi-plus"></i> Add new Product Type
+</button>
+
+@code {
+	ProductType editingProductType = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await productTypeService.GetProductTypes();
+		productTypeService.OnChange += StateHasChanged;
+	} 
+
+	private void EditProductType(ProductType productType)
+	{
+		productType.Editing = true;
+		editingProductType = productType;
+	}
+
+	private void CreateNewProductType()
+	{
+		editingProductType = productTypeService.CreateNewProductType();
+	}
+
+	private async Task UpdateProductType()
+	{
+		if (editingProductType.IsNew)
+		{
+			await productTypeService.AddProductTypes(editingProductType);
+		} else
+		{
+			await productTypeService.UpdateProductTypes(editingProductType);
+		}
+		editingProductType = new ProductType();
+	}
+	private async Task CancelEditing()
+	{
+		editingProductType = new ProductType();
+		await productTypeService.GetProductTypes();
+	}
+
+	public void Dispose()
+	{
+		productTypeService.OnChange -= StateHasChanged;
+	}
+}

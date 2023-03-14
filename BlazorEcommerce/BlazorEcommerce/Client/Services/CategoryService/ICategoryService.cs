@@ -1,8 +1,17 @@
-﻿namespace BlazorEcommerce.Client.Services.CategoryService;
+﻿using BlazorEcommerce.Shared.Models;
+
+namespace BlazorEcommerce.Client.Services.CategoryService;
 
 public interface ICategoryService
 {
+	event Action OnChange;
 	IEnumerable<Category> Categories { get; set; }
-	Task GetCategories();
+	List<Category> AdminCategories { get; set; }
 	Task<ServiceResponse<Category>> GetCategory(int id);
+	Task GetCategories();
+	Task GetAdminCategories();
+	Task AddCategory(Category category);
+	Task UpdateCategory(Category category);
+	Task DeleteCategory(int categoryId);
+	Category CreateNewCategory();
 }

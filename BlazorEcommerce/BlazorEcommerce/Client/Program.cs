@@ -10,6 +10,7 @@ global using BlazorEcommerce.Shared.Models;
 global using BlazorHistory;
 global using Microsoft.AspNetCore.Components.Authorization;
 global using System.Net.Http.Json;
+global using BlazorEcommerce.Client.Services.ProductTypeService;
 
 using BlazorEcommerce.Client;
 using Blazored.LocalStorage;
@@ -32,6 +33,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();	
 builder.Services.AddScoped<IAddressService, AddressService>();	
+builder.Services.AddScoped<IProductTypeService, ProductTypeService>();	
 builder.Services.AddScoped<LazyAssemblyLoader>();
 
 builder.Services.AddMudServices(config =>
