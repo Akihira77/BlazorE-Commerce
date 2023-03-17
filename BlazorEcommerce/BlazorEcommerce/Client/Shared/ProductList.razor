@@ -2,30 +2,29 @@
 @implements IDisposable
 
 @if (productService.Products == null 
-|| !productService.Products.Any())
+		|| !productService.Products.Any())
 {
 	<span>@productService.Message</span>
 } else {
 	<ul class="list-unstyled">
-		@foreach(var item in productService.Products)
-		{
+		<Virtualize Items="productService.Products" Context="product" SpacerElement="li">
 			<li class="media my-3">
 				<div class="media-img-wrapper mr-2">
-					<a href="/product/@item.Id">
-						<img class="media-img" src="@item.ImageUrl" alt="@item.Title" />
+					<a href="/product/@product.Id">
+						<img class="media-img" src="@product.ImageUrl" alt="@product.Title" />
 					</a>
 				</div>
 				<div class="media-body d-flex flex-column">
-					<a class="mb-1 text-decoration-underline text-primary" href="/product/@item.Id">
-						<h4 class="mb-0">@item.Title</h4>
+					<a class="mb-1 text-decoration-underline text-primary" href="/product/@product.Id">
+						<h4 class="mb-0">@product.Title</h4>
 					</a>
-					<p>@item.Description</p>
+					<p>@product.Description</p>
 					<h5 class="price mt-auto">
-						@GetPriceText(item)
+						@GetPriceText(product)
 					</h5>
 				</div>
 			</li>
-		}
+		</Virtualize>
 	</ul>
 	for(int i = 1; i <= productService.PageCount; i++)
 	{

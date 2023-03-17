@@ -88,7 +88,7 @@ public class AuthRepository : Repository<User>, IAuthRepository
 			// will use fo changePassword
 			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
 			new Claim(ClaimTypes.Name, user.Email),
-			new Claim(ClaimTypes.Role, user.Role)
+			new Claim(ClaimTypes.Role, user.Role),
 		};
 
 		var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
@@ -97,8 +97,8 @@ public class AuthRepository : Repository<User>, IAuthRepository
 
 		var token = new JwtSecurityToken(
 			claims: claims,
-			expires: DateTime.Now.AddDays(1),
-			//expires: DateTime.Now,
+			expires: DateTime.Now.AddYears(1),
+			//expires: DateTime.Now.AddHours(1),
 			signingCredentials: creds
 		);
 

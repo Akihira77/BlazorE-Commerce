@@ -1,4 +1,5 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -10,10 +11,10 @@ public class AuthController : ControllerBase
 {
 	private readonly IUnitOfWork _unitOfWork;
 
-	public AuthController(IUnitOfWork unitOfWork)
+    public AuthController(IUnitOfWork unitOfWork)
 	{
 		_unitOfWork = unitOfWork;
-	}
+    }
 
 	[HttpPost("register")]
 	public async Task<ActionResult<ServiceResponse<int>>> Register(UserRegister request)
@@ -55,7 +56,7 @@ public class AuthController : ControllerBase
 					|| result.Equals("User not found")))
 		{
 			response.Success = true;
-			response.Message = "Login success";
+			response.Message = DateTime.Now.AddHours(1).ToString();
 			response.Data = result;
 		}
 

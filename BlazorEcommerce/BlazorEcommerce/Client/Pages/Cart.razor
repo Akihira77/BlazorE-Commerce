@@ -1,6 +1,5 @@
 ﻿@page "/cart"
 @inject ICartService cartService
-@inject IBlazorHistoryService blazorHistory
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
 @inject IOrderService orderService
@@ -62,9 +61,6 @@ else
 			<AddressForm />
 		</div>
 		<div class="d-flex justify-content-end mt-5">
-			<button class="btn btn-success px-4 mr-2" @onclick="Back">
-				Back
-			</button >
 			<button class="btn btn-primary px-4 mr-2" @onclick="PlaceOrder">
 				Checkout
 			</button>
@@ -81,11 +77,6 @@ else
 	{
 		//orderPlaced = false;
 		await LoadCart();
-	}
-
-	private async Task Back()
-	{
-		await blazorHistory.Back();
 	}
 
 	private async Task RemoveItemFromCart(int productId, int productTypeId)

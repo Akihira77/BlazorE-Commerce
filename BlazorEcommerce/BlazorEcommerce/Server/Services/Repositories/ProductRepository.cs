@@ -7,25 +7,42 @@ namespace BlazorEcommerce.Server.Services.Repositories;
 public class ProductRepository : Repository<Product>, IProductRepository
 {
 	private readonly AppDbContext _db;
+	private readonly IHttpContextAccessor _httpContextAccessor;
 
-	public ProductRepository(AppDbContext db) : base(db)
+	public ProductRepository(AppDbContext db, IHttpContextAccessor httpContextAccessor) : base(db)
 	{
 		_db = db;
+		_httpContextAccessor = httpContextAccessor;
 	}
-
 	public async Task<Product> GetProduct(int id)
 	{
-		return await _db.Products
-				.Include(p => p.Variants)
+		Product product = null;
+		if (_httpContextAccessor.HttpContext.User.IsInRole("Admin")) 
+		{
+			product = await _db.Products
+				.Include(p => p.Variants
+						.Where(v => v.Visible && !v.Deleted))
 				.ThenInclude(p => p.ProductType)
-				.FirstOrDefaultAsync(p => p.Id == id);
+				.FirstOrDefaultAsync(p => p.Id == id && !p.Deleted);
+		} else
+		{
+			product = await _db.Products
+				.Include(p => p.Variants
+						.Where(v => v.Visible && !v.Deleted))
+				.ThenInclude(p => p.ProductType)
+				.FirstOrDefaultAsync(p => p.Id == id && !p.Deleted && p.Visible);
+		} 
+
+		return product;
 	}
 
 	public async Task<IEnumerable<Product>> GetProductsByCategory(string? categoryUrl = null)
 	{
 		return await _db.Products
-				.Where(p => p.Category.Url == categoryUrl)
-				.Include(p => p.Variants)
+				.Where(p => p.Category.Url == categoryUrl
+				&& p.Visible && !p.Deleted)
+				.Include(p => p.Variants
+						.Where(v => v.Visible && !v.Deleted))
 				.ThenInclude(p => p.ProductType)
 				.ToListAsync();
 	}
@@ -73,9 +90,15 @@ public class ProductRepository : Repository<Product>, IProductRepository
 		var pageCount = Math.Ceiling(FindProductsBySearch(searchText).Count() / pageResults);
 
 		var obj = await _db.Products
-			.Where(p => p.Title.ToLower().Contains(searchText.ToLower())
-			|| p.Description.ToLower().Contains(searchText.ToLower()))
-			.Include(p => p.Variants)
+			.Where(p => (p.Title
+						.ToLower()
+						.Contains(searchText.ToLower())
+			|| p.Description
+				.ToLower()
+				.Contains(searchText.ToLower()))
+			&& p.Visible && !p.Deleted)
+			.Include(p => p.Variants
+					.Where(v => v.Visible && !v.Deleted))
 			.Skip((page - 1) * (int)pageResults)
 			.Take((int)pageResults)
 			.ToListAsync();
@@ -92,13 +115,55 @@ public class ProductRepository : Repository<Product>, IProductRepository
 	private IIncludableQueryable<Product, IEnumerable<ProductVariant>> FindProductsBySearch(string searchText)
 	{
 		return _db.Products
-			.Where(p => p.Title.ToLower().Contains(searchText.ToLower())
-			|| p.Description.ToLower().Contains(searchText.ToLower()))
-			.Include(p => p.Variants);
+			.Where(p => (p.Title
+						.ToLower()
+						.Contains(searchText.ToLower())
+			|| p.Description
+				.ToLower()
+				.Contains(searchText.ToLower()))
+			&& p.Visible && !p.Deleted)
+			.Include(p => p.Variants
+					.Where(v => v.Visible && !v.Deleted));
 	}
 
 	public void Update(Product obj)
 	{
 		_db.Products.Update(obj);
+	}
+
+	public async Task<IEnumerable<Product>> GetProducts()
+	{
+		var products = await _db.Products
+					.Where(p => p.Visible && !p.Deleted)
+					.Include(p => p.Variants
+							.Where(v => v.Visible && !v.Deleted))
+					.ToListAsync();
+
+		return products;
+	}
+
+	public async Task<IEnumerable<Product>> GetFeaturedProducts()
+	{
+		var products = await _db.Products
+			.Where(p => p.Featured && p.Visible && !p.Deleted)
+			.Include(p => p.Variants
+					.Where(v => v.Visible && !v.Deleted))
+			.ToListAsync();
+
+		return products;
+	}
+
+	public async Task<IEnumerable<Product>> GetAdminProducts()
+	{
+		var products = await _db.Products
+			.Where(p => !p.Deleted)
+			.Include(p => p.Category)
+					.Where(c => !c.Deleted)
+			.Include(p => p.Variants
+					.Where(v => !v.Deleted))
+			.ThenInclude(v => v.ProductType)
+			.ToListAsync();
+
+		return products;
 	}
 }

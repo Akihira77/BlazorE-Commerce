@@ -8,7 +8,8 @@ public class ProductService : IProductService
 	public int CurrentPage { get; set; } = 1;
 	public int PageCount { get; set; } = 0;
 	public string LastSearchText { get; set; } = string.Empty;
-	public IEnumerable<Product> Products { get; set; } = new List<Product>();
+	public List<Product> Products { get; set; }
+	public List<Product> AdminProducts { get; set; }
 
 	public ProductService(HttpClient http)
 	{
@@ -30,7 +31,7 @@ public class ProductService : IProductService
 		var result = await _http
 					.GetFromJsonAsync
 					<ServiceResponse<IEnumerable<Product>>>(to);
-		Products = result.Data;
+		Products = result.Data.ToList();
 		CurrentPage = 1;
 		PageCount = 0;
 
@@ -50,7 +51,7 @@ public class ProductService : IProductService
 				($"api/v1/product/search-products/{searchText}/{page}");
 		if(result != null && result.Data != null)
 		{
-			Products = result.Data.Products;
+			Products = result.Data.Products.ToList();
 			CurrentPage = result.Data.CurrentPage;
 			PageCount = result.Data.Pages;
 		}
@@ -70,5 +71,41 @@ public class ProductService : IProductService
 				($"api/v1/Product/search-suggestion/{searchText}");
 
 		return result.Data;
+	}
+
+	public async Task GetAdminProducts()
+	{
+		var result = await _http.GetFromJsonAsync<ServiceResponse<List<Product>>>("api/v1/product/admin");
+
+		AdminProducts = result.Data;
+		CurrentPage = 1;
+		PageCount = 0;
+		if (AdminProducts.Count == 0)
+		{
+			Message = "No products found.";
+		}
+	}
+
+	public async Task<Product> CreateProduct(Product product)
+	{
+		var result = await _http.PostAsJsonAsync("api/v1/product/add-product", product);
+		var newProduct = (await result.Content.ReadFromJsonAsync<ServiceResponse<Product>>()).Data;
+
+		return newProduct;
+	}
+
+	public async Task<Product> UpdateProduct(Product product)
+	{
+		var result = await _http.PutAsJsonAsync("api/v1/product/update-product", product);
+
+		return (await result.Content.ReadFromJsonAsync<ServiceResponse<Product>>()).Data;
+	}
+
+	public async Task<ServiceResponse<bool>> DeleteProduct(Product product)
+	{
+		var result = await _http.DeleteAsync($"api/v1/product/delete-product/{product.Id}");
+
+		return (await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>());
+
 	}
 }

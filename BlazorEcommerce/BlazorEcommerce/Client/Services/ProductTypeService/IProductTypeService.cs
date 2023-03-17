@@ -7,5 +7,6 @@ public interface IProductTypeService
     Task GetProductTypes();
     Task UpdateProductTypes(ProductType productType);
     Task AddProductTypes(ProductType productType);
+    Task DeleteProductTypes(int productTypeId);
     ProductType CreateNewProductType();
 }

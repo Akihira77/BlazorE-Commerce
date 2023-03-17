@@ -1,5 +1,5 @@
 ﻿.media-body {
-	height : 190px;
+	min-height : 190px;
 }
 
 .media-img {

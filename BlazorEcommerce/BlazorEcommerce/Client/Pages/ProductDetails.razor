@@ -2,7 +2,6 @@
 @inject ISnackbar snackbar
 @inject IProductService productService
 @inject ICartService cartService
-@inject IBlazorHistoryService blazorHistory
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
 
@@ -42,15 +41,6 @@
 				<h4 class="price">$@price.Price</h4>
 			}
 			<div class="action mt-5">
-				<MudButton 
-					Variant="Variant.Outlined" 
-					Color="Color.Success" 
-					@onclick="Back"
-					Class="me-2"
-				>
-					Back
-				</MudButton>
-
 				<AuthorizeView>
 					<Authorized>
 						<MudButton 
@@ -120,10 +110,5 @@
 		snackbar.Configuration.SnackbarVariant = Variant.Text;
 		snackbar.Configuration.MaxDisplayedSnackbars = 2;
 		snackbar.Add($"Added {title} ({GetSelectedVariant().ProductType.Name}) to cart", Severity.Success);
-	}
-
-	private async Task Back()
-	{
-		await blazorHistory.Back();
 	}
 }

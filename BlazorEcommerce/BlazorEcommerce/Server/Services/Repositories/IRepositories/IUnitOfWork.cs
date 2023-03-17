@@ -10,5 +10,6 @@ public interface IUnitOfWork
 	IPaymentRepository Payment { get; }
 	IAddressRepository Address { get; }
 	IProductTypeRepository ProductType { get; }
+	IProductVariantRepository ProductVariant { get; }
 	Task Save();
 }

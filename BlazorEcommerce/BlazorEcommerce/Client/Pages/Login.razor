@@ -1,8 +1,8 @@
 ﻿@page "/login"
 @inject IAuthService authService
-@inject IBlazorHistoryService blazorHistory
 @inject ILocalStorageService localStorage
 @inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navigationManager
 @inject ISnackbar snackbar
 @inject ICartService cartService
 
@@ -25,11 +25,19 @@
 	</div>
 	<ValidationMessage For="() => user.Password" />
 
-	<button type="submit" class="ms-auto btn btn-primary">Login</button>
+	<div class="ms-auto">
+		<button type="button"
+	   class="mr-3 btn btn-primary"
+				@onclick="@(() => navigationManager.NavigateTo("/register"))">
+			Register
+		</button>
+		<button type="submit" class="ms-auto btn btn-primary">Login</button>
+	</div>
 </EditForm>
 
 @code {
 	private UserLogin user = new UserLogin();
+	//private ItemsLocalStorage item = new();
 
 	private string errorMessage = string.Empty;
 	string txtType = "password";
@@ -41,12 +49,13 @@
 		if (result.Success)
 		{
 			errorMessage = string.Empty;
-
+			//item.Value = result.Data;
+			//item.Expiry = result.Message;
 			await localStorage.SetItemAsync("authToken", result.Data);
 			await authenticationStateProvider.GetAuthenticationStateAsync();
 			await cartService.StoreCartItems(true);
-			await blazorHistory.Back();
 
+			navigationManager.NavigateTo("");
 			snackbar.Add($"Welcome {user.Email}", Severity.Success);
 		} else
 		{
