@@ -28,5 +28,10 @@
     <ProjectReference Include="..\Shared\BlazorEcommerce.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Images\" />
+    <Folder Include="StaticFiles\Images\" />
+  </ItemGroup>
+
 
 </Project>

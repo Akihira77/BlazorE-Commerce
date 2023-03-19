@@ -1,4 +1,5 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Newtonsoft.Json;
 using Stripe;
 using Stripe.Checkout;
@@ -44,7 +45,7 @@ public class PaymentRepository : IPaymentRepository
                     ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
                         Name = product.Title,
-                        Images = new List<string> { product.ImageUrl }
+                        //Images = new List<string> { product.ImageUrl.ToString().Length > 20? null : product.ImageUrl }
                     }
                 },
                 Quantity = product.Quantity,
@@ -54,10 +55,10 @@ public class PaymentRepository : IPaymentRepository
         var options = new SessionCreateOptions
         {
             CustomerEmail = _authRepository.GetUserEmail(),
-            ShippingAddressCollection = new SessionShippingAddressCollectionOptions
-            {
-                AllowedCountries = new List<string> { "ID" }
-            },
+            //ShippingAddressCollection = new SessionShippingAddressCollectionOptions
+            //{
+            //    AllowedCountries = new List<string> { "ID" }
+            //},
             PaymentMethodTypes = new List<string>
                 {
                     "card"
@@ -73,8 +74,8 @@ public class PaymentRepository : IPaymentRepository
         return session;
     }
 
-	public async Task<ServiceResponse<int>> FulfillOrder(HttpRequest request)
-	{
+    public async Task<ServiceResponse<int>> FulfillOrder(HttpRequest request)
+    {
         var json = await new StreamReader(request.Body).ReadToEndAsync();
         try
         {
@@ -89,7 +90,9 @@ public class PaymentRepository : IPaymentRepository
 			//stripeEvent.Type == Events.CheckoutSessionCompleted
 			//	|| stripeEvent.Type == Events.PaymentIntentSucceeded
 			//	|| stripeEvent.Type == Events.PaymentIntentCreated
-			if (stripeEvent.Type == Events.CheckoutSessionCompleted)
+			//|| stripeEvent.Type == Events.CheckoutSessionAsyncPaymentSucceeded
+			if(stripeEvent.Type == Events.CheckoutSessionCompleted
+                )
 			{
 				var session = stripeEvent.Data.Object as Session;
                 user = await _authRepository.GetFirstOrDefault((u => u.Email.Equals(session.CustomerEmail)));

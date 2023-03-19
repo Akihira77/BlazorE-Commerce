@@ -20,17 +20,19 @@ public class ProductRepository : Repository<Product>, IProductRepository
 		if (_httpContextAccessor.HttpContext.User.IsInRole("Admin")) 
 		{
 			product = await _db.Products
+				.Include(p => p.Images)
 				.Include(p => p.Variants
-						.Where(v => v.Visible && !v.Deleted))
+						.Where(v => v.Visible))
 				.ThenInclude(p => p.ProductType)
-				.FirstOrDefaultAsync(p => p.Id == id && !p.Deleted);
+				.FirstOrDefaultAsync(p => p.Id == id);
 		} else
 		{
 			product = await _db.Products
+				 .Include(p => p.Images)
 				.Include(p => p.Variants
-						.Where(v => v.Visible && !v.Deleted))
+						.Where(v => v.Visible))
 				.ThenInclude(p => p.ProductType)
-				.FirstOrDefaultAsync(p => p.Id == id && !p.Deleted && p.Visible);
+				.FirstOrDefaultAsync(p => p.Id == id && p.Visible);
 		} 
 
 		return product;
@@ -40,9 +42,10 @@ public class ProductRepository : Repository<Product>, IProductRepository
 	{
 		return await _db.Products
 				.Where(p => p.Category.Url == categoryUrl
-				&& p.Visible && !p.Deleted)
+				&& p.Visible)
+				.Include(p => p.Images)
 				.Include(p => p.Variants
-						.Where(v => v.Visible && !v.Deleted))
+						.Where(v => v.Visible))
 				.ThenInclude(p => p.ProductType)
 				.ToListAsync();
 	}
@@ -96,9 +99,10 @@ public class ProductRepository : Repository<Product>, IProductRepository
 			|| p.Description
 				.ToLower()
 				.Contains(searchText.ToLower()))
-			&& p.Visible && !p.Deleted)
+			&& p.Visible)
+			.Include(p => p.Images)
 			.Include(p => p.Variants
-					.Where(v => v.Visible && !v.Deleted))
+					.Where(v => v.Visible))
 			.Skip((page - 1) * (int)pageResults)
 			.Take((int)pageResults)
 			.ToListAsync();
@@ -121,9 +125,9 @@ public class ProductRepository : Repository<Product>, IProductRepository
 			|| p.Description
 				.ToLower()
 				.Contains(searchText.ToLower()))
-			&& p.Visible && !p.Deleted)
+			&& p.Visible)
 			.Include(p => p.Variants
-					.Where(v => v.Visible && !v.Deleted));
+					.Where(v => v.Visible));
 	}
 
 	public void Update(Product obj)
@@ -134,9 +138,10 @@ public class ProductRepository : Repository<Product>, IProductRepository
 	public async Task<IEnumerable<Product>> GetProducts()
 	{
 		var products = await _db.Products
-					.Where(p => p.Visible && !p.Deleted)
+					.Where(p => p.Visible)
+					.Include(p => p.Images)
 					.Include(p => p.Variants
-							.Where(v => v.Visible && !v.Deleted))
+							.Where(v => v.Visible))
 					.ToListAsync();
 
 		return products;
@@ -145,9 +150,10 @@ public class ProductRepository : Repository<Product>, IProductRepository
 	public async Task<IEnumerable<Product>> GetFeaturedProducts()
 	{
 		var products = await _db.Products
-			.Where(p => p.Featured && p.Visible && !p.Deleted)
+			.Where(p => p.Featured && p.Visible)
+			.Include(p => p.Images)
 			.Include(p => p.Variants
-					.Where(v => v.Visible && !v.Deleted))
+					.Where(v => v.Visible))
 			.ToListAsync();
 
 		return products;
@@ -156,11 +162,9 @@ public class ProductRepository : Repository<Product>, IProductRepository
 	public async Task<IEnumerable<Product>> GetAdminProducts()
 	{
 		var products = await _db.Products
-			.Where(p => !p.Deleted)
+			.Include(p => p.Images)
 			.Include(p => p.Category)
-					.Where(c => !c.Deleted)
-			.Include(p => p.Variants
-					.Where(v => !v.Deleted))
+			.Include(p => p.Variants)
 			.ThenInclude(v => v.ProductType)
 			.ToListAsync();
 

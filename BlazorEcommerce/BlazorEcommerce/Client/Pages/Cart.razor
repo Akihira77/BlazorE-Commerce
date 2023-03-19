@@ -22,12 +22,9 @@ else
 	<div class="pb-5">
 		@foreach(var product in cartProducts)
 		{
-			<div class="container">
-				<div class="image-wrapper">
-					<img 
-						src="@product.ImageUrl"
-						alt="@product.Title"
-						class="image"/>
+			<div class="container mw-100">
+				<div class="image-wrapper me-5">
+					<img class="image" src="@product.ImageUrl" />
 				</div>
 				<div class="name">
 					<h5>
@@ -107,7 +104,6 @@ else
 	{
 		string url = await orderService.PlaceOrder();
 		navigationManager.NavigateTo(url);
-
 
 		// because we redirect to stripe page we dont need this 
 		//await cartService.GetCartItemsCount();

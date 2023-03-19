@@ -80,7 +80,7 @@ public class ProductService : IProductService
 		AdminProducts = result.Data;
 		CurrentPage = 1;
 		PageCount = 0;
-		if (AdminProducts.Count == 0)
+		if(AdminProducts.Count == 0)
 		{
 			Message = "No products found.";
 		}

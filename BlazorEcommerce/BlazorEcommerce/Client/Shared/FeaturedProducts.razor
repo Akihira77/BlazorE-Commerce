@@ -21,14 +21,20 @@
 				<div class="featured-product d-flex flex-column">
 					<div>
 						<a href="product/@product.Id">
-							<img src="@product.ImageUrl"/>
+							@if(!string.IsNullOrEmpty(product.ImageUrl))
+							{
+								<img class="media-img" src="@product.ImageUrl" alt="@product.Title" />
+							} else if(product.Images.Count > 0)
+							{
+								<img class="media-img" src="@product.Images[0].Data" />
+							}
 						</a>
 					</div>
-					<h4>
+					<h5>
 						<a class="text-primary text-decoration-underline" href="product/@product.Id">
 							@product.Title
 						</a>
-					</h4>
+					</h5>
 					@if(product.Variants.Any())
 					{
 						var price = product.Variants.ToList();

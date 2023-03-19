@@ -1,5 +1,6 @@
 ﻿@page "/admin/product"
 @page "/admin/product/{id:int}"
+@using System.Net.Http.Headers;
 @inject IProductService productService
 @inject IProductTypeService productTypeService
 @inject ICategoryService categoryService
@@ -23,18 +24,53 @@
 	</div>
 	<EditForm Model="product" OnValidSubmit="AddOrUpdateProduct" class="mb-5">
 		<DataAnnotationsValidator></DataAnnotationsValidator>
-		<div class="mb-0">
+		<div class="mb-3">
 			<label for="title">Title</label>
 			<InputText id="title" @bind-Value="product.Title" class="form-control"></InputText>
 		</div>
-		<div class="mb-0">
+		<div class="mb-3">
 			<label for="imageUrl">Image Url</label>
 			<InputText id="imageUrl" @bind-Value="product.ImageUrl" class="form-control"></InputText>
 		</div>
-		<div class="mb-0">
-			<img src="@product.ImageUrl" />
+		<div class="mb-3 d-flex flex-wrap flex-row justify-content-center gap-3">
+			@if (!string.IsNullOrEmpty(product.ImageUrl))
+			{
+				<img src="@product.ImageUrl" />
+			} else
+			{
+				foreach(var image in product.Images)
+				{
+					@*<img src="@image.Data" />
+					<button type="button" @onclick="@(() => RemoveImage(image.Id))" class="btn">Remove</button>*@
+					<MudCard>
+						<MudCardContent>
+							<MudImage 
+								Src="@image.Data" 
+								Height="200" 
+								Width="140">
+							</MudImage>
+						</MudCardContent>
+						<MudCardActions Style="justify-content: center">
+							<MudButton 
+								Variant="Variant.Filled" 
+								Color="Color.Error" 
+								OnClick="@(() => RemoveImage(image.Id))">
+								Remove
+							</MudButton>
+						</MudCardActions>
+					</MudCard>
+				}
+			}
 		</div>
-		<div class="mb-0">
+		<div class="mb-3">
+			<label for="images">Image(s)</label>
+			<InputFile id="images" OnChange="OnFilesChange" multiple class="form-control" accept=".jpg,.png,.jpeg"></InputFile>
+			@if(!string.IsNullOrEmpty(ErrorMessage))
+			{
+				<div class="text-danger"><p>@ErrorMessage</p></div>
+			}
+		</div>
+		<div class="mb-3">
 			<label for="description">Description</label>
 			<InputTextArea id="description" @bind-Value="product.Description" class="form-control"></InputTextArea>
 		</div>
@@ -50,7 +86,7 @@
 		{
 			<div class="row">
 				<div class="col">
-					<InputSelect disabled="@variant.Deleted" @bind-Value="variant.ProductTypeId" class="form-control">
+					<InputSelect @bind-Value="variant.ProductTypeId" class="form-control">
 						@foreach(var productType in productTypeService.ProductTypes)
 						{
 							<option value="@productType.Id.ToString()">@productType.Name</option>
@@ -58,16 +94,16 @@
 					</InputSelect>
 				</div>
 				<div class="col">
-					<InputNumber @bind-Value="variant.Price" class="form-control" disabled="@variant.Deleted"></InputNumber>
+					<InputNumber @bind-Value="variant.Price" class="form-control"></InputNumber>
 				</div>
 				<div class="col">
-					<InputNumber @bind-Value="variant.OriginalPrice" class="form-control" disabled="@variant.Deleted"></InputNumber>
+					<InputNumber @bind-Value="variant.OriginalPrice" class="form-control"></InputNumber>
 				</div>
 				<div class="col col-visible d-flex align-items-center justify-content-center">
-					<InputCheckbox @bind-Value="variant.Visible" style="transform: scale(1.5, 1.5)" disabled="@variant.Deleted"></InputCheckbox>
+					<InputCheckbox @bind-Value="variant.Visible" style="transform: scale(1.5, 1.5)"></InputCheckbox>
 				</div>
 				<div class="col">
-					<button class="btn btn-danger" disabled="@variant.Deleted" @onclick="@(() => RemoveVariant(variant.ProductTypeId))">
+					<button class="btn btn-danger" @onclick="@(() => RemoveVariant(variant.ProductTypeId))">
 						<i class="oi oi-trash"></i>
 					</button>
 				</div>
@@ -77,7 +113,7 @@
 			<i class="oi oi-plus"></i> Add Variant
 		</button>
 		<hr />
-		<div class="mb-0">
+		<div class="mb-3">
 			<label for="category">Category</label>
 			<InputSelect id="category" @bind-Value="product.CategoryId" class="form-control"> 
 				@foreach(var category in categoryService.AdminCategories)
@@ -85,6 +121,10 @@
 					<option value="@category.Id">@category.Name</option>
 				}
 			</InputSelect>
+		</div>
+		<div class="mb-3">
+			<label for="stock">Stock</label>
+			<InputNumber id="stock" @bind-Value="product.Stock" class="form-control"></InputNumber>
 		</div>
 		<hr />
 		<div class="form-check">
@@ -109,6 +149,9 @@
 	bool loading = true;
 	string btnText = "";
 	string message = "Loading...";
+	int maxAllowedFiles = 5;
+	long maxFileSize = 1024 * 1024 * 2; // 2 MB
+	string ErrorMessage = string.Empty;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -148,16 +191,13 @@
 			return;
 		}
 
-		if (variant.IsNew)
-		{
+		//if (variant.IsNew)
+		//{
 			var newProductVariants = product.Variants.ToList();
 			newProductVariants.Remove(variant);
 
 			product.Variants = newProductVariants.AsEnumerable();
-		} else
-		{
-			variant.Deleted = true;
-		}
+		//}
 	}
 
 	void AddVariant()
@@ -172,18 +212,60 @@
 	{
 		if (product.IsNew) {
 			var result = await productService.CreateProduct(product);
-			navigationManager.NavigateTo("admin/products");
 
 			snackbar.Configuration.SnackbarVariant = Variant.Text;
 			snackbar.Add("Create new product is success", Severity.Success);
+
+			await Task.Delay(1000);
+			navigationManager.NavigateTo("admin/products", true);
 		} else
 		{
 			product.IsNew = false;
 			product = await productService.UpdateProduct(product);
-			navigationManager.NavigateTo($"admin/product/{product.Id}");
 
 			snackbar.Configuration.SnackbarVariant = Variant.Text;
 			snackbar.Add($"Update {product.Title} is success", Severity.Success);
+
+			await Task.Delay(1000);
+			navigationManager.NavigateTo($"admin/product/{product.Id}", true);
+		}
+	}
+
+	async Task OnFilesChange(InputFileChangeEventArgs e)
+	{
+		ErrorMessage = "";
+		if (e.FileCount > maxAllowedFiles)
+		{
+			ErrorMessage = $"Only {maxAllowedFiles} files can be uploaded";
+			return;
+		}
+
+		var format = "image/png";
+		using var content = new MultipartFormDataContent();
+		foreach(var image in e.GetMultipleFiles(maxAllowedFiles))
+		{
+			if (image.Size > maxFileSize)
+			{
+				ErrorMessage = $"The image files is too big Your Image : {image.Size}, it must less than {maxFileSize}";
+				return;
+			}
+
+			var resizedImage = await image.RequestImageFileAsync(format, 200, 200);
+			var buffer = new byte[resizedImage.Size];
+			await resizedImage.OpenReadStream().ReadAsync(buffer);
+			var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+
+			product.Images.Add(new Image { Data = imageData });
+		}
+	}
+
+	void RemoveImage(int imageId)
+	{
+		var image = product.Images.FirstOrDefault(i => i.Id == imageId);
+
+		if (image != null)
+		{
+			product.Images.Remove(image);
 		}
 	}
 }

@@ -26,6 +26,16 @@
                 </NavLink>
             </div>
         }
+        <div class="dropdown nav-item">
+            <NavLink class="btn dropdown-toggle nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Contact
+            </NavLink>
+            <div class="dropdown-menu dropdown-menu-dark py-0">
+                <a class="dropdown-item nav-link" href="https://wa.me/82380539018" target="_blank">Whatsapp</a>
+                <a class="dropdown-item nav-link" href="https://t.me/Dika_Akihira" target="_blank">Telegram</a>
+                @*<span class="dropdown-item-text py-2">tik.dikawahyu123@gmail.com</span>*@
+            </div>
+        </div>
     </nav>
 </div>
 <div class="search nav-item px-3 pt-3">
@@ -35,6 +45,7 @@
 @code {
     private bool collapseNavMenu = true;
     //private ItemsLocalStorage item = new();
+    bool _isExpanded = false;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()

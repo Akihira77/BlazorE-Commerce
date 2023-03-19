@@ -4,8 +4,9 @@
 
 .media-img {
 	max-height : 200px;
+	width: 170px;
 	max-width : 200px;
-	border-radius : 6px;
+	border-radius : 3px;
 	margin-bottom : 10px;
 	transition : transform .2s;
 }

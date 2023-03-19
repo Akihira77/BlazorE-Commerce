@@ -22,6 +22,7 @@ public class CartRepository : Repository<CartItem>, ICartRepository
 		{
 			var product = await _db.Products
 					.Where(p => p.Id == cartItem.ProductId)
+					.Include(p => p.Images)
 					.FirstOrDefaultAsync();
 
 			if(product == null)
@@ -44,7 +45,7 @@ public class CartRepository : Repository<CartItem>, ICartRepository
 			{
 				ProductId = product.Id,
 				Title = product.Title,
-				ImageUrl = product.ImageUrl,
+				ImageUrl = !string.IsNullOrEmpty(product.ImageUrl) ? product.ImageUrl : product.Images[0].Data,
 				Price = productVariant.Price,
 				ProductType = productVariant.ProductType.Name,
 				ProductTypeId = productVariant.ProductTypeId,

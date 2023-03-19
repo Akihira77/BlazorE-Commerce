@@ -1,7 +1,5 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BlazorEcommerce.Server.Controllers;
 [Route("api/v1/[controller]")]
@@ -11,7 +9,7 @@ public class OrderController : ControllerBase
 	private readonly IUnitOfWork _unitOfWork;
 
 	public OrderController(IUnitOfWork unitOfWork)
-    {
+	{
 		_unitOfWork = unitOfWork;
 	}
 
@@ -21,7 +19,7 @@ public class OrderController : ControllerBase
 		var result = await _unitOfWork.Order.GetOrders();
 		var response = new ServiceResponse<IEnumerable<OrderOverviewDto>>
 		{
-			Data = result,
+			Data = result ?? new List<OrderOverviewDto>(),
 			Message = "Order list"
 		};
 

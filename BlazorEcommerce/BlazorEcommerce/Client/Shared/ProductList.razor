@@ -4,39 +4,53 @@
 @if (productService.Products == null 
 		|| !productService.Products.Any())
 {
-	<span>@productService.Message</span>
+	<div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 70vh">
+		<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+	</div>
 } else {
-	<ul class="list-unstyled">
+	<ul class="list-unstyled d-flex flex-wrap justify-content-center">
 		<Virtualize Items="productService.Products" Context="product" SpacerElement="li">
-			<li class="media my-3">
-				<div class="media-img-wrapper mr-2">
-					<a href="/product/@product.Id">
-						<img class="media-img" src="@product.ImageUrl" alt="@product.Title" />
-					</a>
-				</div>
-				<div class="media-body d-flex flex-column">
-					<a class="mb-1 text-decoration-underline text-primary" href="/product/@product.Id">
-						<h4 class="mb-0">@product.Title</h4>
-					</a>
-					<p>@product.Description</p>
-					<h5 class="price mt-auto">
-						@GetPriceText(product)
-					</h5>
-				</div>
+			<li class="m-2">
+				<MudCard Style="width: 170px; height: 350px">
+					<div class="d-flex justify-content-center">
+						<a href="/product/@product.Id">
+							@if (!string.IsNullOrEmpty(product.ImageUrl))
+							{
+								<img class="media-img" src="@product.ImageUrl" alt="@product.Title" />
+							} else if (product.Images.Count > 0)
+							{
+								<img class="media-img" src="@product.Images[0].Data" alt="@product.Title" />
+							}
+						</a>
+					</div>
+					<MudCardContent Class="d-flex flex-column position-relative py-0 pt-1" Style="height: 90px">
+						<MudText>
+							<a class="mb-1 text-decoration-underline text-primary" href="/product/@product.Id">
+								<p class="mb-0" style="font-size: 14px">@product.Title</p>
+							</a>
+						</MudText>
+						<MudText Class="price position-absolute bottom-0 end-0 pb-1 pe-1" Style="font-size: 13px">@GetPriceText(product)</MudText>
+					</MudCardContent>
+				</MudCard>
 			</li>
 		</Virtualize>
 	</ul>
 	for(int i = 1; i <= productService.PageCount; i++)
 	{
 		<a class="btn 
-			@(i == productService.CurrentPage ? "btn-info" : "btn-outline-info") 
+			@(i == productService.CurrentPage ? "btn-secondary" : "btn-outline-secondary") 
 			page-selection"
 			href="/search/@productService.LastSearchText/@i">
 			@i
 		</a>
 	}
+
+	<MudScrollToTop>
+		<MudFab Color="Color.Dark" StartIcon="@Icons.Material.Filled.KeyboardArrowUp" />
+	</MudScrollToTop>
 }
 @code {
+
 	protected override void OnInitialized()
 	{
 		productService.ProductsChanged += StateHasChanged;

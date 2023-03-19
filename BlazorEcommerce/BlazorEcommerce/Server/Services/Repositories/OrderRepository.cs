@@ -1,5 +1,6 @@
 ﻿using BlazorEcommerce.Server.Data;
 using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+using BlazorEcommerce.Shared.Models;
 
 namespace BlazorEcommerce.Server.Services.Repositories;
 
@@ -21,6 +22,7 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 		var order = await _db.Orders
 			.Include(o => o.OrderItems)
 			.ThenInclude(oi => oi.Product)
+				.ThenInclude(p => p.Images)
 			.Include(o => o.OrderItems)
 			.ThenInclude(oi => oi.ProductType)
 			.Where(o => o.UserId == _authRepository.GetUserId() && o.Id == orderId)
@@ -42,7 +44,7 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 			{
 				ProductId = item.ProductId,
 				ProductType = item.ProductType.Name,
-				ImageUrl = item.Product.ImageUrl,
+				ImageUrl = !string.IsNullOrEmpty(item.Product.ImageUrl)? item.Product.ImageUrl : item.Product.Images[0].Data,
 				Quantity = item.Quantity,
 				Title = item.Product.Title,
 				TotalPrice = item.TotalPrice
@@ -58,10 +60,12 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 	{
 		var orders = await _db.Orders
 				.Include(o => o.OrderItems)
-				.ThenInclude(oi => oi.Product)
+					.ThenInclude(oi => oi.Product)
+					//.ThenInclude(p => p.Images)
 				.Where(o => o.UserId == _authRepository.GetUserId())
 				.OrderByDescending(o => o.OrderDate)
 				.ToListAsync();
+
 
 		var orderOverview = new List<OrderOverviewDto>();
 		foreach (var order in orders)
@@ -77,6 +81,10 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 						: 
 					order.OrderItems.First().Product.Title,
 				ProductImageUrl = order.OrderItems.First().Product.ImageUrl
+				//!string.IsNullOrEmpty(order.OrderItems.First().Product.ImageUrl) ?
+				//					order.OrderItems.First().Product.ImageUrl
+				//					:
+				//					order.OrderItems.First().Product.Images[0].Data
 			});
 		}
 

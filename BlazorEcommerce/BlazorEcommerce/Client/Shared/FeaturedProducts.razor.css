@@ -2,7 +2,7 @@
 	display : flex;
 	flex-direction : row;
 	overflow-x : auto;
-	justify-content : center;
+/*	max-width : 3000px;*/
 }
 
 img {
@@ -23,11 +23,5 @@ img:hover {
 	padding : 10px;
 	border: 1px solid lightgray;
 	border-radius : 10px;
-	max-width : 200px;
-}
-
-@media (max-width : 1023.98px) {
-	.container {
-		justify-content : flex-start;
-	}
+	max-width : 250px;
 }

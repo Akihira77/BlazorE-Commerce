@@ -11,5 +11,6 @@ public interface IUnitOfWork
 	IAddressRepository Address { get; }
 	IProductTypeRepository ProductType { get; }
 	IProductVariantRepository ProductVariant { get; }
+	IImagesRepository Images { get; }
 	Task Save();
 }

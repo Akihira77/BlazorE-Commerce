@@ -52,7 +52,8 @@ public class ProductController : ControllerBase
 	[HttpPut("update-product"), Authorize(Roles = "Admin")]
 	public async Task<ActionResult<ServiceResponse<Product>>> UpdateProduct(Product product)
 	{
-		var dbProduct = await _unitOfWork.Product.GetFirstOrDefault((p => p.Id == product.Id), track: false);
+		var dbProduct = await _unitOfWork.Product
+			.GetFirstOrDefault((p => p.Id == product.Id), track: false, includeProperties: "Images");
 
 		var response = new ServiceResponse<Product>
 		{
@@ -80,6 +81,8 @@ public class ProductController : ControllerBase
 					_unitOfWork.ProductVariant.Update(variant);
 				} 
 			}
+
+			_unitOfWork.Images.RemoveRange(dbProduct.Images);
 
 			_unitOfWork.Product.Update(product);
 			await _unitOfWork.Save();
@@ -109,8 +112,8 @@ public class ProductController : ControllerBase
 			response.Message = "Product is not found";
 		} else
 		{
-			//_unitOfWork.Product.Remove(product);
-			product.Deleted = true;
+			_unitOfWork.Product.Remove(product);
+			//product.Deleted = true;
 			await _unitOfWork.Save();
 		}
 		return Ok(response);
