@@ -3,6 +3,8 @@
 @implements IDisposable
 @attribute [Authorize(Roles = "Admin")]
 
+<h3>Product Types</h3>
+
 @foreach(var productType in productTypeService.ProductTypes)
 {
 	@if(productType.Editing)
@@ -48,7 +50,7 @@
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-								<button type="button" class="btn btn-danger" @onclick=@(() => DeleteProductType(productType.Id))>Delete</button>
+								<button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick=@(() => DeleteProductType(editingProductType.Id))>Delete</button>
 							</div>
 						</div>
 					</div>

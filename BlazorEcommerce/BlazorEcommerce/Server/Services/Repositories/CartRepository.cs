@@ -50,6 +50,7 @@ public class CartRepository : Repository<CartItem>, ICartRepository
 				ProductType = productVariant.ProductType.Name,
 				ProductTypeId = productVariant.ProductTypeId,
 				Quantity = cartItem.Quantity,
+				Stock = product.Stock
 			};
 
 			result.Add(carProduct);

@@ -30,4 +30,11 @@ public class OrderService : IOrderService
 		var url = await result.Content.ReadAsStringAsync();
 		return url;
 	}
+
+	public async Task<bool> Invoice(int orderId)
+	{
+		var result = await _http.GetFromJsonAsync<bool>($"api/v1/order/invoice/{orderId}");
+
+		return result;
+	}
 }

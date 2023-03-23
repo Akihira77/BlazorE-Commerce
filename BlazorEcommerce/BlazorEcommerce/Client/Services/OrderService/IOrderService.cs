@@ -5,4 +5,5 @@ public interface IOrderService
 	Task<string> PlaceOrder();
 	Task<List<OrderOverviewDto>> GetOrders();
 	Task<OrderDetailsDto> GetOrderDetails(int orderId);
+	Task<bool> Invoice(int orderId);
 }

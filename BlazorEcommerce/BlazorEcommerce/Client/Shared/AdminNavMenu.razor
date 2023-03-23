@@ -1,0 +1,54 @@
+﻿<div class="top-row ps-3 navbar navbar-dark navbar-toggler-wrapper">
+    <div class="container-fluid">
+        <HomeButton />
+        <div class="d-flex justify-content-end">
+            <UserButton />
+            <button title="Navigation menu" class="navbar-toggler ms-auto" @onclick="ToggleNavMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </div>
+</div>
+<div class="@NavMenuCssClass position-fixed">
+    <nav class="nav flex-column">
+        <div class="nav-item px-2">
+            <NavLink class="nav-link" href="admin/dashboard" Match="NavLinkMatch.All" @onclick="ToggleNavMenu">
+                Dashboard
+            </NavLink>
+        </div>
+        <div class="nav-item px-2">
+            <NavLink class="nav-link" href="admin/users" @onclick="ToggleNavMenu">
+                Users
+            </NavLink>
+        </div>
+        <div class="nav-item px-2">
+            <NavLink class="nav-link" href="admin/categories" @onclick="ToggleNavMenu">
+                Categories
+            </NavLink>
+        </div>
+        <div class="nav-item px-2">
+            <NavLink class="nav-link" href="admin/product-types" @onclick="ToggleNavMenu">
+                Product Types
+            </NavLink>
+        </div>
+        <div class="nav-item px-2">
+            <NavLink class="nav-link" href="admin/products" @onclick="ToggleNavMenu">
+                Products
+            </NavLink>
+        </div>
+    </nav>
+</div>
+<div class="search nav-item px-3 pt-3">
+    <Search />
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    bool _isExpanded = false;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

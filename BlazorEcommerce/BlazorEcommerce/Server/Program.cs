@@ -3,6 +3,7 @@ global using BlazorEcommerce.Shared.Dto;
 global using BlazorEcommerce.Shared.Models;
 global using Microsoft.EntityFrameworkCore;
 using BlazorEcommerce.Server.Data;
+using BlazorEcommerce.Server.Services.EmailService;
 using BlazorEcommerce.Server.Services.Repositories;
 using BlazorEcommerce.Server.Services.Repositories.IRepositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,6 +38,12 @@ builder.Services
 	});
 builder.Services.AddMemoryCache();
 
+// email config
+var emailConfig = builder.Configuration
+			.GetSection("EmailConfiguration")
+			.Get<EmailConfiguration>();
+builder.Services.AddSingleton(emailConfig);
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();

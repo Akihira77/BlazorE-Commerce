@@ -1,4 +1,6 @@
-﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+﻿using BlazorEcommerce.Server.Services.EmailService;
+using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+using BlazorEcommerce.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers;
@@ -7,10 +9,12 @@ namespace BlazorEcommerce.Server.Controllers;
 public class OrderController : ControllerBase
 {
 	private readonly IUnitOfWork _unitOfWork;
+	private readonly IEmailSender _emailSender;
 
-	public OrderController(IUnitOfWork unitOfWork)
+	public OrderController(IUnitOfWork unitOfWork, IEmailSender emailSender)
 	{
 		_unitOfWork = unitOfWork;
+		_emailSender = emailSender;
 	}
 
 	[HttpGet]
@@ -19,7 +23,7 @@ public class OrderController : ControllerBase
 		var result = await _unitOfWork.Order.GetOrders();
 		var response = new ServiceResponse<IEnumerable<OrderOverviewDto>>
 		{
-			Data = result ?? new List<OrderOverviewDto>(),
+			Data = result,
 			Message = "Order list"
 		};
 
@@ -37,5 +41,18 @@ public class OrderController : ControllerBase
 		};
 
 		return Ok(response);
+	}
+
+	[HttpGet("invoice/{orderId}")]
+	public async Task<bool> Invoice(int orderId)
+	{
+		var userEmail = _unitOfWork.Auth.GetUserEmail();
+		var message = new Message(
+					new string[] { userEmail },
+					"order",
+					orderId.ToString());
+
+		await _emailSender.SendEmailAsync(message);
+		return true;
 	}
 }

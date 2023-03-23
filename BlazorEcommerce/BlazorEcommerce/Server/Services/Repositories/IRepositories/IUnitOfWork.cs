@@ -1,4 +1,6 @@
-﻿namespace BlazorEcommerce.Server.Services.Repositories.IRepositories;
+﻿using BlazorEcommerce.Server.Services.EmailService;
+
+namespace BlazorEcommerce.Server.Services.Repositories.IRepositories;
 
 public interface IUnitOfWork
 {

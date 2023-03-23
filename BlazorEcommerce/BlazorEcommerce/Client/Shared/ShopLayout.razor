@@ -1,22 +1,44 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    <main class="pb-5">
-        <MudThemeProvider />
-        <MudDialogProvider />
-        <MudSnackbarProvider />
-        <div class="top-row pt-2">
-            <HomeButton />
-            <Search />
-            <UserButton />
-            <CartCounter />
-        </div>
-        <div class="nav-menu">
-            <ShopNavMenu />
-        </div>
+    <MudThemeProvider />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
 
-        <article class="content px-2">
-            @Body
-        </article>
-    </main>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <main>
+                    <div class="top-row pt-2 justify-content-between">
+                        <HomeButton />
+                        <AdminButton />
+                    </div>
+                    <div class="d-flex" style="min-height: 100vh">
+                        <div class="nav-menu pt-2" style="min-width: 10%">
+                            <AdminNavMenu />
+                        </div>
+
+                        <article class="content px-2 pb-5" style="min-width: 90%">
+                            @Body
+                        </article>
+                    </div>
+                </main>
+            </Authorized>
+            <NotAuthorized>
+                <main class="pb-5">
+                    <div class="top-row pt-2">
+                        <HomeButton />
+                        <Search />
+                        <UserButton />
+                        <CartCounter />
+                    </div>
+                    <div class="nav-menu">
+                        <ShopNavMenu />
+                    </div>
+
+                    <article class="content px-2">
+                        @Body
+                    </article>
+                </main>
+            </NotAuthorized>
+        </AuthorizeView>
 </div>

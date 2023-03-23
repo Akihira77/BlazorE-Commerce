@@ -1,5 +1,7 @@
 ﻿@page "/orders/{orderId:int}"
 @inject IOrderService orderService
+@inject IAuthService authService
+@inject ISnackbar snackbar
 @attribute [Authorize]
 
 @if(order == null)
@@ -7,8 +9,11 @@
 	<span>Loading order...</span>
 } else
 {
-	<h3>Order from @order.OrderDate.ToString("f")</h3>
+	<div class="d-flex justify-content-between mb-3">
+		<h3>Order from @order.OrderDate.ToString("f")</h3>
+		<button type="button" class="btn btn-success" @onclick="@(() => Invoice(OrderId))">Invoice</button>
 
+	</div>
 	<div class="pb-5">
 		@foreach(var product in order.Products)
 		{
@@ -46,5 +51,14 @@
 	protected override async Task OnInitializedAsync()
 	{
 		order = await orderService.GetOrderDetails(OrderId);
+	}
+
+	private async Task Invoice(int orderId) {
+		var result = await orderService.Invoice(orderId);
+		if (result)
+		{
+			snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+			snackbar.Add("Invoice has been send to your Email", Severity.Success);
+		}
 	}
 }

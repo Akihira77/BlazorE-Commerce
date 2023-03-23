@@ -24,9 +24,12 @@ public class Repository<T> : IRepository<T> where T : class
 		await _dbSet.AddRangeAsync(entities);
 	}
 
-	public async Task<IEnumerable<T>> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
+	public async Task<IEnumerable<T>> GetAll(
+		Expression<Func<T, bool>>? filter = null, 
+		string? includeProperties = null, 
+		bool track = true)
 	{
-		IQueryable<T> query = _dbSet;
+		IQueryable<T> query = (track ? _dbSet : _dbSet.AsNoTracking());
 
 		if(filter != null)
 		{
@@ -43,7 +46,10 @@ public class Repository<T> : IRepository<T> where T : class
 		return await query.ToListAsync();
 	}
 
-	public async Task<T> GetFirstOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null, bool track = true)
+	public async Task<T> GetFirstOrDefault(
+		Expression<Func<T, bool>> filter, 
+		string? includeProperties = null, 
+		bool track = true)
 	{
 		IQueryable<T> query = (track ? _dbSet : _dbSet.AsNoTracking());
 

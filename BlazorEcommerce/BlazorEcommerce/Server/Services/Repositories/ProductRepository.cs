@@ -22,17 +22,17 @@ public class ProductRepository : Repository<Product>, IProductRepository
 			product = await _db.Products
 				.Include(p => p.Images)
 				.Include(p => p.Variants
-						.Where(v => v.Visible))
+						.Where(v => v.Visible && !v.Deleted))
 				.ThenInclude(p => p.ProductType)
-				.FirstOrDefaultAsync(p => p.Id == id);
+				.FirstOrDefaultAsync(p => p.Id == id && !p.Deleted);
 		} else
 		{
 			product = await _db.Products
 				 .Include(p => p.Images)
 				.Include(p => p.Variants
-						.Where(v => v.Visible))
+						.Where(v => v.Visible && !v.Deleted))
 				.ThenInclude(p => p.ProductType)
-				.FirstOrDefaultAsync(p => p.Id == id && p.Visible);
+				.FirstOrDefaultAsync(p => p.Id == id && p.Visible && !p.Deleted);
 		} 
 
 		return product;
@@ -45,7 +45,7 @@ public class ProductRepository : Repository<Product>, IProductRepository
 				&& p.Visible)
 				.Include(p => p.Images)
 				.Include(p => p.Variants
-						.Where(v => v.Visible))
+						.Where(v => v.Visible && !v.Deleted))
 				.ThenInclude(p => p.ProductType)
 				.ToListAsync();
 	}
@@ -99,10 +99,10 @@ public class ProductRepository : Repository<Product>, IProductRepository
 			|| p.Description
 				.ToLower()
 				.Contains(searchText.ToLower()))
-			&& p.Visible)
+			&& p.Visible && !p.Deleted)
 			.Include(p => p.Images)
 			.Include(p => p.Variants
-					.Where(v => v.Visible))
+					.Where(v => v.Visible && !v.Deleted))
 			.Skip((page - 1) * (int)pageResults)
 			.Take((int)pageResults)
 			.ToListAsync();
@@ -125,9 +125,9 @@ public class ProductRepository : Repository<Product>, IProductRepository
 			|| p.Description
 				.ToLower()
 				.Contains(searchText.ToLower()))
-			&& p.Visible)
+			&& p.Visible && !p.Deleted)
 			.Include(p => p.Variants
-					.Where(v => v.Visible));
+					.Where(v => v.Visible && !v.Deleted));
 	}
 
 	public void Update(Product obj)
@@ -138,10 +138,10 @@ public class ProductRepository : Repository<Product>, IProductRepository
 	public async Task<IEnumerable<Product>> GetProducts()
 	{
 		var products = await _db.Products
-					.Where(p => p.Visible)
+					.Where(p => p.Visible && !p.Deleted)
 					.Include(p => p.Images)
 					.Include(p => p.Variants
-							.Where(v => v.Visible))
+							.Where(v => v.Visible && !v.Deleted))
 					.ToListAsync();
 
 		return products;
@@ -150,10 +150,10 @@ public class ProductRepository : Repository<Product>, IProductRepository
 	public async Task<IEnumerable<Product>> GetFeaturedProducts()
 	{
 		var products = await _db.Products
-			.Where(p => p.Featured && p.Visible)
+			.Where(p => p.Featured && p.Visible && !p.Deleted)
 			.Include(p => p.Images)
 			.Include(p => p.Variants
-					.Where(v => v.Visible))
+					.Where(v => v.Visible && !v.Deleted))
 			.ToListAsync();
 
 		return products;
@@ -162,6 +162,7 @@ public class ProductRepository : Repository<Product>, IProductRepository
 	public async Task<IEnumerable<Product>> GetAdminProducts()
 	{
 		var products = await _db.Products
+			.Where(p => !p.Deleted)
 			.Include(p => p.Images)
 			.Include(p => p.Category)
 			.Include(p => p.Variants)

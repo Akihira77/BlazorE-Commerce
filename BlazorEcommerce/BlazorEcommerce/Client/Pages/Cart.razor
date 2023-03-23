@@ -33,21 +33,28 @@ else
 						</a>
 					</h5>
 					<span>@product.ProductType</span>
-					<div class="d-flex gap-3 mt-2">
-						<input class="form-control input-quantity"
-							type="number"
-							value="@product.Quantity"
-								@onchange="@((ChangeEventArgs e) => UpdateQuantity(product, e))"
-							min="1" />
-						<button class="btn btn-outline-danger"
-					@onclick="@(() => RemoveItemFromCart(product.ProductId, product.ProductTypeId))">
-							<i class="oi oi-trash"></i>
-						</button>
+					<div class="d-flex flex-column gap-3 mt-2">
+						<div class="d-flex gap-3">
+							<input class="form-control input-quantity"
+								type="number"
+								value="@product.Quantity"
+									@onchange="@((ChangeEventArgs e) => UpdateQuantity(product, e))"
+								min="1" 
+								max="@product.Stock"/>
+							<button class="btn btn-outline-danger"
+						@onclick="@(() => RemoveItemFromCart(product.ProductId, product.ProductTypeId))">
+								<i class="oi oi-trash"></i>
+							</button>
+						</div>
+						<div class="">
+							Stock : @product.Stock
+						</div>
 					</div>
 				</div>
 				<div class="cart-product-price">
 					@product.Quantity * $@product.Price
 				</div>
+
 			</div>
 		}
 		<div class="cart-product-price">
@@ -95,7 +102,7 @@ else
 	{
 		var quantity = int.Parse(e.Value.ToString());
 		if (quantity > 0) {
-			await cartService.UpdateQuantity(product, quantity);
+			await cartService.UpdateQuantity(product, Math.Min(quantity, product.Stock));
 		}
 		await LoadCart();
 	}

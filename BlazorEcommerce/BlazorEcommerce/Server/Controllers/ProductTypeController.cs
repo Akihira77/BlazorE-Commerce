@@ -68,21 +68,23 @@ public class ProductTypeController : ControllerBase
 	}
 
     [HttpDelete("delete-producttype/{id}")]
-    public async Task<ActionResult<ServiceResponse<bool>>> DeleteProductType(int id)
+    public async Task<ActionResult<ServiceResponse<IEnumerable<ProductType>>>> DeleteProductType(int id)
     {
         var productType = await _unitOfWork.ProductType.GetFirstOrDefault((pt => pt.Id == id));
 
-        var response = new ServiceResponse<bool>();
+        var response = new ServiceResponse<IEnumerable<ProductType>>();
         if (productType != null)
         {
-            response.Data = true;
+            _unitOfWork.ProductType.Remove(productType);
+            await _unitOfWork.Save();
+
             response.Message = "Deleting Product Type is success";
         } else
         {
-            response.Data = false;
             response.Message = "Product Type is not found";
         }
 
+        response.Data = await _unitOfWork.ProductType.GetAll();
         return Ok(response);
     }
 }

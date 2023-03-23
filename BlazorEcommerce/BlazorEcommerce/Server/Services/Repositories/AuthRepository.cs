@@ -135,4 +135,13 @@ public class AuthRepository : Repository<User>, IAuthRepository
 	{
 		return await _db.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
 	}
+
+    public async Task<IEnumerable<User>> GetUsers()
+    {
+		return await _db.Users
+			.Include(u => u.Address)
+            .OrderBy(u => u.DateCreated)
+			.OrderBy(u => u.Role)
+            .ToListAsync();
+    }
 }

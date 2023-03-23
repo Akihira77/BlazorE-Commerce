@@ -1,4 +1,5 @@
 ﻿using BlazorEcommerce.Server.Data;
+using BlazorEcommerce.Server.Services.EmailService;
 using BlazorEcommerce.Server.Services.Repositories.IRepositories;
 
 namespace BlazorEcommerce.Server.Services.Repositories;
@@ -17,7 +18,10 @@ public class UnitOfWork : IUnitOfWork
 	public IProductTypeRepository ProductType { get; private set; }
 	public IProductVariantRepository ProductVariant { get; private set; }
 	public IImagesRepository Images { get; private set; }
-    public UnitOfWork(AppDbContext db, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+    public UnitOfWork(AppDbContext db
+		, IConfiguration configuration
+		, IHttpContextAccessor httpContextAccessor
+		, EmailConfiguration emailConfiguration)
 	{
 		_db = db;
 		Product = new ProductRepository(_db, httpContextAccessor);
@@ -25,7 +29,7 @@ public class UnitOfWork : IUnitOfWork
 		Auth = new AuthRepository(_db, configuration, httpContextAccessor);
 		Cart = new CartRepository(_db, Auth);
 		Order = new OrderRepository(_db, Auth);
-		Payment = new PaymentRepository(Cart, Auth, Order);
+		Payment = new PaymentRepository(Cart, Auth);
 		Address = new AddressRepository(_db);
 		ProductType = new ProductTypeRepository(_db);
 		ProductVariant = new ProductVariantRepository(_db);

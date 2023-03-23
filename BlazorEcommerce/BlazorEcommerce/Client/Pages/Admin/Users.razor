@@ -1,0 +1,115 @@
+﻿@page "/admin/users"
+@inject IAuthService authService
+@inject NavigationManager navigationManager
+
+@if (!userList.Any())
+{
+    <div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 70vh">
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    </div>
+} else {
+    <MudTable Items="@userList" Hover="true" Filter="new Func<UserDto, bool>(FilterFunc1)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h4">User List</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="search" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh Class="text-center">Nr</MudTh>
+            <MudTh Class="text-center">Name</MudTh>
+            <MudTh Class="text-center">Email</MudTh>
+            <MudTh Class="text-center">Date Created</MudTh>
+            <MudTh Class="text-center">Address</MudTh>
+            <MudTh Class="text-center">Role</MudTh>
+            <MudTh Class="text-center">Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nr" Class="text-center">@context.Nr</MudTd>
+            <MudTd DataLabel="Name" Class="text-center">
+                @if (context.User.Address == null)
+                {
+                    <span><em>User have not input Name</em></span>
+                } else
+                {
+                    <span>
+                        @(context.User.Address.FirstName + " " + context.User.Address.LastName)
+                    </span>
+                }
+            </MudTd>
+            <MudTd DataLabel="Email">@context.User.Email</MudTd>
+            <MudTd DataLabel="DateCreated" Class="text-center">@(context.User.DateCreated.ToShortDateString())</MudTd>
+            <MudTd DataLabel="Address" Class="text-center" Style="width: 500px">
+                @if (context.User.Address == null)
+                {
+                    <span><em>User have not input Address</em></span>
+                } else {
+                    <span>
+                        @(context.User.Address.Street + " " 
+                        + context.User.Address.City + " "
+                        + context.User.Address.State + " "
+                        + context.User.Address.Zip + " "
+                            + context.User.Address.Country  + " ")
+                    </span>
+                }
+            </MudTd>
+            <MudTd DataLabel="Role" Class="text-center">@context.User.Role</MudTd>
+            <MudTd DataLabel="Actions" Class="text-center">
+				    <button class="btn btn-primary" @onclick="@(() => EditProduct(context.User.Id))">
+					    <i class="oi oi-pencil"></i>
+				    </button>
+				    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick="@(() => item = context.User)">
+					    <i class="oi oi-trash"></i>
+				    </button>
+
+				    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					    <div class="modal-dialog modal-dialog-centered">
+						    <div class="modal-content">
+							    <div class="modal-header">
+								    <h1 class="modal-title fs-5" id="exampleModalLabel">Delete Confirmation</h1>
+								    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							    </div>
+							    <div class="modal-body">
+								    Do you want to Delete <span class="fw-bold">@(item != null ? item.Email : null)?</span>
+							    </div>
+							    <div class="modal-footer">
+								    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+								    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="@(() => DeleteUser(item))">Delete</button>
+							    </div>
+						    </div>
+					    </div>
+				    </div>
+			    </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+}
+@code {
+    private string search = string.Empty;
+    private User item = null;
+    private IEnumerable<UserDto> userList = new List<UserDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        userList = await authService.GetUserList();
+    }
+
+    private void EditProduct(int userId)
+    {
+        navigationManager.NavigateTo($"/admin/user/{userId}");
+    }
+    private void DeleteUser(User user) {
+
+    }
+    private bool FilterFunc1(UserDto element) => FilterFunc(element, search);
+
+    private bool FilterFunc(UserDto element, string searchString)
+    {
+        if(string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if(element.User.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

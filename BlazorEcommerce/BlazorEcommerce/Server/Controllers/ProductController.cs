@@ -112,8 +112,8 @@ public class ProductController : ControllerBase
 			response.Message = "Product is not found";
 		} else
 		{
-			_unitOfWork.Product.Remove(product);
-			//product.Deleted = true;
+			//_unitOfWork.Product.Remove(product);
+			product.Deleted = true;
 			await _unitOfWork.Save();
 		}
 		return Ok(response);

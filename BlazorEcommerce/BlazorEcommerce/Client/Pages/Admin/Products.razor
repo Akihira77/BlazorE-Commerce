@@ -4,8 +4,6 @@
 @inject ISnackbar snackbar
 @attribute [Authorize(Roles = "Admin")]
 
-<h3>Products</h3>
-
 @if(productService.AdminProducts == null)
 {
 	<div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 70vh">
@@ -19,6 +17,7 @@
 
 	<MudTable Hover="true" Virtualize="true" Items="@items" Filter="new Func<Product,bool>(FilterFunc1)">
 		<ToolBarContent>
+			<MudText Typo="Typo.h4">Product List</MudText>
 			<MudSpacer />
 			<MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
 		</ToolBarContent>
@@ -125,11 +124,9 @@
 	{
 		var result = await productService.DeleteProduct(product);
 
-		if (result.Data)
+		if(result.Data)
 		{
-			snackbar.Add(result.Message, Severity.Success);
-
-			await OnInitializedAsync();
+			navigationManager.NavigateTo("admin/products", true);
 		} else
 		{
 			snackbar.Add(result.Message, Severity.Error);

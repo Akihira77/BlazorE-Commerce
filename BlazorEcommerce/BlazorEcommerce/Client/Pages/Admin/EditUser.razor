@@ -1,0 +1,48 @@
+﻿@page "/admin/user/{userId:int}"
+@inject IAuthService authService
+
+
+@if (loading)
+{
+	<span>@message</span>
+} else {
+	<EditForm Model="user" OnValidSubmit="UpdateUser" class="d-flex flex-column">
+		<DataAnnotationsValidator></DataAnnotationsValidator>
+
+		<div class="mb-3">
+			<label for="email">Email</label>
+			<InputText id="email" @bind-Value="user.Email" class="form-control" disabled></InputText>
+		</div>
+		<div class="mb-3">
+			<label for="role">Role</label>
+			<InputText id="role" @bind-Value="user.Role" class="form-control"></InputText>
+		</div>
+
+		<button class="btn btn-primary ms-auto">Save</button>
+	</EditForm>
+}
+
+@code {
+	[Parameter]
+	public int userId { get; set; }
+
+	string message = "Loading...";
+	bool loading = true;
+	User user = new User();
+	protected override async Task OnParametersSetAsync()
+	{
+		var dbUser = await authService.GetUser(userId);
+		if (dbUser == null)
+		{
+			message = $"User with Id '{userId}' does not exist";
+			return;
+		}
+		user = dbUser;
+		loading = false;
+	}
+
+	private async Task UpdateUser()
+	{
+		await authService.ChangeRole(user);
+	}
+}

@@ -10,4 +10,5 @@ public interface IAuthRepository : IRepository<User>
 	int GetUserId();
 	string GetUserEmail();
 	Task<User> GetUserByEmail(string email);
+	Task<IEnumerable<User>> GetUsers();
 }

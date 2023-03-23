@@ -86,7 +86,7 @@
 		{
 			<div class="row">
 				<div class="col">
-					<InputSelect @bind-Value="variant.ProductTypeId" class="form-control">
+					<InputSelect disabled="@variant.Deleted" @bind-Value="variant.ProductTypeId" class="form-control">
 						@foreach(var productType in productTypeService.ProductTypes)
 						{
 							<option value="@productType.Id.ToString()">@productType.Name</option>
@@ -94,16 +94,16 @@
 					</InputSelect>
 				</div>
 				<div class="col">
-					<InputNumber @bind-Value="variant.Price" class="form-control"></InputNumber>
+					<InputNumber disabled="@variant.Deleted" @bind-Value="variant.Price" class="form-control"></InputNumber>
 				</div>
 				<div class="col">
-					<InputNumber @bind-Value="variant.OriginalPrice" class="form-control"></InputNumber>
+					<InputNumber disabled="@variant.Deleted" @bind-Value="variant.OriginalPrice" class="form-control"></InputNumber>
 				</div>
 				<div class="col col-visible d-flex align-items-center justify-content-center">
-					<InputCheckbox @bind-Value="variant.Visible" style="transform: scale(1.5, 1.5)"></InputCheckbox>
+					<InputCheckbox disabled="@variant.Deleted" @bind-Value="variant.Visible" style="transform: scale(1.5, 1.5)"></InputCheckbox>
 				</div>
 				<div class="col">
-					<button class="btn btn-danger" @onclick="@(() => RemoveVariant(variant.ProductTypeId))">
+					<button class="btn btn-danger" disabled="@variant.Deleted" @onclick="@(() => RemoveVariant(variant.ProductTypeId))">
 						<i class="oi oi-trash"></i>
 					</button>
 				</div>
@@ -184,20 +184,23 @@
 	void RemoveVariant(int productTypeId)
 	{
 		var variant = product.Variants
-		.FirstOrDefault(v => v.ProductTypeId == productTypeId);
+				.FirstOrDefault(v => v.ProductTypeId == productTypeId);
 
 		if (variant == null)
 		{
 			return;
 		}
 
-		//if (variant.IsNew)
-		//{
+		if(variant.IsNew)
+		{
 			var newProductVariants = product.Variants.ToList();
 			newProductVariants.Remove(variant);
 
 			product.Variants = newProductVariants.AsEnumerable();
-		//}
+		} else
+		{
+			variant.Deleted = true;
+		}
 	}
 
 	void AddVariant()

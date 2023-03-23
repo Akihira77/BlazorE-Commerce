@@ -20,7 +20,7 @@ public class CategoryController : ControllerBase
 		var response = new ServiceResponse<IEnumerable<Category>>()
 		{
 			Data = await _unitOfWork.Category
-					.GetAll((c => c.Visible)),
+					.GetAll((c => c.Visible && !c.Deleted)),
 			Message = "Category list",
 		};
 
@@ -33,7 +33,7 @@ public class CategoryController : ControllerBase
 		var response = new ServiceResponse<IEnumerable<Category>>()
 		{
 			Data = await _unitOfWork.Category
-			.GetAll(),
+			.GetAll((c => !c.Deleted)),
 			Message = "Admin - Category list",
 		};
 
@@ -49,7 +49,7 @@ public class CategoryController : ControllerBase
 		var response = new ServiceResponse<IEnumerable<Category>>
 		{
 			Data = await _unitOfWork.Category
-			.GetAll(),
+			.GetAll((c => !c.Deleted)),
 			Message = $"Adding Category {category.Name} is success"
 		};
 
@@ -65,7 +65,8 @@ public class CategoryController : ControllerBase
 		if(category != null)
 		{
 			response.Message = "Deleting category is success";
-			_unitOfWork.Category.Remove(category);
+			category.Deleted = true;
+			//_unitOfWork.Category.Remove(category);
 			await _unitOfWork.Save();
 		} else
 		{
@@ -73,7 +74,7 @@ public class CategoryController : ControllerBase
 			response.Message = "Category is not found";
 		}
 		response.Data = await _unitOfWork.Category
-			.GetAll();
+			.GetAll((c => !c.Deleted));
 		return Ok(response);
 	}
 
@@ -95,7 +96,7 @@ public class CategoryController : ControllerBase
 			response.Message = "Category is not found";
 		}
 		response.Data = await _unitOfWork.Category
-			.GetAll();
+			.GetAll((c => !c.Deleted));
 		return Ok(response);
 	}
 }

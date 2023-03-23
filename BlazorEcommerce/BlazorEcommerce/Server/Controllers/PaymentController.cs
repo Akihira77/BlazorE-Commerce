@@ -1,4 +1,5 @@
-﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+﻿using BlazorEcommerce.Server.Services.EmailService;
+using BlazorEcommerce.Server.Services.Repositories.IRepositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +9,12 @@ namespace BlazorEcommerce.Server.Controllers;
 public class PaymentController : ControllerBase
 {
 	private readonly IUnitOfWork _unitOfWork;
+	private readonly IEmailSender _emailSender;
 
-	public PaymentController(IUnitOfWork unitOfWork)
+	public PaymentController(IUnitOfWork unitOfWork, IEmailSender emailSender)
     {
 		_unitOfWork = unitOfWork;
+		_emailSender = emailSender;
 	}
 
 	[HttpPost("checkout"), Authorize]
@@ -30,15 +33,27 @@ public class PaymentController : ControllerBase
 		{
 			if(request.Data > 0)
 			{
-				var userId = request.Data;
-				var cartItems = await _unitOfWork.Cart.GetAll((c => c.UserId == userId));
+				var user = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Id == request.Data));
+				var cartItems = await _unitOfWork.Cart.GetAll((c => c.UserId == user.Id));
 				var cartProducts = await _unitOfWork.Cart.GetCartProducts(cartItems);
-				var order = _unitOfWork.Order.PlaceOrder(cartProducts, userId);
+				
+				foreach (var product in cartProducts)
+				{
+					var dbProduct = await _unitOfWork.Product.GetFirstOrDefault((p => p.Id == product.ProductId));
+					if (dbProduct != null)
+					{
+						dbProduct.Stock -= product.Quantity;
+					} 
+				}
+
+				var order = _unitOfWork.Order.PlaceOrder(cartProducts, user.Id);
 
 				await _unitOfWork.Order.Add(order);
 
 				_unitOfWork.Cart.RemoveRange(cartItems);
 				await _unitOfWork.Save();
+
+				response.Message = "Order has been fulfilled";
 			}
 			return Ok(response);
 		} else

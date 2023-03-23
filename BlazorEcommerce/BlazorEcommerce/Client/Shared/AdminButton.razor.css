@@ -1,21 +1,21 @@
 ﻿.show-menu {
-	display : block;
+	display: block;
 }
 
 .user-button {
-	margin-left : .5em;
+	margin-left: .5em;
 }
 
 .top-row a {
-	margin-left : 0;
+	margin-left: 0;
 }
 
 .dropdown-item:hover {
-	background-color : white;
+	background-color: white;
 }
 
 .logout:hover {
-	text-decoration : underline;
+	text-decoration: underline;
 }
 
 @media(max-width: 640.98px) {

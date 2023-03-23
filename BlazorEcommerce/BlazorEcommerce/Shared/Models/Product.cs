@@ -19,7 +19,8 @@ public class Product
 	public IEnumerable<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
 
 	public bool Visible { get; set; } = true;
-    public int Stock { get; set; }
+	public bool Deleted { get; set; } = false;
+	public int Stock { get; set; }
 
     [NotMapped]
 	public bool Editing { get; set; } = false;

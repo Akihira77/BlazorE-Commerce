@@ -61,7 +61,7 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 		var orders = await _db.Orders
 				.Include(o => o.OrderItems)
 					.ThenInclude(oi => oi.Product)
-					//.ThenInclude(p => p.Images)
+					.ThenInclude(p => p.Images)
 				.Where(o => o.UserId == _authRepository.GetUserId())
 				.OrderByDescending(o => o.OrderDate)
 				.ToListAsync();
@@ -80,11 +80,10 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 					$"{order.OrderItems.Count() - 1} more ..." 
 						: 
 					order.OrderItems.First().Product.Title,
-				ProductImageUrl = order.OrderItems.First().Product.ImageUrl
-				//!string.IsNullOrEmpty(order.OrderItems.First().Product.ImageUrl) ?
-				//					order.OrderItems.First().Product.ImageUrl
-				//					:
-				//					order.OrderItems.First().Product.Images[0].Data
+				ProductImageUrl = !string.IsNullOrEmpty(order.OrderItems.First().Product.ImageUrl) ?
+									order.OrderItems.First().Product.ImageUrl
+									:
+									order.OrderItems.First().Product.Images[0].Data
 			});
 		}
 
