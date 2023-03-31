@@ -1,6 +1,5 @@
 ﻿using BlazorEcommerce.Server.Services.EmailService;
 using BlazorEcommerce.Server.Services.Repositories.IRepositories;
-using BlazorEcommerce.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers;
@@ -30,6 +29,19 @@ public class OrderController : ControllerBase
 		return Ok(response);
 	}
 
+	[HttpGet("admin/{orderId}")]
+	public async Task<ActionResult<ServiceResponse<OrderDetailsDto>>> AdminGetOrderDetails(int orderId)
+	{
+		var result = await _unitOfWork.Order.AdminGetOrderDetails(orderId);
+		var response = new ServiceResponse<OrderDetailsDto>
+		{
+			Data = result,
+			Message = $"Admin - List Order Details ID {orderId}"
+		};
+
+		return Ok(response);
+	}
+
 	[HttpGet("{orderId}")]
 	public async Task<ActionResult<ServiceResponse<OrderDetailsDto>>> GetOrderDetails(int orderId)
 	{
@@ -54,5 +66,89 @@ public class OrderController : ControllerBase
 
 		await _emailSender.SendEmailAsync(message);
 		return true;
+	}
+	[HttpGet("admin-orders")]
+	public async Task<ActionResult<ServiceResponse<IEnumerable<OrderDto>>>> GetAdminOrders()
+	{
+		var orderDtos = new List<OrderDto>();
+		var result = (await _unitOfWork.Order.GetAll())
+					.OrderByDescending(o => o.OrderDate);
+
+		foreach(var order in result)
+		{
+			orderDtos.Add(new OrderDto
+			{
+				User = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Id == order.UserId), includeProperties: "Address"),
+				Order = order
+			});
+		}
+		return Ok(new ServiceResponse<IEnumerable<OrderDto>>
+		{
+			Data = orderDtos
+		});
+	}
+	[HttpGet("admin/get-order/{orderId}")]
+	public async Task<ActionResult<ServiceResponse<OrderOverviewDto>>> GetOrder(int orderId)
+	{
+		var order = await _unitOfWork.Order.GetFirstOrDefault((o => o.Id == orderId));
+
+		var response = new ServiceResponse<OrderOverviewDto>();
+
+		if(order == null)
+		{
+			response.Message = "Order does not exists";
+			response.Success = false;
+
+			return NotFound(response);
+		}
+
+		response.Data = new OrderOverviewDto
+		{
+			Id = order.Id,
+			OrderStatus = order.OrderStatus,
+		};
+
+		return Ok(response);
+	}
+	[HttpPut("admin/update-order-status/{orderId}")]
+	public async Task<ActionResult<ServiceResponse<IEnumerable<OrderOverviewDto>>>> UpdateOrderStatus(int orderId, [FromBody] int status)
+	{
+		var order = await _unitOfWork.Order.GetFirstOrDefault((o => o.Id == orderId));
+
+		var response = new ServiceResponse<IEnumerable<OrderDto>>();
+
+		if(order == null)
+		{
+			response.Message = "Order does not exists";
+			response.Success = false;
+
+			return NotFound(response);
+		}
+
+		order.OrderStatus = status;
+		await _unitOfWork.Save();
+
+		var orderDtos = new List<OrderDto>();
+		var result = (await _unitOfWork.Order.GetAll())
+					.OrderByDescending(o => o.OrderDate);
+
+		foreach(var item in result)
+		{
+			orderDtos.Add(new OrderDto
+			{
+				User = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Id == item.UserId), includeProperties: "Address"),
+				Order = item
+			});
+		}
+		response.Data = orderDtos;
+		return Ok(response);
+	}
+	[HttpPost("admin/send-order")]
+	public async Task SendOrder(int orderId)
+	{
+		var order = await _unitOfWork.Order.GetFirstOrDefault((o => o.Id == orderId));
+
+		order.OrderStatus = 1;
+		await _unitOfWork.Save();
 	}
 }

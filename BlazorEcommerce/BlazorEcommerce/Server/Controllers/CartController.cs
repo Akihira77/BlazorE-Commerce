@@ -1,7 +1,5 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
-using BlazorEcommerce.Shared;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BlazorEcommerce.Server.Controllers;
 [Route("api/v1/[controller]")]
@@ -13,11 +11,6 @@ public class CartController : ControllerBase
 	public CartController(IUnitOfWork unitOfWork)
 	{
 		_unitOfWork = unitOfWork;
-	}
-
-	private int GetUserId()
-	{
-		return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 	}
 
 	[HttpPost("products")]
@@ -60,7 +53,7 @@ public class CartController : ControllerBase
 	[HttpGet]
 	public async Task<ActionResult<ServiceResponse<IEnumerable<CartProductDto>>>> GetDbCartProducts()
 	{
-		var result = await _unitOfWork.Cart.GetAll((c => c.UserId == GetUserId()));
+		var result = await _unitOfWork.Cart.GetAll((c => c.UserId == _unitOfWork.Auth.GetUserId()));
 
 		var response = new ServiceResponse<IEnumerable<CartProductDto>>
 		{
@@ -75,7 +68,7 @@ public class CartController : ControllerBase
 	public async Task<ActionResult<ServiceResponse<bool>>> AddToCart(CartItem cartItem)
 	{
 		var response = new ServiceResponse<bool> { Success = false };
-		cartItem.UserId = GetUserId();
+		cartItem.UserId = _unitOfWork.Auth.GetUserId();
 
 		var sameItem = await _unitOfWork.Cart
 			.GetFirstOrDefault((c => c.UserId == cartItem.UserId
@@ -104,7 +97,7 @@ public class CartController : ControllerBase
 		var response = new ServiceResponse<bool>();
 
 		var cartItem = await _unitOfWork.Cart
-			.GetFirstOrDefault((c => c.UserId == GetUserId()
+			.GetFirstOrDefault((c => c.UserId == _unitOfWork.Auth.GetUserId()
 			&& c.ProductId == productId
 			&& c.ProductTypeId == productTypeId));
 

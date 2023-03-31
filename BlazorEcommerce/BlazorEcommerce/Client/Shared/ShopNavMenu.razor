@@ -1,4 +1,6 @@
 ﻿@inject ICategoryService categoryService
+@inject ILocalStorageService localStorage
+@inject ICartService cartService
 @implements IDisposable
 
 <div class="top-row ps-3 navbar navbar-dark navbar-toggler-wrapper">
@@ -46,7 +48,6 @@
 
 @code {
     private bool collapseNavMenu = true;
-    //private ItemsLocalStorage item = new();
     bool _isExpanded = false;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
@@ -57,13 +58,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //item = await localStorage.GetItemAsync<ItemsLocalStorage>("authToken");
-
-        //if (item != null && (DateTime.Now > DateTime.Parse(item.Expiry)))
-        //{
-        //    await localStorage.RemoveItemAsync("authToken");
-        //}
-
         await categoryService.GetCategories();
         categoryService.OnChange += StateHasChanged;
     }

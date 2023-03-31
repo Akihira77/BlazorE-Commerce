@@ -2,7 +2,7 @@
 
 public interface IProductService
 {
-	event Action ProductsChanged;
+	event Action? ProductsChanged;
 	List<Product> Products { get; set; }
 	List<Product> AdminProducts { get; set; }
 	string Message { get; set; }

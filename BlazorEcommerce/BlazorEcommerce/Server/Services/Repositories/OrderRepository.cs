@@ -36,6 +36,7 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 
 		orderDetailsDto.OrderDate = order.OrderDate;
 		orderDetailsDto.TotalPrice = order.TotalPrice;
+		orderDetailsDto.OrderStatus = order.OrderStatus;
 		var temp = new List<OrderDetailsProductDto>();
 
 		foreach(var item in order.OrderItems)
@@ -45,6 +46,48 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 				ProductId = item.ProductId,
 				ProductType = item.ProductType.Name,
 				ImageUrl = !string.IsNullOrEmpty(item.Product.ImageUrl)? item.Product.ImageUrl : item.Product.Images[0].Data,
+				Quantity = item.Quantity,
+				Title = item.Product.Title,
+				TotalPrice = item.TotalPrice
+			});
+		}
+
+		orderDetailsDto.Products = temp.AsEnumerable();
+
+		return orderDetailsDto;
+	}
+
+	public async Task<OrderDetailsDto> AdminGetOrderDetails(int orderId)
+	{
+		var orderDetailsDto = new OrderDetailsDto();
+
+		var order = await _db.Orders
+			.Include(o => o.OrderItems)
+			.ThenInclude(oi => oi.Product)
+				.ThenInclude(p => p.Images)
+			.Include(o => o.OrderItems)
+			.ThenInclude(oi => oi.ProductType)
+			.Where(o => o.Id == orderId)
+			.OrderByDescending(o => o.OrderDate)
+			.FirstOrDefaultAsync();
+
+		if(order == null)
+		{
+			return null;
+		}
+
+		orderDetailsDto.OrderDate = order.OrderDate;
+		orderDetailsDto.TotalPrice = order.TotalPrice;
+		orderDetailsDto.OrderStatus = order.OrderStatus;
+		var temp = new List<OrderDetailsProductDto>();
+
+		foreach(var item in order.OrderItems)
+		{
+			temp.Add(new OrderDetailsProductDto
+			{
+				ProductId = item.ProductId,
+				ProductType = item.ProductType.Name,
+				ImageUrl = !string.IsNullOrEmpty(item.Product.ImageUrl) ? item.Product.ImageUrl : item.Product.Images[0].Data,
 				Quantity = item.Quantity,
 				Title = item.Product.Title,
 				TotalPrice = item.TotalPrice
@@ -66,7 +109,6 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 				.OrderByDescending(o => o.OrderDate)
 				.ToListAsync();
 
-
 		var orderOverview = new List<OrderOverviewDto>();
 		foreach (var order in orders)
 		{
@@ -80,6 +122,7 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 					$"{order.OrderItems.Count() - 1} more ..." 
 						: 
 					order.OrderItems.First().Product.Title,
+				OrderStatus = order.OrderStatus,
 				ProductImageUrl = !string.IsNullOrEmpty(order.OrderItems.First().Product.ImageUrl) ?
 									order.OrderItems.First().Product.ImageUrl
 									:

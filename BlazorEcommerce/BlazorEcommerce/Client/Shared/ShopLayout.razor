@@ -5,27 +5,29 @@
     <MudDialogProvider />
     <MudSnackbarProvider />
 
-        <AuthorizeView Roles="Admin">
-            <Authorized>
+    <AuthorizeView>
+        <Authorized>
+            @if(context.User.IsInRole("Admin"))
+            {
                 <main>
-                    <div class="top-row pt-2 justify-content-between">
-                        <HomeButton />
+                    <div class="top-row py-2">
+                        <HomeButton Role="Admin" />
                         <AdminButton />
                     </div>
                     <div class="d-flex" style="min-height: 100vh">
-                        <div class="nav-menu pt-2" style="min-width: 10%">
+                        <div class="nav-menu pt-2" style="width: 15%">
                             <AdminNavMenu />
                         </div>
 
-                        <article class="content px-2 pb-5" style="min-width: 90%">
+                        <article class="content px-2 pb-5" style="width: 85%">
                             @Body
                         </article>
                     </div>
                 </main>
-            </Authorized>
-            <NotAuthorized>
+            } else
+            {
                 <main class="pb-5">
-                    <div class="top-row pt-2">
+                    <div class="top-row py-2">
                         <HomeButton />
                         <Search />
                         <UserButton />
@@ -39,6 +41,23 @@
                         @Body
                     </article>
                 </main>
-            </NotAuthorized>
-        </AuthorizeView>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <main class="pb-5">
+                <div class="top-row py-2">
+                    <HomeButton />
+                    <Search />
+                    <UserButton />
+                </div>
+                <div class="nav-menu">
+                    <ShopNavMenu />
+                </div>
+
+                <article class="content px-2">
+                    @Body
+                </article>
+            </main>
+        </NotAuthorized>
+    </AuthorizeView>
 </div>

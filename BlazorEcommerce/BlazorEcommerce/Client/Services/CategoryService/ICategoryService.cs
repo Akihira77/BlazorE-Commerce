@@ -1,10 +1,8 @@
-﻿using BlazorEcommerce.Shared.Models;
-
-namespace BlazorEcommerce.Client.Services.CategoryService;
+﻿namespace BlazorEcommerce.Client.Services.CategoryService;
 
 public interface ICategoryService
 {
-	event Action OnChange;
+	event Action? OnChange;
 	IEnumerable<Category> Categories { get; set; }
 	List<Category> AdminCategories { get; set; }
 	Task<ServiceResponse<Category>> GetCategory(int id);

@@ -1,0 +1,135 @@
+﻿@page "/admin/orders"
+@inject IOrderService orderService
+@inject NavigationManager navigationManager
+@inject IDialogService dialogService
+@implements IDisposable
+@attribute [Authorize(Roles = "Admin")]
+
+@if(orderService.AdminOrders == null)
+{
+	<div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 70vh">
+		<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+	</div>
+} else
+{
+    <MudTable Items="@orderService.AdminOrders" Hover="true">
+        <ToolBarContent>
+            <MudText Typo="Typo.h4">Order List</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh Class="text-center">Email</MudTh>
+            <MudTh Class="text-center">
+                Created
+            </MudTh>
+            <MudTh Class="text-center">
+                Price
+            </MudTh>
+            <MudTh Class="text-center">Address</MudTh>
+            <MudTh Class="text-center">Status</MudTh>
+            <MudTh Class="text-center">Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Email">@context.User.Email</MudTd>
+            <MudTd Class="text-center" DataLabel="DateCreated">@context.Order.OrderDate.ToString("f")</MudTd>
+            <MudTd Class="text-center fw-bold" DataLabel="Price">$@context.Order.TotalPrice</MudTd>
+            <MudTd Class="text-center" DataLabel="Address" Style="width: 375px">
+                @if(context.User.Address == null)
+                {
+                    <span><em>User have not input Address</em></span>
+                } else
+                {
+                    <span>@context.User.Address.Street</span>
+                    <br />
+                    <span>@context.User.Address.City, @context.User.Address.State, @context.User.Address.Zip</span>
+                    <br />
+                    <span>@context.User.Address.Country</span>
+                    <br />
+                }
+            </MudTd>
+            <MudTd DataLabel="Status" Class="text-center">
+                @if(context.Order.OrderStatus == -1)
+                {
+                    <MudTooltip Text="Order Cancelled" Arrow="true" Placement="Placement.Bottom" Duration="0">
+                        <MudIcon Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Large"></MudIcon>
+                    </MudTooltip>
+                } else if(context.Order.OrderStatus == 1)
+                {
+                    <MudTooltip Text="Order Approved" Arrow="true" Placement="Placement.Bottom" Duration="0">
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Large"></MudIcon>
+                    </MudTooltip>
+                } else
+                {
+                    <MudTooltip Text="Order need Actions" Arrow="true" Placement="Placement.Bottom" Duration="0">
+                        <MudIcon Icon="@Icons.Material.Outlined.Circle" Color="Color.Warning" Size="Size.Large"></MudIcon>
+                    </MudTooltip>
+                }
+            </MudTd>
+            <MudTd DataLabel="Actions" Class="text-center">
+                <button @onclick="(() => OrderDetail(context.Order.Id))">
+                    <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Large"></MudIcon>
+                </button>
+                @if (context.Order.OrderStatus == 0)
+                {
+                    <button @onclick="(() => SendOrder(context.Order.Id))">
+                        <MudIcon Icon="@Icons.Material.Filled.Send" Color="Color.Primary" Size="Size.Large"></MudIcon>
+                    </button>
+                } else if (context.Order.OrderStatus == 1)
+                {
+                    <MudTooltip Text="Order has been delivered" Arrow="true" Placement="Placement.Bottom">
+                        <MudIcon Icon="@Icons.Material.Filled.Details" Color="Color.Success" Size="Size.Large"></MudIcon>
+                    </MudTooltip>
+                } else
+                {
+                    <button @onclick="(() => SeeDetails(context.Order.Id))">
+                        <MudTooltip Text="Order has been cancelled" Arrow="true" Placement="Placement.Bottom">
+                            <MudIcon Icon="@Icons.Material.Filled.CancelScheduleSend" Color="Color.Error" Size="Size.Large"></MudIcon>
+                        </MudTooltip>
+                    </button>
+                }
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{50, 100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private OrderDto item = new OrderDto();
+    protected override async Task OnInitializedAsync()
+    {
+        await orderService.GetAdminOrders();
+        orderService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        orderService.OnChange -= StateHasChanged;
+    }
+
+    private async Task OrderDetail(int orderId)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var parameters = new DialogParameters { ["OrderId"] = orderId };
+
+        var dialog = await dialogService.ShowAsync<AdminOrderDetails>($"Details order ID {orderId}", parameters, options);
+    }
+
+    private async Task SeeDetails(int orderId)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var parameters = new DialogParameters { ["OrderId"] = orderId };
+
+        var dialog = await dialogService.ShowAsync<OrderCancelDetails>($"Details order cancel ID {orderId}", parameters, options);
+    }
+
+    private async Task SendOrder(int orderId)
+    {
+        //await orderService.SendOrder(orderId);
+
+        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Medium };
+        var parameters = new DialogParameters { ["OrderId"] = orderId };
+
+        var dialog = await dialogService.ShowAsync<SendForm>($"Send Order {orderId}", parameters, options);
+    }
+}

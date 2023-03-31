@@ -1,32 +1,41 @@
 ﻿@page "/orders/{orderId:int}"
 @inject IOrderService orderService
-@inject IAuthService authService
 @inject ISnackbar snackbar
 @attribute [Authorize]
 
 @if(order == null)
 {
-	<span>Loading order...</span>
+	<div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 70vh">
+		<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+	</div>
 } else
 {
 	<div class="d-flex justify-content-between mb-3">
 		<h3>Order from @order.OrderDate.ToString("f")</h3>
-		<button type="button" class="btn btn-success" @onclick="@(() => Invoice(OrderId))">Invoice</button>
-
+		<div class="d-flex gap-2 flex-column flex-sm-row">
+			<div>
+				<MudTooltip Text="@GetMessage(order.OrderStatus)">
+					<div class="order-status py-3 px-4 @GetStatusCss(order.OrderStatus) rounded">
+						@GetStatus(order.OrderStatus)
+					</div>
+				</MudTooltip>
+			</div>
+			<button type="button" class="btn btn-success" @onclick="@(() => Invoice(OrderId))">Invoice</button>
+		</div>
 	</div>
 	<div class="pb-5">
 		@foreach(var product in order.Products)
 		{
 			<div class="container d-flex p-1">
-				<div class="image-wrapper text-center">
+				<div class="image-wrapper">
 					<img src="@product.ImageUrl" class="image"/>
 				</div>
 				<div class="name flex-grow-1 p-1">
-					<h5>
+					<h6>
 						<a href="/product/@product.ProductId" class="link-primary text-decoration-underline">
 							@product.Title
 						</a>
-					</h5>
+					</h6>
 					<span>@product.ProductType</span>
 					<br />
 					<span>Quantity: @product.Quantity</span>
@@ -59,6 +68,45 @@
 		{
 			snackbar.Configuration.SnackbarVariant = Variant.Outlined;
 			snackbar.Add("Invoice has been send to your Email", Severity.Success);
+		}
+	}
+
+	private string GetMessage(int orderStatus)
+	{
+		switch(orderStatus)
+		{
+			case -1:
+				return "Your order was cancelled";
+			case 1:
+				return "Your order has been delivered";
+			default:
+				return "Your order status is in processing";
+		}
+	}
+
+	private string GetStatus(int orderStatus)
+	{
+		switch(orderStatus)
+		{
+			case -1:
+				return "Cancelled";
+			case 1:
+				return "Delivered";
+			default:
+				return "Processing";
+		}
+	}
+
+	private string GetStatusCss(int orderStatus)
+	{
+		switch(orderStatus)
+		{
+			case -1:
+				return "bg-danger";
+			case 1:
+				return "bg-success";
+			default:
+				return "bg-warning";
 		}
 	}
 }

@@ -1,18 +1,22 @@
-﻿/*.container {
-	display : flex;
-	padding : 6px;
-}
-*/
-.image-wrapper {
-	width : 150px;
+﻿.image-wrapper {
+	min-width : 120px;
 }
 
 .image {
-	max-height : 150px;
-	max-width : 150px;
+	height : 130px;
+	width : 100px;
 }
 
 .product-price {
 	font-weight : 600;
 	text-align: right;
+}
+
+.order-status {
+	font-size: 1.25rem;
+}
+@media (max-width: 409.98px) {
+	.order-status {
+		font-size: .9rem;
+	}
 }

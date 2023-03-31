@@ -2,18 +2,19 @@
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider authenticationStateProvider
 
-<div class="dropdown">
-	<button @onclick="ToggleUserMenu"
-			@onfocusout="HideUserMenu"
-   class="btn btn-secondary dropdown-toggle user-button">
-		<i class="oi oi-person"></i>
-	</button>
-	<div class="dropdown-menu dropdown-menu-start @UserMenuCssClass" style="min-width: auto">
-		<a href="profile" class="dropdown-item ms-0">Profile</a>
-		<button class="logout dropdown-item" @onclick="Logout">Logout</button>
+<div class="d-flex align-items-center ms-auto" style="margin-right: 5em">
+	<div class="dropdown">
+		<button @onclick="ToggleUserMenu"
+				@onfocusout="HideUserMenu"
+	   class="btn btn-secondary dropdown-toggle user-button">
+			<i class="oi oi-person"></i>
+		</button>
+		<div class="dropdown-menu dropdown-menu-start @UserMenuCssClass">
+			<a href="profile" class="dropdown-item ms-0">Profile</a>
+			<button class="logout dropdown-item" @onclick="Logout">Logout</button>
+		</div>
 	</div>
 </div>
-
 @code {
 	private bool showUserMenu = false;
 

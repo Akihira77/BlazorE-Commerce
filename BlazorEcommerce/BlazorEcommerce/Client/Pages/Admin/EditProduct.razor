@@ -6,6 +6,8 @@
 @inject ICategoryService categoryService
 @inject NavigationManager navigationManager
 @inject ISnackbar snackbar
+@attribute [Authorize(Roles = "Admin")]
+
 
 @if(loading)
 {

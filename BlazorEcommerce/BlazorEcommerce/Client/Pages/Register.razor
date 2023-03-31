@@ -1,5 +1,6 @@
 ﻿@page "/register"
 @inject IAuthService authService
+@inject ISnackbar snackbar
 @inject NavigationManager navigationManager
 
 <PageTitle>Register</PageTitle>
@@ -40,24 +41,24 @@
 		</button>
 		<button type="submit" class="btn btn-primary">Register</button>
 	</div>
-	<div class="@messageCssClass">
-		<span>@message</span>
-	</div>
 </EditForm>
 
 @code {
 	UserRegister user = new UserRegister();
 
-	string message = string.Empty;
-	string messageCssClass = string.Empty;
 	string txtType = "password";
 	string txtConfirmType = "password";
 
 	async Task HandleRegistration()
 	{
 		var result = await authService.Register(user);
-		message = result.Message;
-		messageCssClass = result.Success ? "text-success" : "text-danger";
+		snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+		if (!result)
+		{
+			snackbar.Add("User email is already exist", Severity.Error);
+		} else {
+			snackbar.Add("User registration successful", Severity.Success);
+		}
 	}
 
 	private void ShowPassword()

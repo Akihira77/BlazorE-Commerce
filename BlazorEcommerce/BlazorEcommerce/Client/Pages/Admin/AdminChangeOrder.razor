@@ -1,0 +1,51 @@
+﻿@inject IOrderService orderService
+@inject ISnackbar snackbar
+
+<MudDialog>
+	<DialogContent>
+		<MudItem Class="d-flex justify-center align-center my-auto">
+			<MudRadioGroup Class="mx-auto" @bind-SelectedOption="orderStatus">
+				<MudRadio Placement="Placement.Bottom" Option="-1" Color="Color.Error" UnCheckedColor="Color.Error">Cancel</MudRadio>
+				<MudRadio Placement="Placement.Bottom" Option="0" Color="Color.Warning" UnCheckedColor="Color.Warning">Processing</MudRadio>
+				<MudRadio Placement="Placement.Bottom" Option="1" Color="Color.Success" UnCheckedColor="Color.Success">Approved</MudRadio>
+			</MudRadioGroup>
+		</MudItem>
+	</DialogContent>
+	<DialogActions>
+		<MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+	</DialogActions>
+</MudDialog>
+@code {
+	[CascadingParameter] 
+	MudDialogInstance MudDialog { get; set; }
+
+	[Parameter]
+	public int orderId { get; set; }
+
+	[Parameter]
+	public int orderStatus { get; set; }
+
+	private async Task Submit()
+	{
+		await orderService.UpdateOrderStatus(orderId, orderStatus);
+
+		snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+
+		switch(orderStatus)
+		{
+			case -1:
+				snackbar.Add($"Order {orderId} - Status Cancelled ", Severity.Error);
+				break;
+			case 1:
+				snackbar.Add($"Order {orderId} - Status Approved", Severity.Success);
+				break;
+			default:
+				snackbar.Add($"Order {orderId} - Status Processing", Severity.Warning);
+				break;
+		}
+
+		
+
+		MudDialog.Close(DialogResult.Ok(true));
+	}
+}

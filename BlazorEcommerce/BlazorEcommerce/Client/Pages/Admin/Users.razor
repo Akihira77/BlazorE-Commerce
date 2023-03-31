@@ -1,14 +1,17 @@
 ﻿@page "/admin/users"
 @inject IAuthService authService
 @inject NavigationManager navigationManager
+@implements IDisposable
+@attribute [Authorize(Roles = "Admin")]
 
-@if (!userList.Any())
+
+@if (authService.AdminUsers == null)
 {
     <div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 70vh">
         <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
     </div>
 } else {
-    <MudTable Items="@userList" Hover="true" Filter="new Func<UserDto, bool>(FilterFunc1)">
+    <MudTable Items="@authService.AdminUsers" Hover="true" Filter="new Func<UserDto, bool>(FilterFunc1)">
         <ToolBarContent>
             <MudText Typo="Typo.h4">User List</MudText>
             <MudSpacer />
@@ -38,18 +41,17 @@
             </MudTd>
             <MudTd DataLabel="Email">@context.User.Email</MudTd>
             <MudTd DataLabel="DateCreated" Class="text-center">@(context.User.DateCreated.ToShortDateString())</MudTd>
-            <MudTd DataLabel="Address" Class="text-center" Style="width: 500px">
+            <MudTd DataLabel="Address" Class="text-center" Style="width: 400px">
                 @if (context.User.Address == null)
                 {
                     <span><em>User have not input Address</em></span>
                 } else {
-                    <span>
-                        @(context.User.Address.Street + " " 
-                        + context.User.Address.City + " "
-                        + context.User.Address.State + " "
-                        + context.User.Address.Zip + " "
-                            + context.User.Address.Country  + " ")
-                    </span>
+                    <span>@context.User.Address.Street</span>
+                    <br />
+                    <span>@context.User.Address.City, @context.User.Address.State, @context.User.Address.Zip</span>
+                    <br />
+                    <span>@context.User.Address.Country</span>
+                    <br />
                 }
             </MudTd>
             <MudTd DataLabel="Role" Class="text-center">@context.User.Role</MudTd>
@@ -88,19 +90,26 @@
 @code {
     private string search = string.Empty;
     private User item = null;
-    private IEnumerable<UserDto> userList = new List<UserDto>();
+    private IEnumerable<UserDto> items = new List<UserDto>();
 
     protected override async Task OnInitializedAsync()
     {
-        userList = await authService.GetUserList();
+        await authService.GetUserList();
+        items = authService.AdminUsers;
+        authService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        authService.OnChange -= StateHasChanged;
     }
 
     private void EditProduct(int userId)
     {
         navigationManager.NavigateTo($"/admin/user/{userId}");
     }
-    private void DeleteUser(User user) {
-
+    private async Task DeleteUser(User user) {
+        await authService.DeleteUser(user);
     }
     private bool FilterFunc1(UserDto element) => FilterFunc(element, search);
 

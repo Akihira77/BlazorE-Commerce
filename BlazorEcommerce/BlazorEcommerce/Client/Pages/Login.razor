@@ -58,7 +58,7 @@
 			var role = await authService.GetRole(user.Email);
 			if (role.ToLower().Equals("admin"))
 			{
-				navigationManager.NavigateTo("/admin/dashboard");
+				navigationManager.NavigateTo("/admin");
 			}
 			else
 			{

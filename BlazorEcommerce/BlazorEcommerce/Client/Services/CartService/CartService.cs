@@ -7,7 +7,7 @@ public class CartService : ICartService
 	private readonly ILocalStorageService _localStorage;
 	private readonly HttpClient _http;
 
-	public event Action OnChange;
+	public event Action? OnChange;
 
 	public CartService(ILocalStorageService localStorage, HttpClient http)
 	{
@@ -63,11 +63,16 @@ public class CartService : ICartService
 
 	public async Task GetCartItemsCount()
 	{
-		var result = await _http.GetFromJsonAsync<ServiceResponse<int>>("api/v1/cart/count");
-		var count = result.Data;
+		var isUserAuthenticate = await _localStorage.GetItemAsync<string>("authToken");
 
-		await _localStorage.SetItemAsync("cartItemsCount", count);
+		if (!string.IsNullOrEmpty(isUserAuthenticate))
+		{
+			var result = await _http.GetFromJsonAsync<ServiceResponse<int>>("api/v1/cart/count");
+			var count = result.Data;
 
-		OnChange.Invoke();
-	}
+			await _localStorage.SetItemAsync("cartItemsCount", count);
+
+			OnChange?.Invoke();
+		}
+    }
 }

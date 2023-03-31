@@ -18,6 +18,7 @@ public class UnitOfWork : IUnitOfWork
 	public IProductTypeRepository ProductType { get; private set; }
 	public IProductVariantRepository ProductVariant { get; private set; }
 	public IImagesRepository Images { get; private set; }
+    public IOrderHeaderRepository OrderHeader { get; private set; }
     public UnitOfWork(AppDbContext db
 		, IConfiguration configuration
 		, IHttpContextAccessor httpContextAccessor
@@ -34,6 +35,7 @@ public class UnitOfWork : IUnitOfWork
 		ProductType = new ProductTypeRepository(_db);
 		ProductVariant = new ProductVariantRepository(_db);
 		Images = new ImagesRepository(_db);
+		OrderHeader = new OrderHeaderRepository(_db);
 	}
 	public async Task Save() => await _db.SaveChangesAsync();
 }

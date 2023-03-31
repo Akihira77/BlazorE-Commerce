@@ -1,0 +1,29 @@
+﻿@inject NavigationManager navigationManager
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="form">
+            <MudTextField @bind-Value="courier" Label="Courier" Required="true" RequiredError="Courier is required!" OnlyValidateIfDirty="true" />
+            <MudTextField @bind-Value="resi" Label="No. Resi" Required="true" RequiredError="No. Resi is required!" OnlyValidateIfDirty="true" />
+            <MudPaper Class="pa-4 mt-4">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                           OnClick="Submit">Submit</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(() => form?.Reset())" Class="mx-2">Reset</MudButton>
+            </MudPaper>
+        </MudForm>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public int orderId { get; set; }
+
+    string courier = string.Empty;
+    string resi = string.Empty;
+    MudForm? form;
+
+    void Submit()
+    {
+        navigationManager.NavigateTo("/admin/orders", true);        
+    }
+}

@@ -1,7 +1,6 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace BlazorEcommerce.Server.Controllers;
 [Route("api/v1/[controller]")]
@@ -48,7 +47,7 @@ public class ProductController : ControllerBase
 		};
 		return Ok(response);
 	}
-	
+
 	[HttpPut("update-product"), Authorize(Roles = "Admin")]
 	public async Task<ActionResult<ServiceResponse<Product>>> UpdateProduct(Product product)
 	{
@@ -64,10 +63,10 @@ public class ProductController : ControllerBase
 			foreach(var variant in product.Variants)
 			{
 				var dbVariant = await _unitOfWork.ProductVariant
-					.GetFirstOrDefault((pv => pv.ProductId == variant.ProductId 
-									&& pv.ProductTypeId == variant.ProductTypeId), track : false);
+					.GetFirstOrDefault((pv => pv.ProductId == variant.ProductId
+									&& pv.ProductTypeId == variant.ProductTypeId), track: false);
 
-				if (dbVariant == null)
+				if(dbVariant == null)
 				{
 					variant.ProductType = null;
 					await _unitOfWork.ProductVariant.Add(variant);
@@ -79,7 +78,7 @@ public class ProductController : ControllerBase
 					//dbVariant.Visible = variant.Visible;
 					//dbVariant.Deleted = variant.Deleted;
 					_unitOfWork.ProductVariant.Update(variant);
-				} 
+				}
 			}
 
 			_unitOfWork.Images.RemoveRange(dbProduct.Images);
@@ -91,7 +90,7 @@ public class ProductController : ControllerBase
 		{
 			response.Success = false;
 			response.Message = "Product is not found";
-		} 
+		}
 		return Ok(response);
 	}
 

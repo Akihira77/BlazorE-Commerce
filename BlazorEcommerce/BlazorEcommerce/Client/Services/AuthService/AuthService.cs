@@ -4,12 +4,17 @@ public class AuthService : IAuthService
 {
     private readonly HttpClient _http;
 
+    public List<UserDto> AdminUsers { get; set; } = new List<UserDto>();
+    public string Name { get; set; }
+
+    public event Action? OnChange;
     public AuthService(HttpClient http)
     {
         _http = http;
     }
 
-    public async Task<ServiceResponse<bool>> ChangePassword(UserChangePassword request)
+
+	public async Task<ServiceResponse<bool>> ChangePassword(UserChangePassword request)
     {
         var result = await _http.PostAsJsonAsync("api/v1/auth/change-password", request.Password);
 
@@ -44,11 +49,11 @@ public class AuthService : IAuthService
         return result.Data;
 	}
 
-	public async Task<IEnumerable<UserDto>> GetUserList()
+	public async Task GetUserList()
     {
         var result = await _http.GetFromJsonAsync<ServiceResponse<IEnumerable<UserDto>>>("api/v1/auth/get-all-user");
 
-        return result.Data;
+        AdminUsers = result.Data.ToList();
     }
 
     public async Task<ServiceResponse<string>> Login(UserLogin request)
@@ -58,10 +63,19 @@ public class AuthService : IAuthService
         return await result.Content.ReadFromJsonAsync<ServiceResponse<string>>();
     }
 
-    public async Task<ServiceResponse<int>> Register(UserRegister request)
+    public async Task<bool> Register(UserRegister request)
     {
         var result = await _http.PostAsJsonAsync("api/v1/auth/register", request);
+        var response = await result.Content.ReadFromJsonAsync<ServiceResponse<IEnumerable<User>>>();
 
-        return await result.Content.ReadFromJsonAsync<ServiceResponse<int>>();
+		return response.Success;
+    }
+
+    public async Task DeleteUser(User user)
+    {
+        var result = await _http.DeleteAsync($"api/v1/auth/delete/{user.Id}");
+
+        await GetUserList();
+        OnChange?.Invoke();
     }
 }

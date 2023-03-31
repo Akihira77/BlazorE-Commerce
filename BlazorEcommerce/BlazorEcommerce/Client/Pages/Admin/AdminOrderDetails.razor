@@ -1,0 +1,54 @@
+﻿@inject IOrderService orderService
+
+<MudDialog>
+    <DialogContent>
+		<MudContainer Style="max-height: 500px; overflow-y: scroll">
+			@if(order == null) {
+				<div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 70vh">
+					<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+				</div>
+			} else
+			{
+				<h3>Order from @order.OrderDate.ToString("f")</h3>
+				<div class="pb-5">
+					@foreach(var product in order.Products)
+					{
+						<div class="container d-flex p-1">
+							<div class="image-wrapper" style="min-width: 130px">
+								<img src="@product.ImageUrl" class="image" style="height: 130px; width: 100px;" />
+							</div>
+							<div class="name flex-grow-1 p-1">
+								<h6>
+									<a href="/product/@product.ProductId" class="link-primary text-decoration-underline">
+										@product.Title
+									</a>
+								</h6>
+								<span>@product.ProductType</span>
+								<br />
+								<span>Quantity: @product.Quantity</span>
+							</div>
+							<div class="product-price fw-bold text-end">
+								$@product.TotalPrice
+							</div>
+						</div>
+					}
+					<div class="product-price mt-5 me-5 text-end fs-5">
+						Total: $@order.TotalPrice
+					</div>
+				</div>
+			}
+		</MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+	[Parameter] 
+	public int OrderId { get; set; }
+
+	OrderDetailsDto order = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		order = await orderService.AdminGetOrderDetails(OrderId);
+	}
+}

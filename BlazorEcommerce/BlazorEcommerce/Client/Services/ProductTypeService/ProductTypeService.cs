@@ -8,7 +8,7 @@ public class ProductTypeService : IProductTypeService
 
     public List<ProductType> ProductTypes { get; set; } = new List<ProductType>();
 
-    public event Action OnChange;
+    public event Action? OnChange;
     public ProductTypeService(HttpClient http)
     {
         _http = http;
@@ -23,14 +23,14 @@ public class ProductTypeService : IProductTypeService
 	{
 		var response = await _http.PutAsJsonAsync("api/v1/producttype/update-producttype", productType);
 		ProductTypes = (await response.Content.ReadFromJsonAsync<ServiceResponse<List<ProductType>>>()).Data;
-		OnChange.Invoke();
+		OnChange?.Invoke();
 	}
 
 	public async Task AddProductTypes(ProductType productType)
 	{
 		var response = await _http.PostAsJsonAsync("api/v1/producttype/add-producttype", productType);
 		ProductTypes = (await response.Content.ReadFromJsonAsync<ServiceResponse<List<ProductType>>>()).Data;
-		OnChange.Invoke();
+		OnChange?.Invoke();
 	}
 
 	public ProductType CreateNewProductType()
@@ -38,7 +38,7 @@ public class ProductTypeService : IProductTypeService
 		var newProductType = new ProductType() { IsNew = true, Editing = true };
 
 		ProductTypes.Add(newProductType);
-		OnChange.Invoke();
+		OnChange?.Invoke();
 		return newProductType;
 	}
 
@@ -49,6 +49,6 @@ public class ProductTypeService : IProductTypeService
 							.ReadFromJsonAsync<ServiceResponse<IEnumerable<ProductType>>>()).Data.ToList();
 
 		await GetProductTypes();
-		OnChange.Invoke();
+		OnChange?.Invoke();
 	}
 }

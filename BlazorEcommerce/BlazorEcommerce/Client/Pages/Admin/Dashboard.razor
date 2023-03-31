@@ -1,8 +1,76 @@
-﻿@page "/admin/dashboard"
+﻿@page "/admin"
+@inject IAuthService authService
 @inject IOrderService orderService
+@inject ICategoryService categoryService
+@inject IProductService productService
+@inject IProductTypeService productTypeService
+@attribute [Authorize(Roles = "Admin")]
 
-<h3>Dashboard</h3>
+<h1>Dashboard</h1>
+
+<MudGrid Spacing="2" Class="grid-container pt-5 mx-auto">
+    <MudItem xs="4">
+        <div Class="grid-item rounded-3">
+            <h3>
+                @userCount Users
+            </h3>
+        </div>
+    </MudItem>
+    <MudItem xs="4">
+        <div Class="grid-item rounded-3">
+            <h3>
+                @productCount Products
+            </h3>
+        </div>
+    </MudItem>
+    <MudItem xs="4">
+        <div Class="grid-item rounded-3">
+            <h3>
+                @categoryCount Categories
+            </h3>
+        </div>
+    </MudItem>
+    <MudItem xs="4">
+        <div Class="grid-item rounded-3">
+            <h3>
+                @productTypeCount ProductTypes
+            </h3>
+        </div>
+    </MudItem>
+    <MudItem xs="4">
+        <div Class="grid-item rounded-3">
+            <h3>
+                @orderCount Orders
+            </h3>
+        </div>
+    </MudItem>
+    <MudItem xs="4">
+        <div Class="grid-item rounded-3">
+            <h3></h3>
+        </div>
+    </MudItem>
+</MudGrid>
+
 
 @code {
+    int productCount = 0;
+    int categoryCount = 0;
+    int userCount = 0;
+    int orderCount = 0;
+    int productTypeCount = 0;
 
+    protected override async Task OnInitializedAsync()
+    {
+        //await productService.GetAdminProducts();
+        //await authService.GetUserList();
+        //await orderService.GetAdminOrders();
+        //await categoryService.GetAdminCategories();
+        //await productTypeService.GetProductTypes();
+
+        //productCount = productService.AdminProducts.Count;
+        //userCount = authService.AdminUsers.Count;
+        //orderCount = orderService.AdminOrders.Count;
+        //categoryCount = categoryService.AdminCategories.Count;
+        //productTypeCount = productTypeService.ProductTypes.Count;
+    }
 }

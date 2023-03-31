@@ -2,7 +2,7 @@
 
 public interface ICartService
 {
-    event Action OnChange;
+    event Action? OnChange;
     Task AddToCart(CartItem cartItem);
     Task<IEnumerable<CartProductDto>> GetCartProducts();
     Task RemoveItemFromCart(int productId, int productTypeId);

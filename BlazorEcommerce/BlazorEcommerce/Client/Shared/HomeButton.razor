@@ -1,12 +1,23 @@
 ﻿@inject NavigationManager navigationManager
+@inject IAuthService authService
 
 <button @onclick="GoToHome" class="btn btn-outline-primary home-button">
 	My Shop
 </button>
 
 @code {
+	[Parameter]
+	public string? Role { get; set; } = "Customer";
+
 	private void GoToHome()
 	{
-		navigationManager.NavigateTo("");
+		if (!string.IsNullOrEmpty(Role) 
+		&& Role.ToLower().Equals("admin"))
+		{
+			navigationManager.NavigateTo("/admin");
+		} else
+		{
+			navigationManager.NavigateTo("");
+		}
 	}
 }

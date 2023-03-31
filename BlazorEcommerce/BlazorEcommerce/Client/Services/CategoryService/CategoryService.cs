@@ -4,7 +4,7 @@ public class CategoryService : ICategoryService
 {
 	private readonly HttpClient _http;
 
-	public event Action OnChange;
+	public event Action? OnChange;
 
 	public IEnumerable<Category> Categories { get; set; } = new List<Category>();
 	public List<Category> AdminCategories { get; set; } = new List<Category>();
@@ -46,7 +46,7 @@ public class CategoryService : ICategoryService
 							.ReadFromJsonAsync<ServiceResponse<IEnumerable<Category>>>()).Data.ToList();
 
 		await GetCategories();
-		OnChange.Invoke();
+		OnChange?.Invoke();
 	}
 
 	public async Task UpdateCategory(Category category)
@@ -56,7 +56,7 @@ public class CategoryService : ICategoryService
 							.ReadFromJsonAsync<ServiceResponse<IEnumerable<Category>>>()).Data.ToList();
 
 		await GetCategories();
-		OnChange.Invoke();
+		OnChange?.Invoke();
 	}
 
 	public async Task DeleteCategory(int categoryId)
@@ -66,14 +66,14 @@ public class CategoryService : ICategoryService
 							.ReadFromJsonAsync<ServiceResponse<IEnumerable<Category>>>()).Data.ToList();
 
 		await GetCategories();
-		OnChange.Invoke();
+		OnChange?.Invoke();
 	}
 
 	public Category CreateNewCategory()
 	{
 		var newCategory = new Category { IsNew = true, Editing = true };
 		AdminCategories.Add(newCategory);
-		OnChange.Invoke();
+		OnChange?.Invoke();
 		return newCategory;
 	}
 }

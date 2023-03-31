@@ -20,7 +20,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("register")]
-	public async Task<ActionResult<ServiceResponse<int>>> Register(UserRegister request)
+	public async Task<ActionResult<ServiceResponse<IEnumerable<User>>>> Register(UserRegister request)
 	{
 		var user = await _unitOfWork.Auth
 			.Register(new User
@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
 				Email = request.Email,
 			}, request.Password);
 
-		var response = new ServiceResponse<int>()
+		var response = new ServiceResponse<IEnumerable<User>>()
 		{
 			Message = user.Message
 		};
@@ -41,7 +41,7 @@ public class AuthController : ControllerBase
 		await _unitOfWork.Auth.Add(user);
 		await _unitOfWork.Save();
 
-		response.Data = user.Id;
+		response.Data = await _unitOfWork.Auth.GetAll();
 		return Ok(response);
 	}
 
@@ -179,8 +179,39 @@ public class AuthController : ControllerBase
 		}
 		return Ok(response);
 	}
+	[HttpDelete("delete/{userId}")]
+	public async Task<ActionResult<ServiceResponse<bool>>> DeleteUser(int userId)
+	{
+		var user = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Id == userId));
+
+		if (user == null)
+		{
+			return Ok(new ServiceResponse<bool>
+			{
+				Success = false,
+				Message = "User does not exist"
+			});
+		}
+		_unitOfWork.Auth.Remove(user);
+		await _unitOfWork.Save();
+		return Ok(new ServiceResponse<bool>());
+	}
 	private static string CreateRandomToken()
 	{
 		return Convert.ToHexString(RandomNumberGenerator.GetBytes(3));
+	}
+	[HttpGet("get-name")]
+	public async Task<ActionResult<ServiceResponse<string>>> GetNameUser()
+	{
+		var userAddress = await _unitOfWork.Address
+					.GetFirstOrDefault((a => a.UserId == _unitOfWork.Auth.GetUserId()));
+
+		var response = new ServiceResponse<string>();
+
+		if (userAddress != null)
+		{
+			response.Data = userAddress.FirstName + " " + userAddress.LastName;
+		}
+		return Ok(response);
 	}
 }

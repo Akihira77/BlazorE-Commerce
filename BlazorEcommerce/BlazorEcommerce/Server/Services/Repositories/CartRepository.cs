@@ -72,7 +72,9 @@ public class CartRepository : Repository<CartItem>, ICartRepository
 	public async Task<int> GetCartItemsCount()
 	{
 		int userId = _authRepository.GetUserId();
-		var count = _db.CartItems.Where(ci => ci.UserId == userId).Sum(ci => ci.Quantity);
+		var count = _db.CartItems
+				.Where(ci => ci.UserId == userId)
+				.Sum(ci => ci.Quantity);
 
 		return count;
 	}

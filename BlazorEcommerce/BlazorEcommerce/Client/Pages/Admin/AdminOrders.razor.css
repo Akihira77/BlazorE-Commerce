@@ -1,0 +1,12 @@
+﻿.image-wrapper {
+	width: 150px;
+}
+
+.image {
+	max-height: 150px;
+	max-width: 150px;
+}
+
+.order-price {
+	font-size: 1.2em;
+}

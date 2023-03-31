@@ -22,7 +22,7 @@ public class AuthRepository : Repository<User>, IAuthRepository
 		_httpContextAccessor = httpContextAccessor;
 	}
 	public string GetUserEmail() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
-	public int GetUserId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+	public int GetUserId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
 	
 	public async Task<string> Login(string email, string password)
 	{

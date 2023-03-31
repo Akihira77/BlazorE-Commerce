@@ -9,4 +9,9 @@ public class Order
 	[Column(TypeName = "decimal(18,2)")]
 	public decimal TotalPrice { get; set; }
 	public IEnumerable<OrderItem> OrderItems { get; set; }
+
+	// 0 for processing
+	// -1 for canceled
+	// 1 for shipped
+	public int OrderStatus { get; set; } = 0;
 }

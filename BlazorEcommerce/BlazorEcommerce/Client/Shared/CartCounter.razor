@@ -7,8 +7,10 @@
 		<i class="oi oi-cart"></i>
 		@if (GetCartItemsCount() > 0)
 		{
-			<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@GetCartItemsCount()</span>
-		}
+			<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+				@GetCartItemsCount()
+			</span>
+		}		
 	</a>
 </AuthorizeView>
 
@@ -19,8 +21,9 @@
 		return count;
 	}
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
+		await cartService.GetCartItemsCount();
 		cartService.OnChange += StateHasChanged;
 	}
 

@@ -3,7 +3,7 @@
 public class ProductService : IProductService
 {
 	private readonly HttpClient _http;
-	public event Action ProductsChanged;
+	public event Action? ProductsChanged;
 	public string Message { get; set; } = "Loading products...";
 	public int CurrentPage { get; set; } = 1;
 	public int PageCount { get; set; } = 0;
@@ -39,7 +39,7 @@ public class ProductService : IProductService
 		{
 			Message = "No products found.";
 		}
-		ProductsChanged.Invoke();
+		ProductsChanged?.Invoke();
 	}
 
 	public async Task SearchProducts(string searchText, int page)
@@ -60,7 +60,7 @@ public class ProductService : IProductService
 			Message = "No products found.";
 		}
 
-		ProductsChanged.Invoke();
+		ProductsChanged?.Invoke();
 	}
 
 	public async Task<IEnumerable<string>> SearchProductSuggestion(string searchText)

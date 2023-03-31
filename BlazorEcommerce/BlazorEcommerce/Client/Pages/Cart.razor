@@ -3,6 +3,8 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
 @inject IOrderService orderService
+@inject IAddressService addressService
+@inject ISnackbar snackbar
 @attribute [Authorize]
 
 <PageTitle>Shopping Cart</PageTitle>
@@ -109,11 +111,16 @@ else
 
 	private async Task PlaceOrder()
 	{
-		string url = await orderService.PlaceOrder();
-		navigationManager.NavigateTo(url);
-
-		// because we redirect to stripe page we dont need this 
-		//await cartService.GetCartItemsCount();
-		//orderPlaced = true;
+		var address = await addressService.GetAddress();
+		if (address == null)
+		{
+			snackbar.Configuration.SnackbarVariant = Variant.Outlined;
+			snackbar.Add("Enter your address first", Severity.Error);
+		}
+		else
+		{
+			var url = await orderService.PlaceOrder();
+			navigationManager.NavigateTo(url);
+		}
 	}
 }

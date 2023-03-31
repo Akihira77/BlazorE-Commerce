@@ -36,7 +36,6 @@ public class EmailSender : IEmailSender
 			{
 				Text = $"<p>This is your OTP Code <span style='font-weight: 600'>{message.Content}</span></p>" +
 					$"<br /> <p>This code can be use just for <span style='font-weight: 600'>3 minutes</span></p>"
-				//string.Format("<p style='color:red;'>{0}</p>", message.Content) 
 			};
 		} else if (message.Subject.ToLower().Equals("order"))
 		{
@@ -44,20 +43,21 @@ public class EmailSender : IEmailSender
 
 			var order = await _unitOfWork.Order.GetOrderDetails(int.Parse(message.Content));
 			var file = File.ReadAllText("F:\\File_Mahasiswa\\Programming\\visual studio\\BlazorE-Commerce\\BlazorEcommerce\\BlazorEcommerce\\Server\\StaticFiles\\Html\\InvoiceTop.html");
-			var htmlOrderItems = "<tr class=\"item\">\r\n    <td style=\"border-bottom: 1px solid #eee;\">{0}</td>\r\n\r\n    <td style=\"border-bottom: 1px solid #eee; text-align: right;\">$ {1}</td>\r\n</tr>\r\n\r\n";
+			var htmlOrderItems = "<tr class=\"item\">\r\n    <td>{0}</td>\r\n\r\n    <td>{1}</td>\r\n</tr>\r\n\r\n";
 
 			var sb = new StringBuilder();
 			foreach(var item in order.Products)
 			{
-				sb.AppendFormat(htmlOrderItems, item.Title, item.TotalPrice);
+				sb.AppendFormat(htmlOrderItems, item.Title, item.TotalPrice.ToString("c"));
 			}
 
-			var html = string.Format(file,
-								int.Parse(message.Content),
-								order.OrderDate,
-								order.TotalPrice,
-								sb.ToString(),
-								order.TotalPrice);
+			file = file.Replace("{{0}}", message.Content);
+			file = file.Replace("{{1}}", order.OrderDate.ToString("f"));
+			file = file.Replace("{{2}}", order.TotalPrice.ToString("c"));
+			file = file.Replace("{{3}}", sb.ToString());
+			file = file.Replace("{{4}}", order.TotalPrice.ToString("c"));
+
+			var html = file;
 			emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
 			{
 				Text = html

@@ -1,6 +1,4 @@
-﻿using BlazorEcommerce.Server.Services.EmailService;
-
-namespace BlazorEcommerce.Server.Services.Repositories.IRepositories;
+﻿namespace BlazorEcommerce.Server.Services.Repositories.IRepositories;
 
 public interface IUnitOfWork
 {
@@ -14,5 +12,6 @@ public interface IUnitOfWork
 	IProductTypeRepository ProductType { get; }
 	IProductVariantRepository ProductVariant { get; }
 	IImagesRepository Images { get; }
+	IOrderHeaderRepository OrderHeader { get; }
 	Task Save();
 }
