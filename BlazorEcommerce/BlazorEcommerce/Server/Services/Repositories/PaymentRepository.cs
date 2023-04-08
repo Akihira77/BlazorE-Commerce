@@ -46,13 +46,9 @@ public class PaymentRepository : IPaymentRepository
 			});
 		}
 
-		var options = new SessionCreateOptions
+        var options = new SessionCreateOptions
 		{
 			CustomerEmail = _authRepository.GetUserEmail(),
-			//ShippingAddressCollection = new SessionShippingAddressCollectionOptions
-			//{
-			//    AllowedCountries = new List<string> { "ID" }
-			//},
 			PaymentMethodTypes = new List<string>
 				{
 					"card"
@@ -81,17 +77,12 @@ public class PaymentRepository : IPaymentRepository
 					secret
 				);
 
-			//stripeEvent.Type == Events.CheckoutSessionCompleted
-			//	|| stripeEvent.Type == Events.PaymentIntentSucceeded
-			//	|| stripeEvent.Type == Events.PaymentIntentCreated
-			//|| stripeEvent.Type == Events.CheckoutSessionAsyncPaymentSucceeded 
-			//	&& session.PaymentStatus.ToLower() == "paid"
 
 			var session = stripeEvent.Data.Object as Session;
 			if(stripeEvent.Type == Events.CheckoutSessionCompleted)
 			{
 				var user = await _authRepository.GetFirstOrDefault((u => u.Email.Equals(session.CustomerEmail)));
-				return new ServiceResponse<int> { Data = user.Id, Message = "Fulfill order successful" };
+				return new ServiceResponse<int> { Data = user.Id, Message = session.Id };
 			}
 			return new ServiceResponse<int> { Data = -1, Message = "Something error when checking stripeEvent" };
 		} catch(StripeException ex)

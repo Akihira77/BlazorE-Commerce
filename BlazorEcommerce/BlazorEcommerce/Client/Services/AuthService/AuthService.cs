@@ -21,11 +21,11 @@ public class AuthService : IAuthService
         return await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
     }
 
-	public async Task<ServiceResponse<bool>> ChangeRole(User user)
+	public async Task<ServiceResponse<string>> ChangeRole(User user)
 	{
         var result = await _http.PutAsJsonAsync("api/v1/auth/change-role", user);
 
-		return await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+		return await result.Content.ReadFromJsonAsync<ServiceResponse<string>>();
 	}
 
 	public async Task<string> GetRole(string email)
@@ -66,8 +66,10 @@ public class AuthService : IAuthService
     public async Task<bool> Register(UserRegister request)
     {
         var result = await _http.PostAsJsonAsync("api/v1/auth/register", request);
-        var response = await result.Content.ReadFromJsonAsync<ServiceResponse<IEnumerable<User>>>();
+        var response = await result.Content.ReadFromJsonAsync<ServiceResponse<IEnumerable<UserDto>>>();
 
+        AdminUsers = response.Data.ToList();
+        OnChange?.Invoke();
 		return response.Success;
     }
 

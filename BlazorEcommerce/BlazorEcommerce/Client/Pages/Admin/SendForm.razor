@@ -1,29 +1,83 @@
 ﻿@inject NavigationManager navigationManager
+@inject IAuthService authService
+@inject IOrderService orderService
+@inject IAddressService addressService
 
 <MudDialog>
     <DialogContent>
-        <MudForm @ref="form">
-            <MudTextField @bind-Value="courier" Label="Courier" Required="true" RequiredError="Courier is required!" OnlyValidateIfDirty="true" />
-            <MudTextField @bind-Value="resi" Label="No. Resi" Required="true" RequiredError="No. Resi is required!" OnlyValidateIfDirty="true" />
-            <MudPaper Class="pa-4 mt-4">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary"
-                           OnClick="Submit">Submit</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(() => form?.Reset())" Class="mx-2">Reset</MudButton>
-            </MudPaper>
-        </MudForm>
+        <MudContainer Style="max-height: 700px; overflow-y: scroll">
+            <MudForm @ref="form">
+                <MudGrid>
+                    @*carrier info*@
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="sendOrder.Carrier" Label="Info Carrier" Required="true" OnlyValidateIfDirty="true" />
+                        <MudTextField @bind-Value="sendOrder.TrackingNumber" Label="Tracking Number" Required="true" OnlyValidateIfDirty="true" />
+                    </MudItem>
+
+                    @*user info*@
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="name" Label="Name" ReadOnly="true" />
+                        @if (sendOrder.User != null)
+                        {
+                            <MudTextField @bind-Value="sendOrder.User.Email" Label="Email" ReadOnly="true" />
+                        }
+
+                        @if (sendOrder.Address != null)
+                        {
+                            <MudTextField @bind-Value="sendOrder.Address.Street" Label="Street" ReadOnly="true" />
+                            <MudTextField @bind-Value="sendOrder.Address.City" Label="City" ReadOnly="true" />
+                            <MudTextField @bind-Value="sendOrder.Address.State" Label="State" ReadOnly="true" />
+                            <MudTextField @bind-Value="sendOrder.Address.Zip" Label="Zip Code" ReadOnly="true" />
+                            <MudTextField @bind-Value="sendOrder.Address.Country" Label="Country" ReadOnly="true" />
+                        }
+                    </MudItem>
+
+                    @*order user info*@
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="totalPrice" Label="Total Price" ReadOnly="true" />
+                        <MudTextField @bind-Value="orderDate" Label="Order Date" ReadOnly="true" />
+                        <MudDatePicker Required="true" Label="Estimated Date" Editable="true" @bind-Date="sendOrder.EstimateDate" Placeholder="Select Date" />
+                    </MudItem>
+
+                    <MudItem xs="12" Class="pa-4 mt-4 d-flex justify-content-end">
+                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(() => form?.Reset())" Class="mx-2">Reset</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                                    OnClick="Submit">Submit</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudForm>
+        </MudContainer>
     </DialogContent>
 </MudDialog>
 
 @code {
     [Parameter]
-    public int orderId { get; set; }
+    public Guid orderId { get; set; }
 
-    string courier = string.Empty;
-    string resi = string.Empty;
+    [Parameter]
+    public int userId { get; set; }
+
+    SendOrder sendOrder = new SendOrder();
+    string name = string.Empty;
+    string orderDate = string.Empty;
+    string totalPrice = string.Empty;
     MudForm? form;
 
-    void Submit()
+    protected override async Task OnParametersSetAsync()
     {
-        navigationManager.NavigateTo("/admin/orders", true);        
+        var user = await authService.GetUser(userId);
+        var order = await orderService.GetOrderModel(orderId);
+        var address = await addressService.GetAddress(userId);
+        sendOrder.Order = order;
+        sendOrder.User = user;
+        sendOrder.Address = address;
+        name = address.FirstName + " " + address.LastName;
+        totalPrice = sendOrder.Order.TotalPrice.ToString("c", new CultureInfo("en-US"));
+        orderDate = order.OrderDate.ToShortDateString();
+    }
+
+    private async Task Submit()
+    {
+        navigationManager.NavigateTo("/admin/orders", true);
     }
 }

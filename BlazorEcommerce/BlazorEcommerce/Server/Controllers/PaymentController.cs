@@ -1,69 +1,175 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
+using Stripe.Checkout;
 
 namespace BlazorEcommerce.Server.Controllers;
 [Route("api/v1/[controller]")]
 [ApiController]
 public class PaymentController : ControllerBase
 {
-	private readonly IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
+    const string secret = "whsec_d8ad074fdaa62c2a85136958b93cf6657fa863fd8e0146af3d8d542ab3a7f2db";
 
-	public PaymentController(IUnitOfWork unitOfWork)
-	{
-		_unitOfWork = unitOfWork;
-	}
+    public PaymentController(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
 
-	[HttpPost("checkout"), Authorize]
-	public async Task<string> CreateCheckoutSession()
-	{
-		var session = await _unitOfWork.Payment.CreateCheckoutSession();
-		await _unitOfWork.OrderHeader.Add(new OrderHeader
-		{
-			UserId = _unitOfWork.Auth.GetUserId(),
-			SessionId = session.Id,
-		});
-		await _unitOfWork.Save();
-		return session.Url;
-	}
+    [HttpPost("checkout"), Authorize]
+    public async Task<string> CreateCheckoutSession()
+    {
+        //var session = await _unitOfWork.Payment.CreateCheckoutSession();
+        var cartItems = await _unitOfWork.Cart
+                    .GetAll(c => c.UserId == _unitOfWork.Auth.GetUserId());
+        var products = await _unitOfWork.Cart.GetCartProducts(cartItems);
 
-	[HttpPost]
-	public async Task<ActionResult<ServiceResponse<bool>>> FulfillOrder()
-	{
-		var request = await _unitOfWork.Payment.FulfillOrder(Request);
-		var response = new ServiceResponse<bool>();
-		if(request.Success)
-		{
-			if(request.Data > 0)
-			{
-				var user = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Id == request.Data));
-				var cartItems = await _unitOfWork.Cart.GetAll((c => c.UserId == user.Id));
-				var cartProducts = await _unitOfWork.Cart.GetCartProducts(cartItems);
+        var lineItems = new List<SessionLineItemOptions>();
+        foreach(var product in products)
+        {
+            lineItems.Add(new SessionLineItemOptions
+            {
+                PriceData = new SessionLineItemPriceDataOptions
+                {
+                    UnitAmountDecimal = product.Price * 100,
+                    Currency = "usd",
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
+                    {
+                        Name = product.Title,
+                    }
+                },
+                Quantity = product.Quantity,
+            });
+        }
 
-				foreach(var product in cartProducts)
-				{
-					var dbProduct = await _unitOfWork.Product.GetFirstOrDefault((p => p.Id == product.ProductId));
-					if(dbProduct != null)
-					{
-						dbProduct.Stock -= product.Quantity;
-					}
-				}
+        var orderHeader = new OrderHeader
+        {
+            PaymentStatus = 0,
+            UserId = _unitOfWork.Auth.GetUserId(),
+        };
 
-				var order = _unitOfWork.Order.PlaceOrder(cartProducts, user.Id);
+        //await _unitOfWork.OrderHeader.Add(orderHeader);
+        //await _unitOfWork.Save();
 
-				await _unitOfWork.Order.Add(order);
+        var options = new SessionCreateOptions
+        {
+            CustomerEmail = _unitOfWork.Auth.GetUserEmail(),
+            PaymentMethodTypes = new List<string>
+                {
+                    "card"
+                },
+            LineItems = lineItems,
+            Mode = "payment",
+            SuccessUrl = $"https://localhost:7155/order-success",
+            CancelUrl = "https://localhost:7155/cart"
+        };
 
-				_unitOfWork.Cart.RemoveRange(cartItems);
-				await _unitOfWork.Save();
+        var service = new SessionService();
+        Session session = service.Create(options);
 
-				response.Message = "Order has been fulfilled";
-			}
-			return Ok(response);
-		} else
-		{
-			response.Message = request.Message;
-			response.Success = false;
-			return BadRequest(response);
-		}
-	}
+        orderHeader.SessionId = session.Id;
+        await _unitOfWork.Save();
+
+        return session.Url;
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<ServiceResponse<bool>>> FulfillOrder()
+    {
+        var request = await _unitOfWork.Payment.FulfillOrder(Request);
+        var response = new ServiceResponse<bool>();
+        if(request.Success)
+        {
+            if(request.Data > 0)
+            {
+                var user = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Id == request.Data));
+                var cartItems = await _unitOfWork.Cart.GetAll((c => c.UserId == user.Id));
+                var cartProducts = await _unitOfWork.Cart.GetCartProducts(cartItems);
+                var orderHeader = await _unitOfWork.OrderHeader
+                            .GetFirstOrDefault((oh => oh.SessionId.Equals(request.Message)));
+
+                foreach(var product in cartProducts)
+                {
+                    var dbProduct = await _unitOfWork.Product.GetFirstOrDefault((p => p.Id == product.ProductId));
+                    if(dbProduct != null)
+                    {
+                        dbProduct.Stock -= product.Quantity;
+                    }
+                }
+
+                var order = _unitOfWork.Order.PlaceOrder(cartProducts, user.Id);
+
+                await _unitOfWork.Order.Add(order);
+
+                _unitOfWork.Cart.RemoveRange(cartItems);
+                await _unitOfWork.Save();
+
+                orderHeader.OrderId = order.Id;
+                await _unitOfWork.Save();
+
+                response.Message = "Order has been fulfilled";
+            }
+            return Ok(response);
+        } else
+        {
+            response.Message = request.Message;
+            response.Success = false;
+            return BadRequest(response);
+        }
+    }
+
+    [HttpPost("order-paid/{orderHeaderId}")]
+    public async Task<ActionResult<ServiceResponse<bool>>> CheckoutOrder(int orderHeaderId)
+    {
+        var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+        var response = new ServiceResponse<bool>();
+        try
+        {
+            var stripeEvent = EventUtility
+                .ConstructEvent(
+                    json,
+                    Request.Headers["Stripe-Signature"],
+                    secret
+                );
+
+
+            if(stripeEvent.Type == Events.CheckoutSessionCompleted)
+            {
+                var orderHeader = await _unitOfWork.OrderHeader
+                            .GetFirstOrDefault((oh => oh.Id == orderHeaderId));
+
+                orderHeader.PaymentStatus = 1;
+                var cartItems = await _unitOfWork.Cart
+                            .GetAll((c => c.UserId == orderHeader.UserId));
+                var cartProducts = await _unitOfWork.Cart.GetCartProducts(cartItems);
+
+                foreach(var product in cartProducts)
+                {
+                    var dbProduct = await _unitOfWork.Product.GetFirstOrDefault((p => p.Id == product.ProductId));
+                    if(dbProduct != null)
+                    {
+                        dbProduct.Stock -= product.Quantity;
+                    }
+                }
+
+                var order = _unitOfWork.Order.PlaceOrder(cartProducts, orderHeader.UserId);
+
+                await _unitOfWork.Order.Add(order);
+
+                _unitOfWork.Cart.RemoveRange(cartItems);
+                await _unitOfWork.Save();
+
+                orderHeader.OrderId = order.Id;
+                await _unitOfWork.Save();
+
+                response.Message = "Order has been fulfilled";
+            }
+            return Ok(response);
+        } catch(StripeException ex)
+        {
+            response.Message = ex.Message;
+            return BadRequest(response);
+        }
+    }
 }

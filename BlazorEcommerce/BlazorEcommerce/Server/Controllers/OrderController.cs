@@ -113,7 +113,8 @@ public class OrderController : ControllerBase
 	[HttpPut("admin/update-order-status/{orderId}")]
 	public async Task<ActionResult<ServiceResponse<IEnumerable<OrderOverviewDto>>>> UpdateOrderStatus(int orderId, [FromBody] int status)
 	{
-		var order = await _unitOfWork.Order.GetFirstOrDefault((o => o.Id == orderId));
+		var order = await _unitOfWork.Order
+					.GetFirstOrDefault((o => o.Id == orderId));
 
 		var response = new ServiceResponse<IEnumerable<OrderDto>>();
 
@@ -144,11 +145,48 @@ public class OrderController : ControllerBase
 		return Ok(response);
 	}
 	[HttpPost("admin/send-order")]
-	public async Task SendOrder(int orderId)
+	public async Task SendOrder([FromBody] SendOrder sendOrder)
 	{
-		var order = await _unitOfWork.Order.GetFirstOrDefault((o => o.Id == orderId));
-
+		var order = await _unitOfWork.Order
+				.GetFirstOrDefault((o => o.Id == sendOrder.OrderId));
 		order.OrderStatus = 1;
+
+		await _unitOfWork.SendOrder.Add(sendOrder);
 		await _unitOfWork.Save();
+	}
+
+	[HttpDelete("cancel-order/{orderId}")]
+	public async Task<ActionResult<ServiceResponse<IEnumerable<OrderDto>>>> CancelOrder(int orderId)
+	{
+		var userOrder = await _unitOfWork.Order.GetFirstOrDefault((o => o.Id == orderId));
+
+		userOrder.OrderStatus = -1;
+		await _unitOfWork.Save();
+
+		var orderDtos = new List<OrderDto>();
+		var result = (await _unitOfWork.Order.GetAll())
+					.OrderByDescending(o => o.OrderDate);
+
+		foreach(var order in result)
+		{
+			orderDtos.Add(new OrderDto
+			{
+				User = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Id == order.UserId), includeProperties: "Address"),
+				Order = order
+			});
+		}
+		return Ok(new ServiceResponse<IEnumerable<OrderDto>>
+		{
+			Data = orderDtos
+		});
+	}
+
+	[HttpGet("admin/get-order-model/{orderId}")]
+	public async Task<ActionResult<ServiceResponse<Order>>> GetOrderModel(int orderId)
+	{
+		var order = await _unitOfWork.Order
+			.GetFirstOrDefault((o => o.Id == orderId));
+
+		return Ok(new ServiceResponse<Order> { Data = order });
 	}
 }

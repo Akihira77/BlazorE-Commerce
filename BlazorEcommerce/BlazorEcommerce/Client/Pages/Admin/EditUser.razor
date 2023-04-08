@@ -1,6 +1,8 @@
 ﻿@page "/admin/user/{userId:int}"
 @inject IAuthService authService
+@inject ISnackbar snackbar
 
+<PageTitle>Admin | Update User</PageTitle>
 
 @if (loading)
 {
@@ -10,12 +12,16 @@
 		<DataAnnotationsValidator></DataAnnotationsValidator>
 
 		<div class="mb-3">
-			<label for="email">Email</label>
-			<InputText id="email" @bind-Value="user.Email" class="form-control" disabled></InputText>
+			@*<label for="email">Email</label>*@
+			<MudTextField id="email" @bind-Value="user.Email" Label="Email" Variant="Variant.Outlined" ReadOnly Margin="Margin.Dense" />
 		</div>
 		<div class="mb-3">
-			<label for="role">Role</label>
-			<InputText id="role" @bind-Value="user.Role" class="form-control"></InputText>
+			@*<label for="role">Role</label>*@
+			@*<InputText id="role" @bind-Value="user.Role" class="form-control"></InputText>*@
+			<MudSelect T="string" Label="Role" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" @bind-Value="user.Role" Margin="Margin.Dense">
+				<MudSelectItem Value="@("Admin")" />
+				<MudSelectItem Value="@("Customer")" />
+			</MudSelect>
 		</div>
 
 		<button class="btn btn-primary ms-auto">Save</button>
@@ -29,6 +35,8 @@
 	string message = "Loading...";
 	bool loading = true;
 	User user = new User();
+
+
 	protected override async Task OnParametersSetAsync()
 	{
 		var dbUser = await authService.GetUser(userId);
@@ -41,8 +49,22 @@
 		loading = false;
 	}
 
+	private void OnSelect(ChangeEventArgs e)
+	{
+		user.Role = e.Value.ToString();
+		Console.WriteLine(user.Role);
+		Console.WriteLine(e.Value.ToString());
+	}
+
 	private async Task UpdateUser()
 	{
-		await authService.ChangeRole(user);
+		var result = await authService.ChangeRole(user);
+
+		if (result.Success)
+		{
+			snackbar.Add($"Changes Role Success - {result.Data}", Severity.Success);
+		} else {
+			snackbar.Add($"Changes Role Failed - {result.Data}", Severity.Error);
+		}
 	}
 }

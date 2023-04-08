@@ -13,5 +13,6 @@ public interface IUnitOfWork
 	IProductVariantRepository ProductVariant { get; }
 	IImagesRepository Images { get; }
 	IOrderHeaderRepository OrderHeader { get; }
+	ISendOrderRepository SendOrder { get; }
 	Task Save();
 }

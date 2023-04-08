@@ -62,7 +62,7 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		address = await addressService.GetAddress();
+		address = await addressService.GetAddress(userId: null);
 	}
 
 	private async Task SubmitAddress()

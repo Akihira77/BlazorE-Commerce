@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
 				Email = request.Email,
 			}, request.Password);
 
-		var response = new ServiceResponse<IEnumerable<User>>()
+		var response = new ServiceResponse<IEnumerable<UserDto>>()
 		{
 			Message = user.Message
 		};
@@ -41,8 +41,16 @@ public class AuthController : ControllerBase
 		await _unitOfWork.Auth.Add(user);
 		await _unitOfWork.Save();
 
-		response.Data = await _unitOfWork.Auth.GetAll();
-		return Ok(response);
+        var result = await _unitOfWork.Auth.GetUsers();
+        var userList = new List<UserDto>();
+        int idx = 1;
+        foreach(var dbUser in result)
+        {
+            userList.Add(new UserDto { Nr = idx++, User = user });
+        }
+
+		response.Data = userList;
+        return Ok(response);
 	}
 
 	[HttpPost("login")]
@@ -59,7 +67,6 @@ public class AuthController : ControllerBase
 					|| result.Equals("User not found")))
 		{
 			response.Success = true;
-			response.Message = DateTime.Now.AddHours(1).ToString();
 			response.Data = result;
 		}
 
@@ -149,7 +156,8 @@ public class AuthController : ControllerBase
 	[HttpGet("get-user/{userId}")]
 	public async Task<ActionResult<ServiceResponse<User>>> GetUser(int userId)
 	{
-		var user = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Id == userId));
+		var user = await _unitOfWork.Auth
+				.GetFirstOrDefault((u => u.Id == userId), includeProperties: "Address");
 		var response = new ServiceResponse<User>();
 		
 		if (user == null)
@@ -162,10 +170,10 @@ public class AuthController : ControllerBase
 		return Ok(response);
 	}
 	[HttpPut("change-role")]
-	public async Task<ActionResult<ServiceResponse<bool>>> ChangeRole(User user)
+	public async Task<ActionResult<ServiceResponse<string>>> ChangeRole(User user)
 	{
-		var result = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Id == user.Id));
-		var response = new ServiceResponse<bool>
+		var result = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Id == user.Id), track: false);
+		var response = new ServiceResponse<string>
 		{
 			Success = false,
 			Message = "User is not found"
@@ -176,6 +184,7 @@ public class AuthController : ControllerBase
 			_unitOfWork.Auth.Update(user);
 			await _unitOfWork.Save();
 			response.Success = true;
+			response.Data = user.Role;
 		}
 		return Ok(response);
 	}

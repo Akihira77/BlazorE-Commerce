@@ -1,0 +1,24 @@
+﻿
+<MudButton @onclick="Change">
+    @if(state)
+    {
+        <MudIcon Color="Color.Dark" Icon="@Icons.Material.Filled.LightMode" />
+    } else
+    {
+        <MudIcon Color="Color.Dark" Icon="@Icons.Material.Filled.DarkMode" />
+    }
+</MudButton>
+
+@code {
+    [Parameter]
+    public bool state { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> BackToParent { get; set; }
+
+    private void Change()
+    {
+        state = !state;
+        BackToParent.InvokeAsync(state);
+    }
+}

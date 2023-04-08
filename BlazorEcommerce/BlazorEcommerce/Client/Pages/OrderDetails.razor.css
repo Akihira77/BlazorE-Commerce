@@ -12,9 +12,6 @@
 	text-align: right;
 }
 
-.order-status {
-	font-size: 1.25rem;
-}
 @media (max-width: 409.98px) {
 	.order-status {
 		font-size: .9rem;

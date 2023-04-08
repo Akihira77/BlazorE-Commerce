@@ -10,8 +10,8 @@
 } else {
 	<ul class="list-unstyled d-flex flex-wrap justify-content-center">
 		<Virtualize Items="productService.Products" Context="product" SpacerElement="li">
-			<li class="m-2">
-				<MudCard Style="width: 170px; height: 350px">
+			<li class="m-2 product-card">
+				<MudCard>
 					<div class="d-flex justify-content-center">
 						<a href="/product/@product.Id">
 							@if (!string.IsNullOrEmpty(product.ImageUrl))
@@ -23,13 +23,18 @@
 							}
 						</a>
 					</div>
-					<MudCardContent Class="d-flex flex-column position-relative py-0 pt-1" Style="height: 130px">
-						<MudText>
-							<a class="mb-1 text-decoration-underline text-primary" href="/product/@product.Id">
-								<p class="mb-0" style="font-size: 13px">@product.Title</p>
-							</a>
-						</MudText>
-						<MudText Class="price position-absolute bottom-0 end-0 pb-1 pe-1" Style="font-size: 13px">@GetPriceText(product)</MudText>
+					<MudCardContent Class="d-flex flex-column position-relative py-0 pt-1">
+						<div class="product-text">
+							<MudText>
+								@*text-decoration-underline text-primary*@
+								<a class="mb-1" href="/product/@product.Id">
+									<p class="mb-0 product-title">@product.Title</p>
+								</a>
+							</MudText>
+							<MudText Class="price position-absolute bottom-0 end-0 pb-1 pe-1">
+								<span class="product-price">@GetPriceText(product)</span>
+							</MudText>
+						</div>
 					</MudCardContent>
 				</MudCard>
 			</li>

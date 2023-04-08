@@ -4,6 +4,8 @@
 @inject ISnackbar snackbar
 @attribute [Authorize(Roles = "Admin")]
 
+<PageTitle>Admin | Product List</PageTitle>
+
 @if(productService.AdminProducts == null)
 {
 	<div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 70vh">
@@ -27,8 +29,9 @@
 			<MudTh Class="text-center">Stock</MudTh>
 			<MudTh Class="text-center">Category</MudTh>
 			<MudTh Class="text-center">Variants</MudTh>
-			<MudTh Class="text-center">Price</MudTh>
+			<MudTh Class="text-center">Price ($)</MudTh>
 			<MudTh Class="text-center">Visible</MudTh>
+			<MudTh Class="text-center">Deleted</MudTh>
 			<MudTh Class="text-center">Actions</MudTh>
 		</HeaderContent>
 		<RowTemplate>
@@ -63,7 +66,20 @@
 			<MudTd DataLabel="Visible" Class="text-center">
 				@if(context.Visible)
 				{
-					<i class="oi oi-check" style="transform : scale(1.5, 1.5);"></i>
+					<MudIcon Icon="@Icons.Material.Filled.Check" Size="Size.Medium" Color="Color.Success" />
+				} else
+				{
+					<MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Medium" Color="Color.Error" />
+				}
+			</MudTd>
+			<MudTd DataLabel="Deleted" Class="text-center">
+				@if(context.Deleted)
+				{
+					<MudIcon Icon="@Icons.Material.Filled.Check" Size="Size.Medium" Color="Color.Success" />
+					@*<i class="oi oi-check" style="transform : scale(1.5, 1.5);"></i>*@
+				} else
+				{
+					<MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Medium" Color="Color.Error" />
 				}
 			</MudTd>
 			<MudTd DataLabel="Actions" Class="text-center">

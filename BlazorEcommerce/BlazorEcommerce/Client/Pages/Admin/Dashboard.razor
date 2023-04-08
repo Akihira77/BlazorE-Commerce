@@ -1,76 +1,171 @@
 ﻿@page "/admin"
-@inject IAuthService authService
-@inject IOrderService orderService
-@inject ICategoryService categoryService
-@inject IProductService productService
-@inject IProductTypeService productTypeService
+@inject IDashboardService dashboardService
+@implements IDisposable
 @attribute [Authorize(Roles = "Admin")]
 
-<h1>Dashboard</h1>
+<PageTitle>Admin | Dashboard</PageTitle>
 
-<MudGrid Spacing="2" Class="grid-container pt-5 mx-auto">
-    <MudItem xs="4">
+<div class="d-flex justify-content-around">
+<MudCard Style="width: 240px; height: 240px">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Income This Month</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+
+    <MudCardContent Class="text-center">
+            <MudText Class="fs-3">@(incomeForThisMonth.ToString("c", new CultureInfo("en-US")))</MudText>
+    </MudCardContent>
+</MudCard>
+
+    <div class="ms-5">
+        <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="1000px" Height="350px" ChartOptions="chartOptions"></MudChart>
+    </div>
+</div>
+
+<MudGrid Spacing="2" Class="grid-container pt-5 mx-auto justify-content-center">
+    <MudItem xs="3">
         <div Class="grid-item rounded-3">
-            <h3>
-                @userCount Users
-            </h3>
+            <MudChart ChartType="ChartType.Donut" Width="240px" Height="240px" InputData="@users" InputLabels="@userLabels">
+                <CustomGraphics>
+                    <text class="donut-inner-text" x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3">Total Users</text>
+                    <text class="donut-inner-text" x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@users.Sum().ToString()</text>
+                </CustomGraphics>
+            </MudChart>
         </div>
     </MudItem>
-    <MudItem xs="4">
+    <MudItem xs="3">
         <div Class="grid-item rounded-3">
-            <h3>
-                @productCount Products
-            </h3>
+            <MudChart ChartType="ChartType.Donut" Width="240px" Height="240px" InputData="@products" InputLabels="@productLabels">
+                <CustomGraphics>
+                    <text class="donut-inner-text" x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3">Total Products</text>
+                    <text class="donut-inner-text" x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@products.Sum().ToString()</text>
+                </CustomGraphics>
+            </MudChart>
         </div>
     </MudItem>
-    <MudItem xs="4">
+    <MudItem xs="3">
         <div Class="grid-item rounded-3">
-            <h3>
-                @categoryCount Categories
-            </h3>
+            <MudChart ChartType="ChartType.Donut" Width="240px" Height="240px" InputData="@categories" InputLabels="@categoryLabels">
+                <CustomGraphics>
+                    <text class="donut-inner-text" x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3">Total Category</text>
+                    <text class="donut-inner-text" x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@categories.Sum().ToString()</text>
+                </CustomGraphics>
+            </MudChart>
         </div>
     </MudItem>
-    <MudItem xs="4">
+    <MudItem xs="3">
         <div Class="grid-item rounded-3">
-            <h3>
-                @productTypeCount ProductTypes
-            </h3>
-        </div>
-    </MudItem>
-    <MudItem xs="4">
-        <div Class="grid-item rounded-3">
-            <h3>
-                @orderCount Orders
-            </h3>
-        </div>
-    </MudItem>
-    <MudItem xs="4">
-        <div Class="grid-item rounded-3">
-            <h3></h3>
+            <MudChart ChartType="ChartType.Donut" Width="240px" Height="240px" InputData="@orders" InputLabels="@orderLabels">
+                <CustomGraphics>
+                    <text class="donut-inner-text" x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3">Total Orders</text>
+                    <text class="donut-inner-text" x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@orders.Sum().ToString()</text>
+                </CustomGraphics>
+            </MudChart>
         </div>
     </MudItem>
 </MudGrid>
 
 
-@code {
-    int productCount = 0;
-    int categoryCount = 0;
-    int userCount = 0;
-    int orderCount = 0;
-    int productTypeCount = 0;
+    @code {
+    private int userCount;
+    private int productCount;
+    private int orderCount;
+    private int categoryCount;
+    private int Index = -1;
+    private decimal incomeForThisMonth;
+
+    public double[] products = new double[3];
+    public string[] productLabels = { "Ready Stock", "Not Ready", "Deleted" };
+
+    public double[] categories = new double[2];
+    public string[] categoryLabels = { "Available", "Deleted" };
+
+    public double[] users = new double[1];
+    public string[] userLabels = { "Available" };
+
+    public double[] orders = new double[3];
+    public string[] orderLabels = { "Processing", "Cancelled", "Succeeded" };
+
+    public ChartOptions chartOptions = new();
+    public List<ChartSeries> Series = new List<ChartSeries>();
+    public string[] XAxisLabels = 
+    { 
+        "Jan", 
+        "Feb", 
+        "Mar", 
+        "Apr", 
+        "May", 
+        "Jun", 
+        "Jul", 
+        "Aug", 
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+    };
 
     protected override async Task OnInitializedAsync()
     {
-        //await productService.GetAdminProducts();
-        //await authService.GetUserList();
-        //await orderService.GetAdminOrders();
-        //await categoryService.GetAdminCategories();
-        //await productTypeService.GetProductTypes();
+        await dashboardService.MainDashboard();
+        dashboardService.OnChange += StateHasChanged;
 
-        //productCount = productService.AdminProducts.Count;
-        //userCount = authService.AdminUsers.Count;
-        //orderCount = orderService.AdminOrders.Count;
-        //categoryCount = categoryService.AdminCategories.Count;
-        //productTypeCount = productTypeService.ProductTypes.Count;
+        userCount = dashboardService.PropertyCount.Users.Count();
+        productCount = dashboardService.PropertyCount.Products.Count();
+        categoryCount = dashboardService.PropertyCount.Categories.Count();
+        orderCount = dashboardService.PropertyCount.Orders.Count();
+
+        products[0] = dashboardService
+                    .PropertyCount
+                    .Products
+                    .Where(p => p.Stock > 0)
+                    .Count();
+        products[1] = dashboardService
+                    .PropertyCount
+                    .Products
+                    .Where(p => p.Stock == 0)
+                    .Count();
+        products[2] = productCount - (products[0] + products[1]);
+
+        categories[0] = dashboardService.PropertyCount.Categories.Where(c => c.Deleted).Count();
+        categories[1] = categoryCount - categories[0];
+
+        users[0] = userCount;
+
+        // order processing
+        orders[0] = dashboardService
+                    .PropertyCount
+                    .Orders
+                    .Where(o => o.OrderStatus == 0)
+                    .Count();
+        // order cancelled
+        orders[1] = dashboardService
+                    .PropertyCount
+                    .Orders
+                    .Where(o => o.OrderStatus == -1)
+                    .Count();
+        // order succeeded
+        orders[2] = dashboardService
+                    .PropertyCount
+                    .Orders
+                    .Where(o => o.OrderStatus == 1)
+                    .Count();
+
+        var incomeList = new List<double>();
+        foreach(var income in dashboardService.PropertyCount.IncomeDto.Income)
+        {
+            incomeList.Add((double)income);
+        }
+
+        var monthNow = DateTime.Now.Month;
+        incomeForThisMonth = Convert.ToDecimal(incomeList[monthNow - 1]);
+
+        Series.Add(new ChartSeries() { Name = "Income in one year", Data = incomeList.ToArray() });
+        chartOptions.LineStrokeWidth = 3;
+    }
+
+    public void Dispose()
+    {
+        dashboardService.OnChange -= StateHasChanged;
     }
 }

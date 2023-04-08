@@ -4,12 +4,14 @@ global using BlazorEcommerce.Client.Services.CartService;
 global using BlazorEcommerce.Client.Services.CategoryService;
 global using BlazorEcommerce.Client.Services.ProductService;
 global using BlazorEcommerce.Client.Services.AddressService;
+global using BlazorEcommerce.Client.Services.DashboardService;
 global using BlazorEcommerce.Shared;
 global using BlazorEcommerce.Shared.Dto;
 global using BlazorEcommerce.Shared.Models;
 global using Microsoft.AspNetCore.Components.Authorization;
 global using System.Net.Http.Json;
 global using BlazorEcommerce.Client.Services.ProductTypeService;
+global using System.Globalization;
 
 using BlazorEcommerce.Client;
 using Blazored.LocalStorage;
@@ -34,6 +36,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();	
 builder.Services.AddScoped<IAddressService, AddressService>();	
 builder.Services.AddScoped<IProductTypeService, ProductTypeService>();	
+builder.Services.AddScoped<IDashboardService, DashboardService>();	
 builder.Services.AddScoped<LazyAssemblyLoader>();
 
 builder.Services.AddMudServices(config =>
@@ -46,7 +49,7 @@ builder.Services.AddMudServices(config =>
 	config.SnackbarConfiguration.VisibleStateDuration = 3000;
 	config.SnackbarConfiguration.HideTransitionDuration = 500;
 	config.SnackbarConfiguration.ShowTransitionDuration = 500;
-	config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+	config.SnackbarConfiguration.SnackbarVariant = Variant.Outlined;
 });
 
 // authorization

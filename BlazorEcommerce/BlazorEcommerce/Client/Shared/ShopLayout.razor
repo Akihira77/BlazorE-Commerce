@@ -2,6 +2,7 @@
 
 <div class="page">
     <MudThemeProvider />
+    @*@ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode"*@
     <MudDialogProvider />
     <MudSnackbarProvider />
 
@@ -12,6 +13,7 @@
                 <main>
                     <div class="top-row py-2">
                         <HomeButton Role="Admin" />
+                        @*<ChangeTheme BackToParent="ChangeState" state="@_isDarkMode"/>*@
                         <AdminButton />
                     </div>
                     <div class="d-flex" style="min-height: 100vh">
@@ -30,6 +32,7 @@
                     <div class="top-row py-2">
                         <HomeButton />
                         <Search />
+                        @*<ChangeTheme BackToParent="ChangeState" state="@_isDarkMode" />*@
                         <UserButton />
                         <CartCounter />
                     </div>
@@ -48,6 +51,7 @@
                 <div class="top-row py-2">
                     <HomeButton />
                     <Search />
+                    @*<ChangeTheme BackToParent="ChangeState" state="@_isDarkMode" />*@
                     <UserButton />
                 </div>
                 <div class="nav-menu">
@@ -61,3 +65,22 @@
         </NotAuthorized>
     </AuthorizeView>
 </div>
+
+@*@code {
+    private bool _isDarkMode;
+    private MudThemeProvider _mudThemeProvider;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            _isDarkMode = await _mudThemeProvider.GetSystemPreference();
+            StateHasChanged();
+        }
+    }
+
+    private void ChangeState(bool state)
+    {
+        _isDarkMode = state;
+    }
+}*@

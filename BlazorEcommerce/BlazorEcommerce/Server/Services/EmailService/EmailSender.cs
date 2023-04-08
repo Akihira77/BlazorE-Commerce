@@ -42,7 +42,7 @@ public class EmailSender : IEmailSender
 			emailMessage.Subject = "Blazor ECommerce Order Notification";
 
 			var order = await _unitOfWork.Order.GetOrderDetails(int.Parse(message.Content));
-			var file = File.ReadAllText("F:\\File_Mahasiswa\\Programming\\visual studio\\BlazorE-Commerce\\BlazorEcommerce\\BlazorEcommerce\\Server\\StaticFiles\\Html\\InvoiceTop.html");
+			var file = File.ReadAllText("F:\\File_Mahasiswa\\Programming\\dotnet\\BlazorE-Commerce\\BlazorEcommerce\\BlazorEcommerce\\Server\\StaticFiles\\Html\\InvoiceTop.html");
 			var htmlOrderItems = "<tr class=\"item\">\r\n    <td>{0}</td>\r\n\r\n    <td>{1}</td>\r\n</tr>\r\n\r\n";
 
 			var sb = new StringBuilder();

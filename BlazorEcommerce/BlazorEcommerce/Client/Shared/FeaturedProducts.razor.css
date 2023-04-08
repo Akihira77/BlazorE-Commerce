@@ -2,10 +2,10 @@
 	display : flex;
 	flex-direction : row;
 	overflow-x : auto;
-/*	max-width : 3000px;*/
 }
 
 img {
+	width: 150px;
 	max-width : 200px;
 	max-height : 200px;
 	border-radius : 6px;
@@ -23,5 +23,29 @@ img:hover {
 	padding : 10px;
 	border: 1px solid lightgray;
 	border-radius : 10px;
-	max-width : 250px;
+	width: 170px;
+	max-width : 200px;
+}
+.product-title, .price {
+	font-size: .9rem;
+}
+
+@media (max-width : 1023.98px) {
+	img {
+		max-width: 140px;
+		max-height: 140px;
+	}
+
+	.featured-product {
+		margin: 6px;
+		text-align: center;
+		padding: 6px;
+		border: 1px solid lightgray;
+		border-radius: 6px;
+		max-width: 200px;
+	}
+
+	.product-title {
+		font-size: .8rem;
+	}
 }

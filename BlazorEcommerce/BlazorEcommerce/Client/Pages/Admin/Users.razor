@@ -4,6 +4,7 @@
 @implements IDisposable
 @attribute [Authorize(Roles = "Admin")]
 
+<PageTitle>Admin | User List</PageTitle>
 
 @if (authService.AdminUsers == null)
 {

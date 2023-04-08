@@ -11,6 +11,6 @@ public interface IAuthService
     Task<string> GetRole(string email);
     Task GetUserList();
     Task<User> GetUser(int userId);
-    Task<ServiceResponse<bool>> ChangeRole(User user);
+    Task<ServiceResponse<string>> ChangeRole(User user);
     Task DeleteUser(User user);
 }

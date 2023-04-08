@@ -3,7 +3,7 @@
 @implements IDisposable
 @attribute [Authorize(Roles = "Admin")]
 
-<h3>Product Types</h3>
+<PageTitle>Admin | ProductType List</PageTitle>
 
 @foreach(var productType in productTypeService.ProductTypes)
 {

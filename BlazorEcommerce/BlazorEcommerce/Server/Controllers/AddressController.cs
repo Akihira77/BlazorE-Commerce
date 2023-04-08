@@ -16,15 +16,36 @@ public class AddressController : ControllerBase
 	}
 
 	[HttpGet]
-	public async Task<ActionResult<ServiceResponse<Address>>> GetAddress()
+	public async Task<ActionResult<ServiceResponse<Address>>> GetAddress(int? userId = null)
 	{
-		var response = new ServiceResponse<Address>
-		{
-			Data = await _unitOfWork
-						.Address
-						.GetFirstOrDefault((a => a.UserId == _unitOfWork.Auth.GetUserId())),
-		};
+		var response = new ServiceResponse<Address>();
 
+		if(userId == null)
+		{
+			response.Data = await _unitOfWork.Address
+							.GetFirstOrDefault((a => a.UserId == _unitOfWork.Auth.GetUserId()));
+		} else
+		{
+			response.Data = await _unitOfWork.Address
+							.GetFirstOrDefault((a => a.UserId == userId));
+		}
+		return Ok(response);
+	}
+
+	[HttpGet("get-address/{userId}")]
+	public async Task<ActionResult<ServiceResponse<Address>>> GetAddressUser(int? userId = null)
+	{
+		var response = new ServiceResponse<Address>();
+
+		if (userId == null)
+		{
+			response.Data = await _unitOfWork.Address
+							.GetFirstOrDefault((a => a.UserId == _unitOfWork.Auth.GetUserId()));
+		} else
+		{
+			response.Data = await _unitOfWork.Address
+							.GetFirstOrDefault((a => a.UserId ==  userId));
+		}
 		return Ok(response);
 	}
 

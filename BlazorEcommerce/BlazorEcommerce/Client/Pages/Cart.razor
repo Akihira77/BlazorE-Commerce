@@ -114,7 +114,6 @@ else
 		var address = await addressService.GetAddress();
 		if (address == null)
 		{
-			snackbar.Configuration.SnackbarVariant = Variant.Outlined;
 			snackbar.Add("Enter your address first", Severity.Error);
 		}
 		else

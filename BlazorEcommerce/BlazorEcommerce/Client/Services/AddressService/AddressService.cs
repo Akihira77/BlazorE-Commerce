@@ -18,10 +18,16 @@ public class AddressService : IAddressService
 			<ServiceResponse<Address>>().Result.Data;
 	}
 
-	public async Task<Address> GetAddress()
+	public async Task<Address> GetAddress(int? userId = null)
 	{
-		var response = await _http.GetFromJsonAsync<ServiceResponse<Address>>("api/v1/address");
-
+		ServiceResponse<Address> response;
+		if(userId == null)
+		{
+			response = await _http.GetFromJsonAsync<ServiceResponse<Address>>("api/v1/address");
+		} else
+		{
+			response = await _http.GetFromJsonAsync<ServiceResponse<Address>>($"api/v1/address/get-address/{userId}");
+		} 
 		return response.Data;
 	}
 }

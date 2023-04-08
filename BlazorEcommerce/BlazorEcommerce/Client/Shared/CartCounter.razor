@@ -3,15 +3,19 @@
 @implements IDisposable
 
 <AuthorizeView>
-	<a href="cart" class="btn btn-outline-info text-decoration-none position-relative">
-		<i class="oi oi-cart"></i>
-		@if (GetCartItemsCount() > 0)
-		{
-			<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+	@if (GetCartItemsCount() > 0)
+	{
+		<a href="cart" class="btn btn-outline-info text-decoration-none position-relative">
+		@*<i class="oi oi-cart"></i>*@
+
+			@*<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
 				@GetCartItemsCount()
-			</span>
-		}		
-	</a>
+			</span>*@
+			<MudBadge Content="GetCartItemsCount()" Color="Color.Error" Overlap="true">
+				<MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Info" Size="Size.Medium" />
+			</MudBadge>
+		</a>
+	}
 </AuthorizeView>
 
 @code {

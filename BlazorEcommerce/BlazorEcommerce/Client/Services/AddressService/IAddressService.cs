@@ -2,6 +2,6 @@
 
 public interface IAddressService
 {
-	Task<Address> GetAddress();
+	Task<Address> GetAddress(int? userId = null);
 	Task<Address> AddOrUpdateAddress(Address address);
 }

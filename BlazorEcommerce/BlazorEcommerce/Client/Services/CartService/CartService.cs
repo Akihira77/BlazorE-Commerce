@@ -24,7 +24,7 @@ public class CartService : ICartService
 
 	public async Task<IEnumerable<CartProductDto>> GetCartProducts()
 	{
-		await GetCartItemsCount();
+		//await GetCartItemsCount();
 		var response = await _http.GetFromJsonAsync<ServiceResponse<IEnumerable<CartProductDto>>>("api/v1/cart");
 		return response.Data;
 	}
@@ -43,7 +43,8 @@ public class CartService : ICartService
 				ProductTypeId = product.ProductTypeId,
 				Quantity = quantity
 			});
-	}
+        await GetCartItemsCount();
+    }
 
 	public async Task StoreCartItems(bool emptyLocalCart = false)
 	{

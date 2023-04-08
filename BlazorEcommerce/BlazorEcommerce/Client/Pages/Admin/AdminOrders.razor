@@ -5,6 +5,8 @@
 @implements IDisposable
 @attribute [Authorize(Roles = "Admin")]
 
+<PageTitle>Admin | Order List</PageTitle>
+
 @if(orderService.AdminOrders == null)
 {
 	<div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 70vh">
@@ -31,7 +33,9 @@
         <RowTemplate>
             <MudTd DataLabel="Email">@context.User.Email</MudTd>
             <MudTd Class="text-center" DataLabel="DateCreated">@context.Order.OrderDate.ToString("f")</MudTd>
-            <MudTd Class="text-center fw-bold" DataLabel="Price">$@context.Order.TotalPrice</MudTd>
+            <MudTd Class="text-center fw-bold" DataLabel="Price">
+                @(context.Order.TotalPrice.ToString("c", new CultureInfo("en-US")))
+            </MudTd>
             <MudTd Class="text-center" DataLabel="Address" Style="width: 375px">
                 @if(context.User.Address == null)
                 {
@@ -70,7 +74,7 @@
                 </button>
                 @if (context.Order.OrderStatus == 0)
                 {
-                    <button @onclick="(() => SendOrder(context.Order.Id))">
+                    <button @onclick="(() => SendOrder(context.Order.Id, context.User.Id))">
                         <MudIcon Icon="@Icons.Material.Filled.Send" Color="Color.Primary" Size="Size.Large"></MudIcon>
                     </button>
                 } else if (context.Order.OrderStatus == 1)
@@ -123,12 +127,14 @@
         var dialog = await dialogService.ShowAsync<OrderCancelDetails>($"Details order cancel ID {orderId}", parameters, options);
     }
 
-    private async Task SendOrder(int orderId)
+    private async Task SendOrder(int orderId, int userId)
     {
-        //await orderService.SendOrder(orderId);
-
-        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Medium };
-        var parameters = new DialogParameters { ["OrderId"] = orderId };
+        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var parameters = new DialogParameters 
+        { 
+            ["OrderId"] = orderId, 
+            ["UserId"] = userId
+        };
 
         var dialog = await dialogService.ShowAsync<SendForm>($"Send Order {orderId}", parameters, options);
     }
