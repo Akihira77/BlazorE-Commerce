@@ -17,14 +17,14 @@ public class OrderService : IOrderService
         var result = await _http.GetFromJsonAsync<ServiceResponse<IEnumerable<OrderDto>>>("api/v1/order/admin-orders");
         AdminOrders = result.Data.ToList();
     }
-    public async Task<OrderDetailsDto> GetOrderDetails(Guid orderId)
+    public async Task<OrderDetailsDto> GetOrderDetails(int orderId)
 	{
 		var result = await _http.GetFromJsonAsync<ServiceResponse<OrderDetailsDto>>($"api/v1/order/{orderId}");
 
 		return result.Data;
 	}
 
-	public async Task<OrderDetailsDto> AdminGetOrderDetails(Guid orderId)
+	public async Task<OrderDetailsDto> AdminGetOrderDetails(int orderId)
 	{
 		var result = await _http.GetFromJsonAsync<ServiceResponse<OrderDetailsDto>>($"api/v1/order/admin/{orderId}");
 
@@ -46,21 +46,21 @@ public class OrderService : IOrderService
 		return url;
 	}
 
-	public async Task<bool> Invoice(Guid orderId)
+	public async Task<bool> Invoice(int orderId)
 	{
 		var result = await _http.GetFromJsonAsync<bool>($"api/v1/order/invoice/{orderId}");
 
 		return result;
 	}
 
-	public async Task<OrderOverviewDto> GetOrder(Guid orderId)
+	public async Task<OrderOverviewDto> GetOrder(int orderId)
 	{
 		var result = await _http.GetFromJsonAsync<ServiceResponse<OrderOverviewDto>>($"api/v1/order/admin/get-order/{orderId}");
 
 		return result.Data;
 	}
 
-	public async Task UpdateOrderStatus(Guid orderId, int orderStatus)
+	public async Task UpdateOrderStatus(int orderId, int orderStatus)
 	{
 		var result = await _http.PutAsJsonAsync($"api/v1/order/admin/update-order-status/{orderId}", orderStatus);
 
@@ -70,12 +70,12 @@ public class OrderService : IOrderService
 		OnChange?.Invoke();
 	}
 
-    public async Task SendOrder(Guid orderId)
+    public async Task SendOrder(int orderId)
     {
 		await _http.PostAsJsonAsync("api/v1/order/admin/send-order", orderId);
     }
 
-	public async Task CancelOrder(Guid orderId)
+	public async Task CancelOrder(int orderId)
 	{
 		var result = await _http.DeleteAsync($"api/v1/order/cancel-order/{orderId}");
 
@@ -85,7 +85,7 @@ public class OrderService : IOrderService
 		OnChange?.Invoke();
 	}
 
-    public async Task<Order> GetOrderModel(Guid orderId)
+    public async Task<Order> GetOrderModel(int orderId)
     {
 		var result = await _http.GetFromJsonAsync<ServiceResponse<Order>>($"api/v1/order/admin/get-order-model/{orderId}");
 

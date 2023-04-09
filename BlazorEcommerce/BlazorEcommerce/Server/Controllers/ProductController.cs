@@ -38,7 +38,7 @@ public class ProductController : ControllerBase
 			variant.ProductType = null;
 		}
 		await _unitOfWork.Product.Add(product);
-		await _unitOfWork.Save();
+		await _unitOfWork.SaveAsync();
 
 		var response = new ServiceResponse<Product>
 		{
@@ -84,7 +84,7 @@ public class ProductController : ControllerBase
 			_unitOfWork.Images.RemoveRange(dbProduct.Images);
 
 			_unitOfWork.Product.Update(product);
-			await _unitOfWork.Save();
+			await _unitOfWork.SaveAsync();
 			response.Data = product;
 		} else
 		{
@@ -113,7 +113,7 @@ public class ProductController : ControllerBase
 		{
 			//_unitOfWork.Product.Remove(product);
 			product.Deleted = true;
-			await _unitOfWork.Save();
+			await _unitOfWork.SaveAsync();
 		}
 		return Ok(response);
 	}

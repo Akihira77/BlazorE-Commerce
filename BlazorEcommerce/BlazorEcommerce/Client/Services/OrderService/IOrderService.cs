@@ -6,13 +6,13 @@ public interface IOrderService
 	List<OrderDto> AdminOrders { get; set; }
 	Task<string> PlaceOrder();
 	Task<List<OrderOverviewDto>> GetOrders();
-	Task<OrderOverviewDto> GetOrder(Guid orderId);
-	Task<OrderDetailsDto> GetOrderDetails(Guid orderId);
-	Task<OrderDetailsDto> AdminGetOrderDetails(Guid orderId);
-	Task<Order> GetOrderModel(Guid orderId);
-	Task<bool> Invoice(Guid orderId);
+	Task<OrderOverviewDto> GetOrder(int orderId);
+	Task<OrderDetailsDto> GetOrderDetails(int orderId);
+	Task<OrderDetailsDto> AdminGetOrderDetails(int orderId);
+	Task<Order> GetOrderModel(int orderId);
+	Task<bool> Invoice(int orderId);
 	Task GetAdminOrders();
-	Task UpdateOrderStatus(Guid orderId, int orderStatus);
-	Task SendOrder(Guid orderId);
-	Task CancelOrder(Guid orderId);
+	Task UpdateOrderStatus(int orderId, int orderStatus);
+	Task SendOrder(int orderId);
+	Task CancelOrder(int orderId);
 }

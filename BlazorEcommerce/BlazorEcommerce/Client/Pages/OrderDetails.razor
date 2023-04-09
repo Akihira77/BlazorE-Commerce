@@ -22,7 +22,7 @@
 	<div class="d-flex justify-content-between mb-3">
 		<h3>Order from @order.OrderDate.ToString("f")</h3>
 		<div class="d-flex gap-2 flex-column flex-sm-row">
-			<button type="button" class="btn btn-success" @onclick="@(() => Invoice(OrderId))">Invoice</button>
+			<button type="button" class="btn btn-success" @onclick="@(() => Invoice(orderId))">Invoice</button>
 			<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Cancel</button>
 
 			<!-- Modal -->
@@ -75,16 +75,16 @@
 
 @code {
 	[Parameter]
-	public Guid OrderId { get; set; }
+	public int orderId { get; set; }
 
 	OrderDetailsDto order = null;
 
 	protected override async Task OnInitializedAsync()
 	{
-		order = await orderService.GetOrderDetails(OrderId);
+		order = await orderService.GetOrderDetails(orderId);
 	}
 
-	private async Task Invoice(Guid orderId) {
+	private async Task Invoice(int orderId) {
 		var result = await orderService.Invoice(orderId);
 		if (result)
 		{
@@ -94,7 +94,7 @@
 
 	private async Task CancelOrder()
 	{
-		await orderService.CancelOrder(OrderId);
+		await orderService.CancelOrder(orderId);
 		navigationManager.NavigateTo("/orders", true);
 	}
 

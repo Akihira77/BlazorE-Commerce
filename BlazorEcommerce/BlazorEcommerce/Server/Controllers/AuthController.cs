@@ -39,7 +39,7 @@ public class AuthController : ControllerBase
 			return BadRequest(response);
 		}
 		await _unitOfWork.Auth.Add(user);
-		await _unitOfWork.Save();
+		await _unitOfWork.SaveAsync();
 
         var result = await _unitOfWork.Auth.GetUsers();
         var userList = new List<UserDto>();
@@ -94,7 +94,7 @@ public class AuthController : ControllerBase
 		}
 
 		_unitOfWork.Auth.Update(result);
-		await _unitOfWork.Save();
+		await _unitOfWork.SaveAsync();
 		response.Success = true;
 		response.Message = "Password has been changed.";
 
@@ -182,7 +182,7 @@ public class AuthController : ControllerBase
 		if(result != null)
 		{
 			_unitOfWork.Auth.Update(user);
-			await _unitOfWork.Save();
+			await _unitOfWork.SaveAsync();
 			response.Success = true;
 			response.Data = user.Role;
 		}
@@ -202,7 +202,7 @@ public class AuthController : ControllerBase
 			});
 		}
 		_unitOfWork.Auth.Remove(user);
-		await _unitOfWork.Save();
+		await _unitOfWork.SaveAsync();
 		return Ok(new ServiceResponse<bool>());
 	}
 	private static string CreateRandomToken()

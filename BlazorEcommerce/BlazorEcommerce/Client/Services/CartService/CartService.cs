@@ -32,6 +32,7 @@ public class CartService : ICartService
 	public async Task RemoveItemFromCart(int productId, int productTypeId)
 	{
 		await _http.DeleteAsync($"api/v1/cart/remove-cart-item/{productId}&&{productTypeId}");
+		await GetCartItemsCount();
 	}
 
 	public async Task UpdateQuantity(CartProductDto product, int quantity)

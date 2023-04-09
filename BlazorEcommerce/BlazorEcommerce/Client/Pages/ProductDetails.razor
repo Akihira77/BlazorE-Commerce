@@ -109,17 +109,23 @@
 
 	private async Task AddToCart(string title)
 	{
-		var productVariant = GetSelectedVariant();
-		var cartItem = new CartItem
+		if (product.Stock > 0)
 		{
-			ProductId = productVariant.ProductId,
-			ProductTypeId = productVariant.ProductTypeId
-		};
+			var productVariant = GetSelectedVariant();
+			var cartItem = new CartItem
+				{
+					ProductId = productVariant.ProductId,
+					ProductTypeId = productVariant.ProductTypeId
+				};
 
-		await cartService.AddToCart(cartItem);
+			await cartService.AddToCart(cartItem);
 
-		snackbar.Configuration.SnackbarVariant = Variant.Text;
-		snackbar.Configuration.MaxDisplayedSnackbars = 2;
-		snackbar.Add($"Added {title} ({GetSelectedVariant().ProductType.Name}) to cart", Severity.Success);
+			snackbar.Configuration.SnackbarVariant = Variant.Text;
+			snackbar.Configuration.MaxDisplayedSnackbars = 2;
+			snackbar.Add($"Added {title} ({GetSelectedVariant().ProductType.Name}) to cart", Severity.Success);
+		} else
+		{
+			snackbar.Add("Sorry we running out of this product", Severity.Error);
+		}
 	}
 }

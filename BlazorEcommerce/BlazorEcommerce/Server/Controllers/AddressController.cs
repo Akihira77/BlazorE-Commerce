@@ -79,7 +79,7 @@ public class AddressController : ControllerBase
 			response.Message = "Updating address success";
 		}
 
-		await _unitOfWork.Save();
+		await _unitOfWork.SaveAsync();
 		response.Data = address;
 
 		return Ok(response);

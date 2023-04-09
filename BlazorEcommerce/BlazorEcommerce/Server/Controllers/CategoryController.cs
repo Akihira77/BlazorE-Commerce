@@ -45,7 +45,7 @@ public class CategoryController : ControllerBase
 	{
 		category.Editing = category.IsNew = false;
 		await _unitOfWork.Category.Add(category);
-		await _unitOfWork.Save();
+		await _unitOfWork.SaveAsync();
 		var response = new ServiceResponse<IEnumerable<Category>>
 		{
 			Data = await _unitOfWork.Category
@@ -67,7 +67,7 @@ public class CategoryController : ControllerBase
 			response.Message = "Deleting category is success";
 			category.Deleted = true;
 			//_unitOfWork.Category.Remove(category);
-			await _unitOfWork.Save();
+			await _unitOfWork.SaveAsync();
 		} else
 		{
 			response.Success = false;
@@ -89,7 +89,7 @@ public class CategoryController : ControllerBase
 			response.Message = "Updating category is success";
 			category.Editing = false;
 			_unitOfWork.Category.Update(category);
-			await _unitOfWork.Save();
+			await _unitOfWork.SaveAsync();
 		} else
 		{
 			response.Success = false;

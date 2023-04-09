@@ -31,7 +31,7 @@ public class CartController : ControllerBase
 		var result = _unitOfWork.Cart.StoreCartItems(cartItems);
 
 		await _unitOfWork.Cart.AddRange(result);
-		await _unitOfWork.Save();
+		await _unitOfWork.SaveAsync();
 
 		var response = GetDbCartProducts();
 
@@ -87,7 +87,7 @@ public class CartController : ControllerBase
 			response.Success = true;
 		}
 		response.Data = response.Success;
-		await _unitOfWork.Save();
+		await _unitOfWork.SaveAsync();
 		return Ok(response);
 	}
 
@@ -104,7 +104,7 @@ public class CartController : ControllerBase
 		if(cartItem != null)
 		{
 			_unitOfWork.Cart.Remove(cartItem);
-			await _unitOfWork.Save();
+			await _unitOfWork.SaveAsync();
 			response.Message = "Deleting cart item from db success";
 		} else
 		{

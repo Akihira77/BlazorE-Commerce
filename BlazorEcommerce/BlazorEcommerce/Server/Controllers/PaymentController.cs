@@ -49,7 +49,6 @@ public class PaymentController : ControllerBase
             UserId = _unitOfWork.Auth.GetUserId(),
         };
 
-        //await _unitOfWork.OrderHeader.Add(orderHeader);
         //await _unitOfWork.Save();
 
         var options = new SessionCreateOptions
@@ -69,7 +68,9 @@ public class PaymentController : ControllerBase
         Session session = service.Create(options);
 
         orderHeader.SessionId = session.Id;
-        await _unitOfWork.Save();
+
+        await _unitOfWork.OrderHeader.Add(orderHeader);
+        await _unitOfWork.SaveAsync();
 
         return session.Url;
     }
@@ -103,10 +104,11 @@ public class PaymentController : ControllerBase
                 await _unitOfWork.Order.Add(order);
 
                 _unitOfWork.Cart.RemoveRange(cartItems);
-                await _unitOfWork.Save();
-
+                
+                _unitOfWork.Save();
                 orderHeader.OrderId = order.Id;
-                await _unitOfWork.Save();
+                
+                await _unitOfWork.SaveAsync();
 
                 response.Message = "Order has been fulfilled";
             }
@@ -158,10 +160,10 @@ public class PaymentController : ControllerBase
                 await _unitOfWork.Order.Add(order);
 
                 _unitOfWork.Cart.RemoveRange(cartItems);
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
 
                 orderHeader.OrderId = order.Id;
-                await _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
 
                 response.Message = "Order has been fulfilled";
             }

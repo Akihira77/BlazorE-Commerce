@@ -32,7 +32,7 @@ public class ProductTypeController : ControllerBase
     {
         productType.Editing = productType.IsNew = false;
         await _unitOfWork.ProductType.Add(productType);
-        await _unitOfWork.Save();
+        await _unitOfWork.SaveAsync();
 
 		var response = new ServiceResponse<List<ProductType>>
 		{
@@ -59,7 +59,7 @@ public class ProductTypeController : ControllerBase
         {
             productType.Editing = false;
             _unitOfWork.ProductType.Update(productType);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
             response.Data = (await _unitOfWork.ProductType.GetAll()).ToList();
             response.Message = "Updating product type is success";
         }
@@ -76,7 +76,7 @@ public class ProductTypeController : ControllerBase
         if (productType != null)
         {
             _unitOfWork.ProductType.Remove(productType);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             response.Message = "Deleting Product Type is success";
         } else

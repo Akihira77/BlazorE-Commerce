@@ -127,7 +127,7 @@ public class OrderController : ControllerBase
 		}
 
 		order.OrderStatus = status;
-		await _unitOfWork.Save();
+		await _unitOfWork.SaveAsync();
 
 		var orderDtos = new List<OrderDto>();
 		var result = (await _unitOfWork.Order.GetAll())
@@ -152,7 +152,7 @@ public class OrderController : ControllerBase
 		order.OrderStatus = 1;
 
 		await _unitOfWork.SendOrder.Add(sendOrder);
-		await _unitOfWork.Save();
+		await _unitOfWork.SaveAsync();
 	}
 
 	[HttpDelete("cancel-order/{orderId}")]
@@ -161,7 +161,7 @@ public class OrderController : ControllerBase
 		var userOrder = await _unitOfWork.Order.GetFirstOrDefault((o => o.Id == orderId));
 
 		userOrder.OrderStatus = -1;
-		await _unitOfWork.Save();
+		await _unitOfWork.SaveAsync();
 
 		var orderDtos = new List<OrderDto>();
 		var result = (await _unitOfWork.Order.GetAll())

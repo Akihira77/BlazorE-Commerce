@@ -40,5 +40,6 @@ public class UnitOfWork : IUnitOfWork
 		OrderHeader = new OrderHeaderRepository(_db);
 		SendOrder = new SendOrderRepository(_db);
 	}
-	public async Task Save() => await _db.SaveChangesAsync();
+	public void Save() => _db.SaveChanges();
+	public async Task SaveAsync() => await _db.SaveChangesAsync();
 }
