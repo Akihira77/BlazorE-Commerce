@@ -42,7 +42,7 @@ public class ProductRepository : Repository<Product>, IProductRepository
 	{
 		return await _db.Products
 				.Where(p => p.Category.Url == categoryUrl
-				&& p.Visible)
+				&& p.Visible && !p.Deleted)
 				.Include(p => p.Images)
 				.Include(p => p.Variants
 						.Where(v => v.Visible && !v.Deleted))
@@ -162,11 +162,10 @@ public class ProductRepository : Repository<Product>, IProductRepository
 	public async Task<IEnumerable<Product>> GetAdminProducts()
 	{
 		var products = await _db.Products
-			.Where(p => !p.Deleted)
 			.Include(p => p.Images)
 			.Include(p => p.Category)
 			.Include(p => p.Variants)
-			.ThenInclude(v => v.ProductType)
+				.ThenInclude(v => v.ProductType)
 			.ToListAsync();
 
 		return products;

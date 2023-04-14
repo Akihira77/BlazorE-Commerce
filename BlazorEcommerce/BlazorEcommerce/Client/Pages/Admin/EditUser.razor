@@ -12,19 +12,17 @@
 		<DataAnnotationsValidator></DataAnnotationsValidator>
 
 		<div class="mb-3">
-			@*<label for="email">Email</label>*@
 			<MudTextField id="email" @bind-Value="user.Email" Label="Email" Variant="Variant.Outlined" ReadOnly Margin="Margin.Dense" />
 		</div>
 		<div class="mb-3">
-			@*<label for="role">Role</label>*@
-			@*<InputText id="role" @bind-Value="user.Role" class="form-control"></InputText>*@
 			<MudSelect T="string" Label="Role" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" @bind-Value="user.Role" Margin="Margin.Dense">
 				<MudSelectItem Value="@("Admin")" />
 				<MudSelectItem Value="@("Customer")" />
 			</MudSelect>
 		</div>
 
-		<button class="btn btn-primary ms-auto">Save</button>
+		@*<button class="btn btn-primary ms-auto">Save</button>*@
+		<MudButton ButtonType="ButtonType.Submit" Class="ms-auto" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small">Save</MudButton>
 	</EditForm>
 }
 

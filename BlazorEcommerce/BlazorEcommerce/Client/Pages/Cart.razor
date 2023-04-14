@@ -42,15 +42,15 @@ else
 								value="@product.Quantity"
 									@onchange="@((ChangeEventArgs e) => UpdateQuantity(product, e))"
 								min="1" 
-								max="@product.Stock"/>
+								/>
 							<button class="btn btn-outline-danger"
 						@onclick="@(() => RemoveItemFromCart(product.ProductId, product.ProductTypeId))">
 								<i class="oi oi-trash"></i>
 							</button>
 						</div>
-						<div class="">
+@*						<div class="">
 							Stock : @product.Stock
-						</div>
+						</div>*@
 					</div>
 				</div>
 				<div class="cart-product-price">
@@ -104,7 +104,7 @@ else
 	{
 		var quantity = int.Parse(e.Value.ToString());
 		if (quantity > 0) {
-			await cartService.UpdateQuantity(product, Math.Min(quantity, product.Stock));
+			await cartService.UpdateQuantity(product, quantity);
 		}
 		await LoadCart();
 	}

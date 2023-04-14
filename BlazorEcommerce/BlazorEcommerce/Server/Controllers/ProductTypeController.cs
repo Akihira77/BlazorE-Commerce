@@ -87,4 +87,17 @@ public class ProductTypeController : ControllerBase
         response.Data = await _unitOfWork.ProductType.GetAll();
         return Ok(response);
     }
+
+    [HttpGet("producttype-category/{categoryId}")]
+    public async Task<ActionResult<ServiceResponse<IEnumerable<ProductType>>>> GetProductTypeByCategory(int categoryId)
+    {
+		var response = new ServiceResponse<IEnumerable<ProductType>>
+		{
+			Data = (await _unitOfWork.ProductType
+                    .GetAll((pt => pt.CategoryId == categoryId)))
+                    .AsEnumerable(),
+		};
+
+		return Ok(response);
+	}
 }

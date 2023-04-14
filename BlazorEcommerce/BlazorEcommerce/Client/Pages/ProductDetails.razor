@@ -10,68 +10,81 @@
 	<span>@message</span>
 } else
 {
-	<div class="media container pb-5">
-		<div class="media-img-wrapper mr-2">
-			@if (!string.IsNullOrEmpty(product.ImageUrl))
-			{
-				<img class="media-img" src="@product.ImageUrl" alt="@product.Title" />
-			} else
-			{
-				<MudCarousel Class="mud-width-full" ItemsSource="product.Images" Style="height: 250px;">
-					<ItemTemplate>
-						<MudImage Src="@context.Data" Style="height: 200px; width: 140px"></MudImage>
-					</ItemTemplate>
-				</MudCarousel>
-			}
-		</div>
-		<div class="ms-1 media-body">
-			<h2 class="mb-0">@product.Title</h2>
-			<p class="ms-1 mt-2">@product.Description</p>
-			@if(product.Variants.Any())
-			{
-				<div class="mb-3 mt-2">
-					<select class="form-select" @bind="currentTypeId">
-						@foreach(var variant in product.Variants)
-						{
-							<option value="@variant.ProductTypeId">
-								@variant.ProductType.Name
-							</option>
-						}
-					</select>
-				</div>
-			}
-
-			@if (GetSelectedVariant() != null)
-			{
-				var price = GetSelectedVariant();
-				@if (price.OriginalPrice >= price.Price)
+	<div class="container pb-5 d-flex flex-column flex-lg-row flex-wrap flex-lg-nowrap overflow-hidden">
+		<div class="container-left">
+			<div class="media-img-wrapper mr-2 ">
+				@if (!string.IsNullOrEmpty(product.ImageUrl))
 				{
-					<h6 class="text-muted original-price">$@price.OriginalPrice</h6>
+					<img class="media-img" src="@product.ImageUrl" alt="@product.Title" />
+				} else
+				{
+					<MudCarousel Class="mud-width-full" ItemsSource="product.Images" Style="height: 250px;" AutoCycle="false">
+						<ItemTemplate>
+							<MudImage Src="@context.Data" Style="height: 200px; width: 140px"></MudImage>
+						</ItemTemplate>
+					</MudCarousel>
 				}
-				<h4 class="price">$@price.Price</h4>
-				<span>Stock : @product.Stock</span>
-			}
-			<div class="action mt-5">
+			</div>
+		</div>
+		<div class="ms-1 media-body mr-4">
+				<h2 class="mb-0">@product.Title</h2>
+			
+				@if(product.Variants.Any())
+				{
+					<div class="mb-3 mt-2">
+						<select class="form-select" @bind="currentTypeId">
+							@foreach(var variant in product.Variants)
+							{
+								<option value="@variant.ProductTypeId">
+									@variant.ProductType.Name
+								</option>
+							}
+						</select>
+					</div>
+				}
+
+				@if (GetSelectedVariant() != null)
+				{
+					var price = GetSelectedVariant();
+					@if (price.OriginalPrice >= price.Price)
+					{
+						<h6 class="text-muted original-price">$@price.OriginalPrice</h6>
+					}
+					<h4 class="price">$@price.Price</h4>
+				}
+			<div class="container-mid overflow-scroll">
+				<div class="mt-3" style="max-width: 700px">
+					<h4>Description: </h4>
+					<pre class="description ms-1 mt-2">@product.Description</pre>
+				</div>
+			</div>
+		</div>
+		<div class="container-right">
+			<MudCard Class="p-3 d-flex flex-column" Style="width: 100%">
+@*			<MudCardContent>
+				<MudText>Add to Cart</MudText>
+			</MudCardContent>*@
+			<MudCardActions Class="mt-auto">
 				<AuthorizeView>
 					<Authorized>
-						<MudButton 
-								Variant="Variant.Outlined" 
-								Color="Color.Info" 
-								@onclick="@(() => AddToCart(product.Title))">
-							<i class="oi oi-cart"></i>
-							&nbsp;&nbsp;&nbsp;Add to Cart
+						<MudButton FullWidth="true" Variant="Variant.Filled"
+							   Color="Color.Success"
+							   @onclick="@(() => AddToCart(product.Title))"
+							   StartIcon="@Icons.Material.Filled.AddShoppingCart">
+							Add to Cart
 						</MudButton>
 					</Authorized>
 					<NotAuthorized>
-						<MudButton Variant="Variant.Outlined"
-							   Color="Color.Info"
-							   @onclick="@(() => navigationManager.NavigateTo("/login"))">
-							<i class="oi oi-cart"></i>
-							&nbsp;&nbsp;&nbsp;Add to Cart
+						<MudButton FullWidth="true" Variant="Variant.Filled"
+							   Color="Color.Success"
+							   @onclick="@(() => navigationManager.NavigateTo("/login"))"
+							   StartIcon="@Icons.Material.Filled.AddShoppingCart">
+							Add to Cart
 						</MudButton>
 					</NotAuthorized>
 				</AuthorizeView>
-			</div>
+			</MudCardActions>
+		</MudCard>
 		</div>
 	</div>
 }
@@ -109,23 +122,17 @@
 
 	private async Task AddToCart(string title)
 	{
-		if (product.Stock > 0)
-		{
-			var productVariant = GetSelectedVariant();
-			var cartItem = new CartItem
-				{
-					ProductId = productVariant.ProductId,
-					ProductTypeId = productVariant.ProductTypeId
-				};
+		var productVariant = GetSelectedVariant();
+		var cartItem = new CartItem
+			{
+				ProductId = productVariant.ProductId,
+				ProductTypeId = productVariant.ProductTypeId
+			};
 
-			await cartService.AddToCart(cartItem);
+		await cartService.AddToCart(cartItem);
 
-			snackbar.Configuration.SnackbarVariant = Variant.Text;
-			snackbar.Configuration.MaxDisplayedSnackbars = 2;
-			snackbar.Add($"Added {title} ({GetSelectedVariant().ProductType.Name}) to cart", Severity.Success);
-		} else
-		{
-			snackbar.Add("Sorry we running out of this product", Severity.Error);
-		}
+		snackbar.Configuration.SnackbarVariant = Variant.Text;
+		snackbar.Configuration.MaxDisplayedSnackbars = 2;
+		snackbar.Add($"Added {title} ({GetSelectedVariant().ProductType.Name}) to cart", Severity.Success);
 	}
 }

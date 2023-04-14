@@ -67,7 +67,7 @@
 			snackbar.Add($"Welcome {user.Email}", Severity.Success);
 		} else
 		{
-			snackbar.Add($"Wrong password", Severity.Error);
+			snackbar.Add($"{result.Message}", Severity.Error);
 		}
 	}
 

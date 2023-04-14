@@ -3,13 +3,14 @@
 @attribute [Authorize(Roles = "Admin")]
 @implements IDisposable
 
-<PageTitle>Admin | Categories</PageTitle>
+<PageTitle>Admin | Category List</PageTitle>
 
 <div class="header">
 	<div class="col">Name</div>
 	<div class="col">Url</div>
 	<div class="col">Visible</div>
-	<div class="col"></div>
+	<div class="col">Deleted</div>
+	<div class="col">Actions</div>
 </div>
 
 @foreach(var category in categoryService.AdminCategories)
@@ -27,13 +28,10 @@
 				<div class="col col-visible">
 					<InputCheckbox @bind-Value="editingCategory.Visible" class="big-checkbox" style="transform : scale(2,2);" />
 				</div>
-				<div class="col">
-					<button type="submit" class="btn btn-success">
-						<i class="oi oi-cloud-upload"></i>
-					</button>
-					<button class="btn btn-danger" @onclick="CancelEditing">
-						<i class="oi oi-circle-x"></i>
-					</button>
+				<div class="col"></div>
+				<div class="col text-center">
+					<MudIconButton ButtonType="ButtonType.Submit" Icon="@Icons.Material.Filled.CloudUpload" Variant="Variant.Filled" Color="Color.Success" />
+					<MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Error" @onclick="CancelEditing" />
 				</div>
 			</div>
 		</EditForm>
@@ -49,18 +47,34 @@
 			<div class="col col-visible">
 				@if(category.Visible)
 				{
-					<i class="oi oi-check" style="transform : scale(1.5, 1.5);"></i>
-				} 
-				@*<span>@(category.Visible ? "✔️" : "")</span>*@
+					<MudTooltip Text="This category is not Visible to Customer" Arrow="true" Placement="Placement.Top">
+						<MudIcon Icon="@Icons.Material.Filled.Check" Size="Size.Medium" Color="Color.Success" />
+					</MudTooltip>
+				} else
+				{
+					<MudTooltip Text="This category is Visible to Customer" Arrow="true" Placement="Placement.Top">
+						<MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Medium" Color="Color.Error" />
+					</MudTooltip>
+				}
 			</div>
-			<div class="col">
-				<button class="btn btn-primary" @onclick=@(() => EditCategory(category))>
-					<i class="oi oi-pencil"></i>
-				</button>
-				<button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick="@(() => editingCategory = category)">
-					<i class="oi oi-trash"></i>
-				</button>
+			<div class="col col-deleted">
+				@if(category.Deleted)
+				{
+					<MudTooltip Text="This category can't be Accessed by Customer" Arrow="true" Placement="Placement.Top">
+						<MudIcon Icon="@Icons.Material.Filled.Check" Size="Size.Medium" Color="Color.Success" />
+					</MudTooltip>
+				} else
+				{
+					<MudTooltip Text="This category can be Accessed by Customer" Arrow="true" Placement="Placement.Top">
+						<MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Medium" Color="Color.Error" />
+					</MudTooltip>
+				}
+			</div>
+			<div class="col text-center">
+				<MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Info" aria-label="Edit" @onclick=@(() => EditCategory(category)) />
+				<MudIconButton data-bs-toggle="modal" data-bs-target="#exampleModal" Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" aria-label="Edit" @onclick=@(() => editingCategory = category) />
 
+				@*Modal*@
 				<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-dialog-centered">
 						<div class="modal-content">
@@ -83,9 +97,9 @@
 	}
 }
 
-<button class="btn btn-primary my-5" @onclick="CreateNewCategory">
-	<i class="oi oi-plus"></i> Add New Category
-</button>
+<MudButton Class="my-5" StartIcon="@Icons.Material.Filled.Add" Color="Color.Info" @onclick="CreateNewCategory" Variant="Variant.Filled">
+	<MudText>Add New Category</MudText>
+</MudButton>
 
 @code {
 	Category editingCategory = null;

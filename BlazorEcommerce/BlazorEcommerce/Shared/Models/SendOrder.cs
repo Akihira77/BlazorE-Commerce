@@ -1,4 +1,6 @@
-﻿namespace BlazorEcommerce.Shared.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BlazorEcommerce.Shared.Models;
 public class SendOrder
 {
 	public int Id { get; set; }
@@ -8,7 +10,8 @@ public class SendOrder
     public Order Order { get; set; }
     public int? AddressId { get; set; }
     public Address Address { get; set; }
-    public string Carrier { get; set; } = string.Empty;
+    //public string Carrier { get; set; } = string.Empty;
+    [MaxLength(15)]
     public string TrackingNumber { get; set; } = string.Empty;
     public DateTime? EstimateDate { get; set; } = DateTime.Now.AddDays(7);
 }

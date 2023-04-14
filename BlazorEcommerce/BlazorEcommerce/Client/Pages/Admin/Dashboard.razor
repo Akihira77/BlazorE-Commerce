@@ -1,5 +1,6 @@
 ﻿@page "/admin"
 @inject IDashboardService dashboardService
+@inject NavigationManager navigationManager
 @implements IDisposable
 @attribute [Authorize(Roles = "Admin")]
 
@@ -68,6 +69,8 @@
 
 
     @code {
+    private HubConnection _hubConnection;
+
     private int userCount;
     private int productCount;
     private int orderCount;
@@ -75,8 +78,8 @@
     private int Index = -1;
     private decimal incomeForThisMonth;
 
-    public double[] products = new double[3];
-    public string[] productLabels = { "Ready Stock", "Not Ready", "Deleted" };
+    public double[] products = new double[2];
+    public string[] productLabels = { "Ready", "Deleted" };
 
     public double[] categories = new double[2];
     public string[] categoryLabels = { "Available", "Deleted" };
@@ -118,16 +121,15 @@
         products[0] = dashboardService
                     .PropertyCount
                     .Products
-                    .Where(p => p.Stock > 0)
+                    .Where(p => !p.Deleted)
                     .Count();
-        products[1] = dashboardService
-                    .PropertyCount
-                    .Products
-                    .Where(p => p.Stock == 0)
-                    .Count();
-        products[2] = productCount - (products[0] + products[1]);
+        products[1] = productCount - products[0];
 
-        categories[0] = dashboardService.PropertyCount.Categories.Where(c => c.Deleted).Count();
+        categories[0] = dashboardService
+                    .PropertyCount
+                    .Categories
+                    .Where(c => !c.Deleted)
+                    .Count();
         categories[1] = categoryCount - categories[0];
 
         users[0] = userCount;
@@ -162,10 +164,18 @@
 
         Series.Add(new ChartSeries() { Name = "Income in one year", Data = incomeList.ToArray() });
         chartOptions.LineStrokeWidth = 3;
+
+
+        _hubConnection = new HubConnectionBuilder()
+                        .WithUrl(navigationManager.ToAbsoluteUri("/checkout"))
+                        .Build();
+
+        await _hubConnection.StartAsync();
     }
 
-    public void Dispose()
+    public async Task Dispose()
     {
         dashboardService.OnChange -= StateHasChanged;
+        await _hubConnection.DisposeAsync();
     }
 }

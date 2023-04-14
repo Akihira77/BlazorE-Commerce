@@ -13,9 +13,9 @@
 	</div>
 } else
 {
-	<button class="btn btn-primary my-5 float-end" @onclick="CreateNewProduct">
-		<i class="oi oi-plus"></i> Add New Product
-	</button>
+	<MudButton Class="my-5 float-end" StartIcon="@Icons.Material.Filled.Add" Color="Color.Info" @onclick="CreateNewProduct" Variant="Variant.Filled">
+		<MudText>Add New Product</MudText>
+	</MudButton>
 
 	<MudTable Hover="true" Virtualize="true" Items="@items" Filter="new Func<Product,bool>(FilterFunc1)">
 		<ToolBarContent>
@@ -26,7 +26,6 @@
 		<HeaderContent>
 			<MudTh Class="text-center">Image</MudTh>
 			<MudTh Class="text-center">Product</MudTh>
-			<MudTh Class="text-center">Stock</MudTh>
 			<MudTh Class="text-center">Category</MudTh>
 			<MudTh Class="text-center">Variants</MudTh>
 			<MudTh Class="text-center">Price ($)</MudTh>
@@ -45,7 +44,6 @@
 				}
 			</MudTd>
 			<MudTd DataLabel="Product">@context.Title</MudTd>
-			<MudTd DataLabel="Stock" Class="text-center">@context.Stock</MudTd>
 			<MudTd DataLabel="Category" Class="text-center">@context.Category.Name</MudTd>
 			<MudTd DataLabel="Variants" Class="text-center">
 				@foreach(var variant in context.Variants)
@@ -66,30 +64,35 @@
 			<MudTd DataLabel="Visible" Class="text-center">
 				@if(context.Visible)
 				{
-					<MudIcon Icon="@Icons.Material.Filled.Check" Size="Size.Medium" Color="Color.Success" />
+					<MudTooltip Text="This product is Visible to Customer" Arrow="true" Placement="Placement.Top">
+						<MudIcon Icon="@Icons.Material.Filled.Check" Size="Size.Medium" Color="Color.Success" />
+					</MudTooltip>
 				} else
 				{
-					<MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Medium" Color="Color.Error" />
+					<MudTooltip Text="This product is not Visible to Customer" Arrow="true" Placement="Placement.Top">
+						<MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Medium" Color="Color.Error" />
+					</MudTooltip>
 				}
 			</MudTd>
 			<MudTd DataLabel="Deleted" Class="text-center">
 				@if(context.Deleted)
 				{
-					<MudIcon Icon="@Icons.Material.Filled.Check" Size="Size.Medium" Color="Color.Success" />
-					@*<i class="oi oi-check" style="transform : scale(1.5, 1.5);"></i>*@
+					<MudTooltip Text="This product can't be Accessed by Customer" Arrow="true" Placement="Placement.Top">
+						<MudIcon Icon="@Icons.Material.Filled.Check" Size="Size.Medium" Color="Color.Success" />
+					</MudTooltip>
 				} else
 				{
-					<MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Medium" Color="Color.Error" />
+					<MudTooltip Text="This product can be Accessed by Customer" Arrow="true" Placement="Placement.Top">
+						<MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Medium" Color="Color.Error" />
+					</MudTooltip>
 				}
 			</MudTd>
 			<MudTd DataLabel="Actions" Class="text-center">
-				<button class="btn btn-primary" @onclick="@(() => EditProduct(context.Id))">
-					<i class="oi oi-pencil"></i>
-				</button>
-				<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick="@(() => item = context)">
-					<i class="oi oi-trash"></i>
-				</button>
+				<MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Info" @onclick="@(()=>
+					EditProduct(context.Id))" />
+				<MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick="@(() => item = context)" />
 
+				@*Modal*@
 				<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-dialog-centered">
 						<div class="modal-content">

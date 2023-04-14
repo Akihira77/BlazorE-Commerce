@@ -1,9 +1,16 @@
 ﻿@page "/admin/product-types"
 @inject IProductTypeService productTypeService
+@inject ICategoryService categoryService
 @implements IDisposable
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Admin | ProductType List</PageTitle>
+
+<div class="header">
+	<div class="col">Name</div>
+	<div class="col">Category</div>
+	<div class="col">Actions</div>
+</div>
 
 @foreach(var productType in productTypeService.ProductTypes)
 {
@@ -12,15 +19,19 @@
 		<EditForm Model="editingProductType" OnSubmit="UpdateProductType">
 			<div class="row">
 				<div class="col">
-					<InputText @bind-Value="editingProductType.Name" class="form-control"></InputText>
+					<MudTextField @bind-Value="editingProductType.Name" class="form-control" Label="Name" Margin="Margin.Dense" Variant="Variant.Outlined"></MudTextField>
 				</div>
 				<div class="col">
-					<button type="submit" class="btn btn-success">
-						<i class="oi oi-cloud-upload"></i>
-					</button>
-					<button class="btn btn-danger" @onclick="CancelEditing">
-						<i class="oi oi-circle-x"></i>
-					</button>
+					<MudSelect Margin="Margin.Dense" T="int" @bind-Value="@editingProductType.CategoryId" Label="Category" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+						@foreach(var category in categoryService.AdminCategories)
+						{
+							<MudSelectItem Value="@category.Id">@category.Name</MudSelectItem>
+						}
+					</MudSelect>
+				</div>
+				<div class="col text-center">
+					<MudIconButton ButtonType="ButtonType.Submit" Icon="@Icons.Material.Filled.CloudUpload" Variant="Variant.Filled" Color="Color.Success" />
+					<MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Error" @onclick="CancelEditing" />
 				</div>
 			</div>
 		</EditForm>
@@ -30,14 +41,14 @@
 			<div class="col">
 				@productType.Name
 			</div>
-			<div class="col">
-				<button class="btn btn-primary" @onclick=@(() => EditProductType(productType))>
-					<i class="oi oi-pencil"></i>
-				</button>
-				<button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick="@(() => editingProductType = productType)">
-					<i class="oi oi-trash"></i>
-				</button>
+			<div class="col text-center">
+				@GetCategoryName(productType.CategoryId)
+			</div>
+			<div class="col text-center">
+				<MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Info" aria-label="Edit" @onclick=@(() => EditProductType(productType)) />
+				<MudIconButton data-bs-toggle="modal" data-bs-target="#exampleModal" Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" aria-label="Edit" @onclick=@(() => editingProductType = productType) />
 
+				@*Modal*@
 				<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-dialog-centered">
 						<div class="modal-content">
@@ -59,9 +70,9 @@
 		</div>
 	}
 }
-<button class="btn btn-primary my-5" @onclick="CreateNewProductType">
-	<i class="oi oi-plus"></i> Add new Product Type
-</button>
+<MudButton Class="my-5" StartIcon="@Icons.Material.Filled.Add" Color="Color.Info" @onclick="CreateNewProductType" Variant="Variant.Filled">
+	<MudText>Add New Product Type</MudText>
+</MudButton>
 
 @code {
 	ProductType editingProductType = null;
@@ -69,8 +80,17 @@
 	protected override async Task OnInitializedAsync()
 	{
 		await productTypeService.GetProductTypes();
+		await categoryService.GetAdminCategories();
 		productTypeService.OnChange += StateHasChanged;
 	} 
+
+	private string GetCategoryName(int categoryId)
+	{
+		var category = categoryService
+				.AdminCategories
+				.FirstOrDefault(c => c.Id == categoryId);
+		return category.Name;
+	}
 
 	private void EditProductType(ProductType productType)
 	{

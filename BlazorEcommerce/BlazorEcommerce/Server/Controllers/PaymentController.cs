@@ -93,10 +93,10 @@ public class PaymentController : ControllerBase
                 foreach(var product in cartProducts)
                 {
                     var dbProduct = await _unitOfWork.Product.GetFirstOrDefault((p => p.Id == product.ProductId));
-                    if(dbProduct != null)
-                    {
-                        dbProduct.Stock -= product.Quantity;
-                    }
+                    //if(dbProduct != null)
+                    //{
+                    //    dbProduct.Stock -= product.Quantity;
+                    //}
                 }
 
                 var order = _unitOfWork.Order.PlaceOrder(cartProducts, user.Id);
@@ -149,10 +149,10 @@ public class PaymentController : ControllerBase
                 foreach(var product in cartProducts)
                 {
                     var dbProduct = await _unitOfWork.Product.GetFirstOrDefault((p => p.Id == product.ProductId));
-                    if(dbProduct != null)
-                    {
-                        dbProduct.Stock -= product.Quantity;
-                    }
+                    //if(dbProduct != null)
+                    //{
+                    //    dbProduct.Stock -= product.Quantity;
+                    //}
                 }
 
                 var order = _unitOfWork.Order.PlaceOrder(cartProducts, orderHeader.UserId);

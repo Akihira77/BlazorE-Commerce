@@ -7,6 +7,7 @@ public class Product
 	[Key]
 	public int Id { get; set; }
 	[Required]
+	[MaxLength(50)]
 	public string Title { get; set; } = string.Empty;
 	public string Description { get; set; } = string.Empty;
 	public string ImageUrl { get; set; } = string.Empty;
@@ -20,9 +21,10 @@ public class Product
 
 	public bool Visible { get; set; } = true;
 	public bool Deleted { get; set; } = false;
-	public int Stock { get; set; }
+	//public int Stock { get; set; }
+	public long Rating { get; set; }
 
-    [NotMapped]
+	[NotMapped]
 	public bool Editing { get; set; } = false;
 	[NotMapped]
 	public bool IsNew { get; set; } = false;

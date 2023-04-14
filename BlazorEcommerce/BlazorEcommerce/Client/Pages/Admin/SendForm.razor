@@ -8,10 +8,10 @@
         <MudContainer Style="max-height: 700px; overflow-y: scroll">
             <MudForm @ref="form">
                 <MudGrid>
-                    @*carrier info*@
+                    @*Sending info*@
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="sendOrder.Carrier" Label="Info Carrier" Required="true" OnlyValidateIfDirty="true" />
                         <MudTextField @bind-Value="sendOrder.TrackingNumber" Label="Tracking Number" Required="true" OnlyValidateIfDirty="true" />
+                        <MudDatePicker Required="true" Label="Estimated Date" Editable="true" @bind-Date="sendOrder.EstimateDate" Placeholder="Select Date" />
                     </MudItem>
 
                     @*user info*@
@@ -36,7 +36,6 @@
                     <MudItem xs="12" md="6">
                         <MudTextField @bind-Value="totalPrice" Label="Total Price" ReadOnly="true" />
                         <MudTextField @bind-Value="orderDate" Label="Order Date" ReadOnly="true" />
-                        <MudDatePicker Required="true" Label="Estimated Date" Editable="true" @bind-Date="sendOrder.EstimateDate" Placeholder="Select Date" />
                     </MudItem>
 
                     <MudItem xs="12" Class="pa-4 mt-4 d-flex justify-content-end">

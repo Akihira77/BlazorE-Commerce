@@ -41,7 +41,8 @@
                 }
             </MudTd>
             <MudTd DataLabel="Email">@context.User.Email</MudTd>
-            <MudTd DataLabel="DateCreated" Class="text-center">@(context.User.DateCreated.ToShortDateString())</MudTd>
+            <MudTd DataLabel="DateCreated" Class="text-center">@(context.User.DateCreated.ToShortDateString())
+            </MudTd>
             <MudTd DataLabel="Address" Class="text-center" Style="width: 400px">
                 @if (context.User.Address == null)
                 {
@@ -57,31 +58,28 @@
             </MudTd>
             <MudTd DataLabel="Role" Class="text-center">@context.User.Role</MudTd>
             <MudTd DataLabel="Actions" Class="text-center">
-				    <button class="btn btn-primary" @onclick="@(() => EditProduct(context.User.Id))">
-					    <i class="oi oi-pencil"></i>
-				    </button>
-				    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick="@(() => item = context.User)">
-					    <i class="oi oi-trash"></i>
-				    </button>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Info" @onclick="@(() => EditUser(context.User.Id))" />
+				<MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick="@(() => item = context.User)" />
 
-				    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-					    <div class="modal-dialog modal-dialog-centered">
-						    <div class="modal-content">
-							    <div class="modal-header">
-								    <h1 class="modal-title fs-5" id="exampleModalLabel">Delete Confirmation</h1>
-								    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-							    </div>
-							    <div class="modal-body">
-								    Do you want to Delete <span class="fw-bold">@(item != null ? item.Email : null)?</span>
-							    </div>
-							    <div class="modal-footer">
-								    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-								    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="@(() => DeleteUser(item))">Delete</button>
-							    </div>
-						    </div>
-					    </div>
-				    </div>
-			    </MudTd>
+                @*Modal*@
+				<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h1 class="modal-title fs-5" id="exampleModalLabel">Delete Confirmation</h1>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								Do you want to Delete <span class="fw-bold">@(item != null ? item.Email : null)?</span>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+								<button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="@(() => DeleteUser(item))">Delete</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager />
@@ -105,13 +103,15 @@
         authService.OnChange -= StateHasChanged;
     }
 
-    private void EditProduct(int userId)
+    private void EditUser(int userId)
     {
         navigationManager.NavigateTo($"/admin/user/{userId}");
     }
+
     private async Task DeleteUser(User user) {
         await authService.DeleteUser(user);
     }
+
     private bool FilterFunc1(UserDto element) => FilterFunc(element, search);
 
     private bool FilterFunc(UserDto element, string searchString)
