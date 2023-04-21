@@ -3,9 +3,9 @@
 @inject IOrderService orderService
 @inject IAddressService addressService
 
-<MudDialog>
+<MudDialog Class="overflow-hidden">
     <DialogContent>
-        <MudContainer Style="max-height: 700px; overflow-y: scroll">
+        <MudContainer Style="max-height: 700px; overflow-y: auto">
             <MudForm @ref="form">
                 <MudGrid>
                     @*Sending info*@
@@ -38,7 +38,7 @@
                         <MudTextField @bind-Value="orderDate" Label="Order Date" ReadOnly="true" />
                     </MudItem>
 
-                    <MudItem xs="12" Class="pa-4 mt-4 d-flex justify-content-end">
+                    <MudItem xs="12" Class="d-flex justify-content-end">
                         <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(() => form?.Reset())" Class="mx-2">Reset</MudButton>
                         <MudButton Variant="Variant.Filled" Color="Color.Primary"
                                     OnClick="Submit">Submit</MudButton>

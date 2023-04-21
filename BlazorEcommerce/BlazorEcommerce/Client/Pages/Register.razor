@@ -52,11 +52,11 @@
 	async Task HandleRegistration()
 	{
 		var result = await authService.Register(user);
-		if (!result)
+		if (!result.Success)
 		{
-			snackbar.Add("User email is already exist", Severity.Error);
+			snackbar.Add($"{result.Message}", Severity.Error);
 		} else {
-			snackbar.Add("User registration successful", Severity.Success);
+			snackbar.Add($"{result.Message}", Severity.Success);
 		}
 	}
 

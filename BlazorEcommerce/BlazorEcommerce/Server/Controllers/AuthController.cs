@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
 				Email = request.Email,
 			}, request.Password);
 
-		var response = new ServiceResponse<IEnumerable<UserDto>>()
+		var response = new ServiceResponse<bool>()
 		{
 			Message = user.Message
 		};
@@ -41,15 +41,6 @@ public class AuthController : ControllerBase
 		await _unitOfWork.Auth.Add(user);
 		await _unitOfWork.SaveAsync();
 
-        var result = await _unitOfWork.Auth.GetUsers();
-        var userList = new List<UserDto>();
-        int idx = 1;
-        foreach(var dbUser in result)
-        {
-            userList.Add(new UserDto { Nr = idx++, User = user });
-        }
-
-		response.Data = userList;
         return Ok(response);
 	}
 

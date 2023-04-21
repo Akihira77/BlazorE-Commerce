@@ -5,19 +5,14 @@
 .media-img {
 	max-height : 190px;
 	width: 140px;
+	margin-bottom: 6px;
 	border-radius : 3px;
-	margin-bottom : 10px;
 	transition : transform .2s;
 }
 
 .media-img:hover {
 	transform : scale(1.1);
 }
-
-/*.media-img-wrapper {
-	width : 200px;
-	text-align : center;
-}*/
 
 .page-selection {
 	margin-right : 15px;
@@ -30,11 +25,11 @@
 }
 
 .product-title  {
-	font-size: .9rem;
+	font-size: .85rem;
 }
 
 .product-price {
-	font-size: .8rem;
+	font-size: .75rem;
 }
 
 .product-text {

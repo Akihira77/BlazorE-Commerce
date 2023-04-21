@@ -12,20 +12,20 @@
         <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
     </div>
 } else {
-    <MudTable Items="@authService.AdminUsers" Hover="true" Filter="new Func<UserDto, bool>(FilterFunc1)">
+    <MudTable Items="@authService.AdminUsers" Hover="true" Filter="new Func<UserDto, bool>(SearchUserCommand)">
         <ToolBarContent>
             <MudText Typo="Typo.h4">User List</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="search" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Class="text-center">Nr</MudTh>
-            <MudTh Class="text-center">Name</MudTh>
-            <MudTh Class="text-center">Email</MudTh>
-            <MudTh Class="text-center">Date Created</MudTh>
-            <MudTh Class="text-center">Address</MudTh>
-            <MudTh Class="text-center">Role</MudTh>
-            <MudTh Class="text-center">Actions</MudTh>
+            <MudTh Class="text-center fw-bold">Nr</MudTh>
+            <MudTh Class="text-center fw-bold">Name</MudTh>
+            <MudTh Class="text-center fw-bold">Email</MudTh>
+            <MudTh Class="text-center fw-bold">Date Created</MudTh>
+            <MudTh Class="text-center fw-bold">Address</MudTh>
+            <MudTh Class="text-center fw-bold">Role</MudTh>
+            <MudTh Class="text-center fw-bold">Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Nr" Class="text-center">@context.Nr</MudTd>
@@ -112,14 +112,28 @@
         await authService.DeleteUser(user);
     }
 
-    private bool FilterFunc1(UserDto element) => FilterFunc(element, search);
+    private bool SearchUserCommand(UserDto element) => SearchUser(element, search);
 
-    private bool FilterFunc(UserDto element, string searchString)
+    private bool SearchUser(UserDto element, string searchString)
     {
-        if(string.IsNullOrWhiteSpace(searchString))
+        if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if(element.User.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+
+        // search first or last name
+        if (element.User.Address.FirstName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || element.User.Address.LastName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
+
+        // search email
+        if (element.User.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        // search address
+        if (element.User.Address.Country.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.User.Address.State.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
         return false;
     }
 }

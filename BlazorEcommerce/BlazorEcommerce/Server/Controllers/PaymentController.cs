@@ -1,4 +1,5 @@
-﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+﻿using BlazorEcommerce.Server.Services.EmailService;
+using BlazorEcommerce.Server.Services.Repositories.IRepositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
@@ -10,11 +11,15 @@ namespace BlazorEcommerce.Server.Controllers;
 public class PaymentController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IEmailSender _emailSender;
+
     const string secret = "whsec_d8ad074fdaa62c2a85136958b93cf6657fa863fd8e0146af3d8d542ab3a7f2db";
 
-    public PaymentController(IUnitOfWork unitOfWork)
+    public PaymentController(IUnitOfWork unitOfWork,
+        IEmailSender emailSender)
     {
         _unitOfWork = unitOfWork;
+        _emailSender = emailSender;
     }
 
     [HttpPost("checkout"), Authorize]
@@ -104,13 +109,21 @@ public class PaymentController : ControllerBase
                 await _unitOfWork.Order.Add(order);
 
                 _unitOfWork.Cart.RemoveRange(cartItems);
-                
+
                 _unitOfWork.Save();
                 orderHeader.OrderId = order.Id;
-                
+
                 await _unitOfWork.SaveAsync();
 
                 response.Message = "Order has been fulfilled";
+
+
+                var message = new Message(
+                    new string[] { user.Email },
+                        "Checkout",
+                        "A Checkout has been completed");
+                await _emailSender.SendEmailAsync(message);
+
             }
             return Ok(response);
         } else

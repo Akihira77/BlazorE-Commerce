@@ -2,6 +2,7 @@
 	display : flex;
 	flex-direction : row;
 	overflow-x : auto;
+	justify-content: center;
 }
 
 img {
@@ -31,9 +32,13 @@ img:hover {
 }
 
 @media (max-width : 1023.98px) {
+	.container {
+		justify-content: start;
+	}
+
 	img {
-		max-width: 140px;
-		max-height: 140px;
+		max-width: 115px;
+		max-height: 120px;
 	}
 
 	.featured-product {
@@ -46,6 +51,10 @@ img:hover {
 	}
 
 	.product-title {
-		font-size: .8rem;
+		font-size: .7rem;
+	}
+
+	.price {
+		font-size: .7rem;
 	}
 }

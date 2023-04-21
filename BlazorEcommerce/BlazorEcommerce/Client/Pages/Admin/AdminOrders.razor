@@ -1,6 +1,7 @@
 ﻿@page "/admin/orders"
 @inject IOrderService orderService
 @inject NavigationManager navigationManager
+@inject ISnackbar snackbar
 @inject IDialogService dialogService
 @implements IDisposable
 @attribute [Authorize(Roles = "Admin")]
@@ -14,21 +15,28 @@
 	</div>
 } else
 {
-    <MudTable Items="@orderService.AdminOrders" Hover="true">
+    <MudTable Items="@orderService.AdminOrders" Hover="true" SortLabel="Sort By">
         <ToolBarContent>
             <MudText Typo="Typo.h4">Order List</MudText>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Class="text-center">Email</MudTh>
-            <MudTh Class="text-center">
+            <MudTh Class="text-center fw-bold">Email</MudTh>
+            <MudTh Class="text-center fw-bold">
                 Created
             </MudTh>
-            <MudTh Class="text-center">
-                Price
+            <MudTh Class="text-center fw-bold">
+                    Price
+                @if (_direction.ToLower().Equals("ascending"))
+                {
+                    <MudIconButton Size="Size.Small" OnClick="@(() => OnSort("ascending"))" Icon="@Icons.Material.Filled.ArrowDropUp" aria-label="ascending" />
+                } else
+                {
+                    <MudIconButton Size="Size.Small" OnClick="@(() => OnSort("descending"))" Icon="@Icons.Material.Filled.ArrowDropDown" aria-label="ascending" />
+                }
             </MudTh>
-            <MudTh Class="text-center">Address</MudTh>
-            <MudTh Class="text-center">Status</MudTh>
-            <MudTh Class="text-center">Actions</MudTh>
+            <MudTh Class="text-center fw-bold">Address</MudTh>
+            @*<MudTh Class="text-center fw-bold">Status</MudTh>*@
+            <MudTh Class="text-center fw-bold">Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Email">@context.User.Email</MudTd>
@@ -50,7 +58,7 @@
                     <br />
                 }
             </MudTd>
-            <MudTd DataLabel="Status" Class="text-center">
+            @*<MudTd DataLabel="Status" Class="text-center">
                 @if(context.Order.OrderStatus == -1)
                 {
                     <MudTooltip Text="Order Cancelled" Arrow="true" Placement="Placement.Bottom" Duration="0">
@@ -67,7 +75,7 @@
                         <MudIcon Icon="@Icons.Material.Outlined.Circle" Color="Color.Warning" Size="Size.Large"></MudIcon>
                     </MudTooltip>
                 }
-            </MudTd>
+            </MudTd>*@
             <MudTd DataLabel="Actions" Class="text-center">
                 <button @onclick="(() => OrderDetail(context.Order.Id))">
                     <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Large"></MudIcon>
@@ -99,16 +107,55 @@
 }
 
 @code {
+    private HubConnection? _hubConnection;
+
     private OrderDto item = new OrderDto();
+
+    string _direction = "ascending";
     protected override async Task OnInitializedAsync()
     {
         await orderService.GetAdminOrders();
         orderService.OnChange += StateHasChanged;
+
+        _hubConnection = new HubConnectionBuilder()
+                        .WithUrl(navigationManager.ToAbsoluteUri("/hubs/userCount"))
+                        .WithAutomaticReconnect()
+                        .Build();
+
+        _hubConnection.On<string>("userCheckout", (incomingMessage) =>
+        {
+            snackbar.Add(incomingMessage, Severity.Info, config =>
+            {
+                config.RequireInteraction = true;
+                config.ShowCloseIcon = false;
+                config.Onclick = e =>
+                {
+                    navigationManager.NavigateTo(navigationManager.Uri, true);
+                    return Task.CompletedTask;
+                };
+            });
+        });
+
+        await _hubConnection.StartAsync();
     }
 
     public void Dispose()
     {
         orderService.OnChange -= StateHasChanged;
+        _hubConnection?.DisposeAsync();
+    }
+
+    private void OnSort(string direction)
+    {
+        if (direction.ToLower().Equals("ascending"))
+        {
+            orderService.AdminOrders = orderService.AdminOrders.OrderBy(ao => ao.Order.TotalPrice).ToList();
+            _direction = "descending";
+        } else
+        {
+            orderService.AdminOrders = orderService.AdminOrders.OrderByDescending(ao => ao.Order.TotalPrice).ToList();
+            _direction = "ascending";
+        }
     }
 
     private async Task OrderDetail(int orderId)

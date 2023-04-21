@@ -1,14 +1,12 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
-@font-face {
-    font-family: "Open Sauce One Regular";
-    font-style: normal;
-    font-weight: normal;
-    src: local("Open Sauce One Regular"), url("open-sauce-one-cufonfonts-webfont/OpenSauceOne-Regular.ttf");
-}
+@import url('open-sauce-one-cufonfonts-webfont/style.css');
 
 
 html, body {
-    /*    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;*/
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+* {
     font-family: 'Open Sauce One Regular';
 }
 

@@ -11,7 +11,6 @@ global using BlazorEcommerce.Shared.Models;
 global using Microsoft.AspNetCore.Components.Authorization;
 global using System.Net.Http.Json;
 global using BlazorEcommerce.Client.Services.ProductTypeService;
-global using System.Globalization;
 
 using BlazorEcommerce.Client;
 using Blazored.LocalStorage;

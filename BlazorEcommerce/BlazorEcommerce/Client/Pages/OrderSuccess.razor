@@ -1,5 +1,6 @@
 ﻿@page "/order-success"
 @inject ICartService cartService
+@inject NavigationManager navigationManager
 
 <PageTitle>Thank you!</PageTitle>
 
@@ -8,8 +9,24 @@
 <span>Thank you for your order! You can check your orders <a href="orders" class="link-primary text-decoration-underline">here</a></span>
 
 @code {
+	private HubConnection? _hubConnection;
+
 	protected override async Task OnInitializedAsync()
 	{
 		await cartService.GetCartItemsCount();
+
+		// create connection
+		_hubConnection = new HubConnectionBuilder()
+						.WithUrl(navigationManager.ToAbsoluteUri("/hubs/userCount"))
+						.WithAutomaticReconnect()
+						.Build();
+
+		// start connections
+		await _hubConnection.StartAsync();
+
+		if (_hubConnection.State == HubConnectionState.Connected)
+		{
+			await _hubConnection.SendAsync("AdminNotificationAfterUserCheckout", "A Checkout has been completed");
+		}
 	}
 }

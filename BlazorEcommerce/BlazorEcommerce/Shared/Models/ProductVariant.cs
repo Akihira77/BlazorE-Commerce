@@ -5,13 +5,11 @@ using System.Text.Json.Serialization;
 namespace BlazorEcommerce.Shared.Models;
 public class ProductVariant
 {
-	[ForeignKey("ProductId")]
 	[JsonIgnore]
 	public Product? Product { get; set; }
 	[Required]
 	public int ProductId { get; set; }
 
-	[ForeignKey("ProductTypeId")]
 	public ProductType? ProductType { get; set; }
 	[Required]
 	public int ProductTypeId { get; set; }

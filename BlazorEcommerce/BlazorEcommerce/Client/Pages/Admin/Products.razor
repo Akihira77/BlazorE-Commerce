@@ -17,21 +17,21 @@
 		<MudText>Add New Product</MudText>
 	</MudButton>
 
-	<MudTable Hover="true" Virtualize="true" Items="@items" Filter="new Func<Product,bool>(FilterFunc1)">
+	<MudTable Hover="true" Virtualize="true" Items="@items" Filter="new Func<Product,bool>(SearchProductCommand)">
 		<ToolBarContent>
 			<MudText Typo="Typo.h4">Product List</MudText>
 			<MudSpacer />
 			<MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
 		</ToolBarContent>
 		<HeaderContent>
-			<MudTh Class="text-center">Image</MudTh>
-			<MudTh Class="text-center">Product</MudTh>
-			<MudTh Class="text-center">Category</MudTh>
-			<MudTh Class="text-center">Variants</MudTh>
-			<MudTh Class="text-center">Price ($)</MudTh>
-			<MudTh Class="text-center">Visible</MudTh>
-			<MudTh Class="text-center">Deleted</MudTh>
-			<MudTh Class="text-center">Actions</MudTh>
+			<MudTh Class="text-center fw-bold">Image</MudTh>
+			<MudTh Class="text-center fw-bold">Product</MudTh>
+			<MudTh Class="text-center fw-bold">Category</MudTh>
+			<MudTh Class="text-center fw-bold">Variants</MudTh>
+			<MudTh Class="text-center fw-bold">Price ($)</MudTh>
+			<MudTh Class="text-center fw-bold">Visible</MudTh>
+			<MudTh Class="text-center fw-bold">Deleted</MudTh>
+			<MudTh Class="text-center fw-bold">Actions</MudTh>
 		</HeaderContent>
 		<RowTemplate>
 			<MudTd DataLabel="Image" Class="text-center">
@@ -89,7 +89,7 @@
 			</MudTd>
 			<MudTd DataLabel="Actions" Class="text-center">
 				<MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Info" @onclick="@(()=>
-					EditProduct(context.Id))" />
+					EditProduct(context.Id, context.CategoryId))" />
 				<MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick="@(() => item = context)" />
 
 				@*Modal*@
@@ -129,14 +129,14 @@
 		items = productService.AdminProducts;
 	}
 
-	void EditProduct(int productId)
+	void EditProduct(int productId, int categoryId)
 	{
-		navigationManager.NavigateTo($"admin/product/{productId}");
+		navigationManager.NavigateTo($"admin/edit-product/{productId}/{categoryId}");
 	}
 
 	void CreateNewProduct()
 	{
-		navigationManager.NavigateTo("admin/product");
+		navigationManager.NavigateTo("admin/add-product");
 	}
 
 	async Task DeleteProduct(Product product)
@@ -152,9 +152,9 @@
 		}
 	}
 
-	private bool FilterFunc1(Product element) => FilterFunc(element, searchString1);
+	private bool SearchProductCommand(Product element) => SearchProduct(element, searchString1);
 
-	private bool FilterFunc(Product element, string searchString)
+	private bool SearchProduct(Product element, string searchString)
 	{
 		if(string.IsNullOrWhiteSpace(searchString))
 			return true;

@@ -1,4 +1,8 @@
-﻿.image-wrapper {
+﻿.details h5 {
+	font-family: 'Open Sauce One Semibold';
+}
+
+.image-wrapper {
 	width : 150px;
 }
 

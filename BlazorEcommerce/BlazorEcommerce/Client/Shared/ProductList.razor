@@ -1,12 +1,14 @@
 ﻿@inject IProductService productService
 @implements IDisposable
 
-@if (productService.Products == null 
-		|| !productService.Products.Any())
+@if (productService.Products == null)
 {
 	<div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 70vh">
 		<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 	</div>
+} else if (productService.Products.Count() == 0)
+{
+	<em>There is no product for this category</em>
 } else {
 	<ul class="list-unstyled d-flex flex-wrap justify-content-center">
 		<Virtualize Items="productService.Products" Context="product" SpacerElement="li">
@@ -23,10 +25,21 @@
 							}
 						</a>
 					</div>
-					<MudCardContent Class="d-flex flex-column position-relative py-0 pt-1">
+					<MudCardContent Class="d-flex flex-column position-relative py-0">
 						<div class="product-text">
 							<MudText>
-								@*text-decoration-underline text-primary*@
+								@if(GetProductRatingCount(product.Id) > 0) {
+									<div class="d-flex text-secondary gap-1 align-items-center">
+										<div class="">
+											<MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Style="font-size: 1.1rem" Title="Rate"/>
+										</div>
+										<div class="d-flex gap-1 align-items-center" style="font-size: .8rem; padding-top: 3px">
+											<span>@rate.ToString("#.0").Replace(',', '.')</span>
+											<span>|</span>
+											<span>@ratingCount</span>
+										</div>
+									</div>
+								}
 								<a class="mb-1" href="/product/@product.Id">
 									<p class="mb-0 product-title">@product.Title</p>
 								</a>
@@ -56,6 +69,8 @@
 }
 @code {
 
+	int ratingCount;
+	decimal rate;
 	protected override void OnInitialized()
 	{
 		productService.ProductsChanged += StateHasChanged;
@@ -64,6 +79,23 @@
 	public void Dispose()
 	{
 		productService.ProductsChanged -= StateHasChanged;
+	}
+
+	private int GetProductRatingCount(int productId)
+	{
+		var product = productService.Products.First(p => p.Id == productId);
+
+		if (product.Ratings.Any())
+		{
+			ratingCount = product.Ratings.Count();
+
+			rate = (decimal) product.Ratings.Average(pr => pr.Rate);
+
+			return product.Ratings.Count();
+		} else
+		{
+			return 0;
+		}
 	}
 
 	private string GetPriceText(Product product)

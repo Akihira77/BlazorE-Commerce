@@ -18,11 +18,10 @@ public class Product
 
 	public bool Featured { get; set; } = false;
 	public IEnumerable<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
+	public IEnumerable<ProductRatings> Ratings { get; set; } = new List<ProductRatings>();
 
 	public bool Visible { get; set; } = true;
 	public bool Deleted { get; set; } = false;
-	//public int Stock { get; set; }
-	public long Rating { get; set; }
 
 	[NotMapped]
 	public bool Editing { get; set; } = false;

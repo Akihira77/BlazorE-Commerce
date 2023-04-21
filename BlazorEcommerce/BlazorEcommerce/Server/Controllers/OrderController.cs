@@ -61,7 +61,7 @@ public class OrderController : ControllerBase
 		var userEmail = _unitOfWork.Auth.GetUserEmail();
 		var message = new Message(
 					new string[] { userEmail },
-					"order",
+					"invoice",
 					orderId.ToString());
 
 		await _emailSender.SendEmailAsync(message);

@@ -1,4 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager navigationManager
+@implements IDisposable
+
 
 <div class="page">
     <MudThemeProvider />
@@ -66,21 +69,45 @@
     </AuthorizeView>
 </div>
 
-@*@code {
-    private bool _isDarkMode;
-    private MudThemeProvider _mudThemeProvider;
+@code {
+    private HubConnection? _hubConnection;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if(firstRender)
+        // create connection
+        _hubConnection = new HubConnectionBuilder()
+                        .WithUrl(navigationManager.ToAbsoluteUri("/hubs/userCount"))
+                        .WithAutomaticReconnect()
+                        .Build();
+
+        // start connections
+        await _hubConnection.StartAsync();
+
+        // invoke hub methods aka send notifications to hub
+        if (_hubConnection.State == HubConnectionState.Connected)
         {
-            _isDarkMode = await _mudThemeProvider.GetSystemPreference();
-            StateHasChanged();
+            await _hubConnection.SendAsync("CalculateUserView");
         }
     }
 
-    private void ChangeState(bool state)
+    public void Dispose()
     {
-        _isDarkMode = state;
+        _hubConnection?.DisposeAsync();
     }
-}*@
+    //private bool _isDarkMode;
+    //private MudThemeProvider _mudThemeProvider;
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if(firstRender)
+    //    {
+    //        _isDarkMode = await _mudThemeProvider.GetSystemPreference();
+    //        StateHasChanged();
+    //    }
+    //}
+
+    //private void ChangeState(bool state)
+    //{
+    //    _isDarkMode = state;
+    //}
+}

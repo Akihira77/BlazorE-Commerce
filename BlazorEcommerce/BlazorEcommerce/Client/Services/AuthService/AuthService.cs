@@ -63,14 +63,12 @@ public class AuthService : IAuthService
         return await result.Content.ReadFromJsonAsync<ServiceResponse<string>>();
     }
 
-    public async Task<bool> Register(UserRegister request)
+    public async Task<ServiceResponse<bool>> Register(UserRegister request)
     {
         var result = await _http.PostAsJsonAsync("api/v1/auth/register", request);
-        var response = await result.Content.ReadFromJsonAsync<ServiceResponse<IEnumerable<UserDto>>>();
+        var response = await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
 
-        AdminUsers = response.Data.ToList();
-        OnChange?.Invoke();
-		return response.Success;
+		return response;
     }
 
     public async Task DeleteUser(User user)

@@ -4,6 +4,7 @@ using BlazorEcommerce.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorEcommerce.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230419102444_productRatingsReviewsCanBeNULL")]
+    partial class productRatingsReviewsCanBeNULL
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -424,8 +427,20 @@ namespace BlazorEcommerce.Server.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Rate")
-                        .HasColumnType("int");
+                    b.Property<bool>("M1")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("M2")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("M3")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("M4")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("M5")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Reviews")
                         .HasColumnType("nvarchar(max)");

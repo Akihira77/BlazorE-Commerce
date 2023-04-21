@@ -1,5 +1,5 @@
-﻿@page "/admin/product"
-@page "/admin/product/{id:int}"
+﻿@page "/admin/add-product"
+@page "/admin/edit-product/{Id:int}/{categoryId:int}"
 @using System.Net.Http.Headers;
 @inject IProductService productService
 @inject IProductTypeService productTypeService
@@ -89,7 +89,9 @@
 			</MudSelect>
 		</div>
 
-		@if (product.CategoryId != 0)
+		@if (product.CategoryId != 0
+			&& (productTypeService.ProductTypes != null
+				&& productTypeService.ProductTypes.Count() > 0))
 		{
 			@foreach (var variant in product.Variants)
 			{
@@ -139,6 +141,8 @@
 @code {
 	[Parameter]
 	public int Id { get; set; }
+	[Parameter]
+	public int categoryId { get; set; }
 
 	Product product = new Product();
 	bool loading = true;
@@ -165,6 +169,7 @@
 		{
 			product = new Product { IsNew = true };
 			btnText = "Create Product";
+			await productTypeService.GetProductTypes();
 		} else
 		{
 			Product dbProduct = (await productService.GetProduct(Id)).Data;
@@ -174,6 +179,8 @@
 				message = $"Product with Id '{Id}' does not exist!";
 				return;
 			}
+			//product.CategoryId = dbProduct.CategoryId;
+			await productTypeService.GetProductTypesByCategory(categoryId);
 			product = dbProduct;
 			product.Editing = true;
 			btnText = "Update Product";

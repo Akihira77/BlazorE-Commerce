@@ -1,24 +1,37 @@
 ﻿@page "/admin"
 @inject IDashboardService dashboardService
 @inject NavigationManager navigationManager
+@inject ISnackbar snackbar
 @implements IDisposable
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Admin | Dashboard</PageTitle>
 
 <div class="d-flex justify-content-around">
-<MudCard Style="width: 240px; height: 240px">
-    <MudCardHeader>
-        <CardHeaderContent>
-            <MudText Typo="Typo.h6">Income This Month</MudText>
-        </CardHeaderContent>
-    </MudCardHeader>
+    <div>
+        <MudCard Style="width: 240px; height: 240px">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Income of this Month</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
-    <MudCardContent Class="text-center">
-            <MudText Class="fs-3">@(incomeForThisMonth.ToString("c", new CultureInfo("en-US")))</MudText>
-    </MudCardContent>
-</MudCard>
+            <MudCardContent Class="text-center">
+                    <MudText Class="fs-3">@(incomeForThisMonth.ToString("c", new CultureInfo("en-US")))</MudText>
+            </MudCardContent>
+        </MudCard>
+        <MudCard Class="mt-2">
+            <MudCardHeader Class="text-center">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Total Views</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
+            <MudCardContent Class="text-center">
+                <MudText>@_totalViews</MudText>
+            </MudCardContent>
+        </MudCard>
+        </div>
     <div class="ms-5">
         <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="1000px" Height="350px" ChartOptions="chartOptions"></MudChart>
     </div>
@@ -69,7 +82,8 @@
 
 
     @code {
-    private HubConnection _hubConnection;
+    private HubConnection? _hubConnection;
+    private int _totalViews;
 
     private int userCount;
     private int productCount;
@@ -165,17 +179,52 @@
         Series.Add(new ChartSeries() { Name = "Income in one year", Data = incomeList.ToArray() });
         chartOptions.LineStrokeWidth = 3;
 
-
+        // create connection
         _hubConnection = new HubConnectionBuilder()
-                        .WithUrl(navigationManager.ToAbsoluteUri("/checkout"))
+                        .WithUrl(navigationManager.ToAbsoluteUri("/hubs/userCount"))
+                        .WithAutomaticReconnect()
                         .Build();
 
+        // connect to methods that hubs invokes aka receive notifications from hub
+        _hubConnection.On<int>("updateUserViewCount", (incomingTotalViews) =>
+        {
+            _totalViews = incomingTotalViews;
+            Console.WriteLine(incomingTotalViews);
+            InvokeAsync(StateHasChanged);
+        });
+
+        _hubConnection.On<string>("userCheckout", (incomingMessage) =>
+        {
+            snackbar.Add(incomingMessage, Severity.Info, config =>
+            {
+                config.RequireInteraction = true;
+                config.ShowCloseIcon = false;
+                config.Onclick = e =>
+                {
+                    navigationManager.NavigateTo("admin/orders", true);
+                    return Task.CompletedTask;
+                };
+            });
+        });
+
+        // start connections
         await _hubConnection.StartAsync();
+
+        // invoke hub methods aka send notifications to hub
+        //await _hubConnection?.SendAsync("CalculateUserView");
     }
 
-    public async Task Dispose()
+    //private async Task Send()
+    //{
+    //    await _hubConnection?.SendAsync("CalculateUserView");
+    //}
+
+    //public bool IsConnected =>
+    //    _hubConnection?.State == HubConnectionState.Connected;
+
+    public void Dispose()
     {
         dashboardService.OnChange -= StateHasChanged;
-        await _hubConnection.DisposeAsync();
+        _hubConnection?.DisposeAsync();
     }
 }
