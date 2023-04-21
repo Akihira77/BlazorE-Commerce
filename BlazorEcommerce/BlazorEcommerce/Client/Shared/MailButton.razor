@@ -1,0 +1,20 @@
+﻿@inject NavigationManager navigationManager
+@inject IDialogService dialogService
+
+<MudTooltip Text="Send message to all Clients" ShowOnFocus="false">
+	<MudIconButton 
+		Icon="@Icons.Material.Outlined.Mail" 
+		Size="Size.Large" 
+		Color="Color.Default" 
+		OnClick="SendMessage"/>
+</MudTooltip>
+
+
+@code {
+	private async Task SendMessage()
+	{
+		var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+		var dialog = await dialogService.ShowAsync<SendMessageFormDialog>("Send Messages to all Clients", options);
+	}
+}

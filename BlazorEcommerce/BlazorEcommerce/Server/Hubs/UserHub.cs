@@ -21,4 +21,9 @@ public class UserHub : Hub
     {
         await Clients.All.SendAsync("userCheckout", message);
     }
+
+    public async Task SendMessageToAllClients(string message)
+    {
+        await Clients.All.SendAsync("ReceiveMessages", message);
+    }
 }

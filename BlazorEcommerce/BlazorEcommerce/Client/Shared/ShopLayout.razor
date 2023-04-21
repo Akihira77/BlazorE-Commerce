@@ -17,7 +17,10 @@
                     <div class="top-row py-2">
                         <HomeButton Role="Admin" />
                         @*<ChangeTheme BackToParent="ChangeState" state="@_isDarkMode"/>*@
-                        <AdminButton />
+                        <div class="d-flex justify-content-end">
+                            <MailButton />
+                            <AdminButton />
+                        </div>
                     </div>
                     <div class="d-flex" style="min-height: 100vh">
                         <div class="nav-menu pt-2" style="width: 15%">
@@ -76,7 +79,7 @@
     {
         // create connection
         _hubConnection = new HubConnectionBuilder()
-                        .WithUrl(navigationManager.ToAbsoluteUri("/hubs/userCount"))
+                        .WithUrl(navigationManager.ToAbsoluteUri("/hubs/user"))
                         .WithAutomaticReconnect()
                         .Build();
 

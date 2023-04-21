@@ -1,0 +1,39 @@
+﻿@inject NavigationManager navigationManager
+
+<MudDialog Class="overflow-hidden">
+    <DialogContent>
+        <MudContainer Style="max-height: 700px; overflow-y: auto">
+            <MudForm @ref="form">
+                <MudTextField T="string" Label="Messages" Variant="Variant.Outlined" @bind-Value="_message" Lines="5" />
+                <MudButton Class="float-end mt-3" Variant="Variant.Filled" Color="Color.Primary" OnClick="Send">Submit</MudButton>
+            </MudForm>
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+
+@code {
+    public string? _message { get; set; }
+    MudForm? form;
+    private HubConnection? _hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // create connection
+        _hubConnection = new HubConnectionBuilder()
+                        .WithUrl(navigationManager.ToAbsoluteUri("/hubs/user"))
+                        .WithAutomaticReconnect()
+                        .Build();
+
+        // connect to methods that hubs invokes aka receive notifications from hub
+
+        // start connections
+        await _hubConnection.StartAsync();
+    }
+
+    // invoke hub methods aka send notifications to hub
+    private async Task Send()
+    {
+        await _hubConnection?.SendAsync("SendMessageToAllClients", _message);
+    }
+}

@@ -21,21 +21,25 @@
         </ToolBarContent>
         <HeaderContent>
             <MudTh Class="text-center fw-bold">Email</MudTh>
-            <MudTh Class="text-center fw-bold">
-                Created
+            <MudTh Class="fw-bold">
+                <div class="d-flex align-items-center justify-content-center">
+                    Created
+                    <div class="d-flex flex-column">
+                        <MudIconButton Style="max-height: 14px" Size="Size.Small" OnClick="@(() => SortByDateCreated("ascending"))" Icon="@Icons.Material.Filled.ArrowDropUp" aria-label="ascending" />
+                        <MudIconButton Style="max-height: 14px" Size="Size.Small" OnClick="@(() => SortByDateCreated("descending"))" Icon="@Icons.Material.Filled.ArrowDropDown" aria-label="ascending" />
+                    </div>
+                </div>
             </MudTh>
-            <MudTh Class="text-center fw-bold">
+            <MudTh Class="fw-bold">
+                <div class="d-flex align-items-center justify-content-center">
                     Price
-                @if (_direction.ToLower().Equals("ascending"))
-                {
-                    <MudIconButton Size="Size.Small" OnClick="@(() => OnSort("ascending"))" Icon="@Icons.Material.Filled.ArrowDropUp" aria-label="ascending" />
-                } else
-                {
-                    <MudIconButton Size="Size.Small" OnClick="@(() => OnSort("descending"))" Icon="@Icons.Material.Filled.ArrowDropDown" aria-label="ascending" />
-                }
+                    <div class="d-flex flex-column">
+                        <MudIconButton Style="max-height: 14px" Size="Size.Small" OnClick="@(() => SortByPrice("ascending"))" Icon="@Icons.Material.Filled.ArrowDropUp" aria-label="ascending" />
+                        <MudIconButton Style="max-height: 14px" Size="Size.Small" OnClick="@(() => SortByPrice("descending"))" Icon="@Icons.Material.Filled.ArrowDropDown" aria-label="ascending" />
+                    </div>
+                </div>
             </MudTh>
             <MudTh Class="text-center fw-bold">Address</MudTh>
-            @*<MudTh Class="text-center fw-bold">Status</MudTh>*@
             <MudTh Class="text-center fw-bold">Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -58,24 +62,6 @@
                     <br />
                 }
             </MudTd>
-            @*<MudTd DataLabel="Status" Class="text-center">
-                @if(context.Order.OrderStatus == -1)
-                {
-                    <MudTooltip Text="Order Cancelled" Arrow="true" Placement="Placement.Bottom" Duration="0">
-                        <MudIcon Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Large"></MudIcon>
-                    </MudTooltip>
-                } else if(context.Order.OrderStatus == 1)
-                {
-                    <MudTooltip Text="Order Approved" Arrow="true" Placement="Placement.Bottom" Duration="0">
-                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Large"></MudIcon>
-                    </MudTooltip>
-                } else
-                {
-                    <MudTooltip Text="Order need Actions" Arrow="true" Placement="Placement.Bottom" Duration="0">
-                        <MudIcon Icon="@Icons.Material.Outlined.Circle" Color="Color.Warning" Size="Size.Large"></MudIcon>
-                    </MudTooltip>
-                }
-            </MudTd>*@
             <MudTd DataLabel="Actions" Class="text-center">
                 <button @onclick="(() => OrderDetail(context.Order.Id))">
                     <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Large"></MudIcon>
@@ -118,7 +104,7 @@
         orderService.OnChange += StateHasChanged;
 
         _hubConnection = new HubConnectionBuilder()
-                        .WithUrl(navigationManager.ToAbsoluteUri("/hubs/userCount"))
+                        .WithUrl(navigationManager.ToAbsoluteUri("/hubs/user"))
                         .WithAutomaticReconnect()
                         .Build();
 
@@ -145,7 +131,7 @@
         _hubConnection?.DisposeAsync();
     }
 
-    private void OnSort(string direction)
+    private void SortByPrice(string direction)
     {
         if (direction.ToLower().Equals("ascending"))
         {
@@ -158,12 +144,25 @@
         }
     }
 
+    private void SortByDateCreated(string direction)
+    {
+        if(direction.ToLower().Equals("ascending"))
+        {
+            orderService.AdminOrders = orderService.AdminOrders.OrderBy(ao => ao.Order.OrderDate).ToList();
+            _direction = "descending";
+        } else
+        {
+            orderService.AdminOrders = orderService.AdminOrders.OrderByDescending(ao => ao.Order.OrderDate).ToList();
+            _direction = "ascending";
+        }
+    }
+
     private async Task OrderDetail(int orderId)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
         var parameters = new DialogParameters { ["OrderId"] = orderId };
 
-        var dialog = await dialogService.ShowAsync<AdminOrderDetails>($"Details order ID {orderId}", parameters, options);
+        var dialog = await dialogService.ShowAsync<AdminOrderDetailsDialog>($"Details order ID {orderId}", parameters, options);
     }
 
     private async Task SeeDetails(int orderId)
@@ -183,6 +182,6 @@
             ["UserId"] = userId
         };
 
-        var dialog = await dialogService.ShowAsync<SendForm>($"Send Order {orderId}", parameters, options);
+        var dialog = await dialogService.ShowAsync<SendFormDialog>($"Send Order {orderId}", parameters, options);
     }
 }

@@ -181,7 +181,7 @@
 
         // create connection
         _hubConnection = new HubConnectionBuilder()
-                        .WithUrl(navigationManager.ToAbsoluteUri("/hubs/userCount"))
+                        .WithUrl(navigationManager.ToAbsoluteUri("/hubs/user"))
                         .WithAutomaticReconnect()
                         .Build();
 

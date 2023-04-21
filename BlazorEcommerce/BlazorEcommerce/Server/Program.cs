@@ -83,7 +83,7 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
-app.MapHub<UserHub>("/hubs/userCount");
+app.MapHub<UserHub>("/hubs/user");
 app.MapFallbackToFile("index.html");
 
 app.Run();
