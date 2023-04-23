@@ -11,6 +11,7 @@ public class ProductRatings
 	public Product Product { get; set; }
 	[Required]
     public int ProductId { get; set; }
+    [Range(0, 5)]
     public int Rate { get; set; } = 0;
     public string? Reviews { get; set; } = string.Empty;
 }

@@ -63,10 +63,12 @@
                 }
             </MudTd>
             <MudTd DataLabel="Actions" Class="text-center">
-                <button @onclick="(() => OrderDetail(context.Order.Id))">
-                    <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Large"></MudIcon>
-                </button>
-                @if (context.Order.OrderStatus == 0)
+                <MudTooltip Text="See Details">
+                    <button @onclick="(() => OrderDetail(context.Order.Id))">
+                        <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Large"></MudIcon>
+                    </button>
+                </MudTooltip>
+                @*@if (context.Order.OrderStatus == 0)
                 {
                     <button @onclick="(() => SendOrder(context.Order.Id, context.User.Id))">
                         <MudIcon Icon="@Icons.Material.Filled.Send" Color="Color.Primary" Size="Size.Large"></MudIcon>
@@ -83,7 +85,7 @@
                             <MudIcon Icon="@Icons.Material.Filled.CancelScheduleSend" Color="Color.Error" Size="Size.Large"></MudIcon>
                         </MudTooltip>
                     </button>
-                }
+                }*@
             </MudTd>
         </RowTemplate>
         <PagerContent>

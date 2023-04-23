@@ -2,7 +2,18 @@
 @inject IAuthService authService
 
 <button @onclick="GoToHome" class="btn btn-outline-primary home-button">
-	BlazorECommerce
+	@*BlazorECommerce*@
+	<div class="brand">
+		<img style="max-height: 40px" src="https://res.cloudinary.com/duthytmqy/image/upload/v1682229266/bec-high-resolution-logo-color-on-transparent-background_mnb8ph.png" />
+		<span>BlazorECommerce</span>
+	</div>
+</button>
+
+<button @onclick="GoToHome" class="btn mobile-home-button">
+	<div class="brand">
+		<img style="max-height: 40px" src="https://res.cloudinary.com/duthytmqy/image/upload/v1682229266/bec-high-resolution-logo-color-on-transparent-background_mnb8ph.png" />
+		<span>BlazorECommerce</span>
+	</div>
 </button>
 
 @code {

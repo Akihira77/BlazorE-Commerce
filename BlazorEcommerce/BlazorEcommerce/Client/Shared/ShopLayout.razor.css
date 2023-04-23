@@ -48,6 +48,12 @@ main {
     .top-row ::deep a, .top-row ::deep .btn-link {
         margin-left: 0;
     }
+
+    .nav-menu {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
 }
 
 @media (min-width: 641px) {

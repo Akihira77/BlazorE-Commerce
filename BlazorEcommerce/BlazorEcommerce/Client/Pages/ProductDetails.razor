@@ -28,7 +28,7 @@
 		</div>
 		<div class="ms-1 media-body mr-4">
 			<h2 class="mb-0">@product.Title</h2>
-			@if(GetProductRatingCount(product.Id) > 0)
+			@if(rate > 0)
 			{
 				<div class="d-flex text-secondary gap-1 align-items-center">
 					<div class="">
@@ -37,7 +37,7 @@
 					<div class="d-flex gap-1 align-items-center pt-1" style="font-size: .8rem">
 						<span>@rate.ToString("#.0").Replace(',', '.')</span>
 						<span>|</span>
-						<span>@ratingCount</span>
+						<span>@ratingCount user</span>
 					</div>
 				</div>
 			}
@@ -108,7 +108,7 @@
 	private int currentTypeId = 1;
 
 	int ratingCount;
-	double rate;
+	double rate = 0;
 
 	[Parameter]
 	public int Id { get; set; }
@@ -121,6 +121,9 @@
 		if (result.Success)
 		{
 			product = result.Data;
+			ratingCount = product.Ratings.Count();
+			rate = product.Ratings.Average(pr => pr.Rate);
+			
 			var variants = product.Variants.ToList();
 			if (product.Variants.Any())
 			{
@@ -150,22 +153,4 @@
 		snackbar.Configuration.MaxDisplayedSnackbars = 2;
 		snackbar.Add($"Added {title} ({GetSelectedVariant().ProductType.Name}) to cart", Severity.Success);
 	}
-
-	private int GetProductRatingCount(int productId)
-	{
-		var product = productService.Products.First(p => p.Id == productId);
-
-		if(product.Ratings.Any())
-		{
-			ratingCount = product.Ratings.Count();
-
-			rate = product.Ratings.Average(pr => pr.Rate);
-
-			return product.Ratings.Count();
-		} else
-		{
-			return 0;
-		}
-	}
-
 }

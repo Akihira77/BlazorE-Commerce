@@ -1,4 +1,6 @@
-﻿namespace BlazorEcommerce.Shared.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BlazorEcommerce.Shared.Models;
 public class OrderHeader
 {
 	public int Id { get; set; }
@@ -7,8 +9,8 @@ public class OrderHeader
 	public int? OrderId { get; set; }
 	public Order Order { get; set; }
 
-	// 0 unpaid
-	// 1 paid
-	public int PaymentStatus { get; set; } = 1;
+	// false - unpaid
+	// true - paid
+	public bool IsPaid { get; set; }
 	public string SessionId { get; set; } = string.Empty;
 }

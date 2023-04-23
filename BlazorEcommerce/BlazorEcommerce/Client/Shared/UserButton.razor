@@ -9,7 +9,7 @@
 		<i class="oi oi-person"></i>
 	</button>
 	<div class="dropdown-menu dropdown-menu-start @UserMenuCssClass" style="min-width: auto">
-		<AuthorizeView>
+		<AuthorizeView Roles="Admin,Customer">
 			<Authorized>
 				<a href="profile" class="dropdown-item">Profile</a>
 				<a href="orders" class="dropdown-item">Orders</a>

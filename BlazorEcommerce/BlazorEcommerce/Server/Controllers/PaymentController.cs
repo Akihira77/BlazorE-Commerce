@@ -50,7 +50,7 @@ public class PaymentController : ControllerBase
 
         var orderHeader = new OrderHeader
         {
-            PaymentStatus = 0,
+            IsPaid = false,
             UserId = _unitOfWork.Auth.GetUserId(),
         };
 
@@ -112,6 +112,7 @@ public class PaymentController : ControllerBase
 
                 _unitOfWork.Save();
                 orderHeader.OrderId = order.Id;
+                orderHeader.IsPaid = true;
 
                 await _unitOfWork.SaveAsync();
 
@@ -130,60 +131,6 @@ public class PaymentController : ControllerBase
         {
             response.Message = request.Message;
             response.Success = false;
-            return BadRequest(response);
-        }
-    }
-
-    [HttpPost("order-paid/{orderHeaderId}")]
-    public async Task<ActionResult<ServiceResponse<bool>>> CheckoutOrder(int orderHeaderId)
-    {
-        var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-        var response = new ServiceResponse<bool>();
-        try
-        {
-            var stripeEvent = EventUtility
-                .ConstructEvent(
-                    json,
-                    Request.Headers["Stripe-Signature"],
-                    secret
-                );
-
-
-            if(stripeEvent.Type == Events.CheckoutSessionCompleted)
-            {
-                var orderHeader = await _unitOfWork.OrderHeader
-                            .GetFirstOrDefault((oh => oh.Id == orderHeaderId));
-
-                orderHeader.PaymentStatus = 1;
-                var cartItems = await _unitOfWork.Cart
-                            .GetAll((c => c.UserId == orderHeader.UserId));
-                var cartProducts = await _unitOfWork.Cart.GetCartProducts(cartItems);
-
-                foreach(var product in cartProducts)
-                {
-                    var dbProduct = await _unitOfWork.Product.GetFirstOrDefault((p => p.Id == product.ProductId));
-                    //if(dbProduct != null)
-                    //{
-                    //    dbProduct.Stock -= product.Quantity;
-                    //}
-                }
-
-                var order = _unitOfWork.Order.PlaceOrder(cartProducts, orderHeader.UserId);
-
-                await _unitOfWork.Order.Add(order);
-
-                _unitOfWork.Cart.RemoveRange(cartItems);
-                await _unitOfWork.SaveAsync();
-
-                orderHeader.OrderId = order.Id;
-                await _unitOfWork.SaveAsync();
-
-                response.Message = "Order has been fulfilled";
-            }
-            return Ok(response);
-        } catch(StripeException ex)
-        {
-            response.Message = ex.Message;
             return BadRequest(response);
         }
     }

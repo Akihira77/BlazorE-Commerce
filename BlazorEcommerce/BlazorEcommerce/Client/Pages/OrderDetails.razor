@@ -20,7 +20,7 @@
 	</div>*@
 
 	<div class="d-flex justify-content-between mb-3">
-		<h3>Order from @order.OrderDate.ToString("f")</h3>
+		<h3>Order from @order.OrderDate.ToString("f", new CultureInfo("en-us"))</h3>
 		<div class="d-flex gap-2 flex-column flex-sm-row">
 			<MudTooltip Text="This Invoice will be send to your Email" Arrow="true" Placement="Placement.Left">
 				<MudButton ButtonType="ButtonType.Button" OnClick="(() => Invoice(orderId))" Color="Color.Success" Variant="Variant.Filled">Invoice</MudButton>

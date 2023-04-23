@@ -14,12 +14,7 @@
 @if(cartProducts == null || !cartProducts.Any())
 {
 	<span>@message</span>
-} 
-@*else if (orderPlaced)
-{
-	<span>Thank you for your order! You can check your orders <a href="orders" class="link-primary text-decoration-underline">here</a></span>
-} *@
-else
+} else
 {
 	<div class="pb-5">
 		@foreach(var product in cartProducts)
@@ -63,7 +58,11 @@ else
 			Total : $@cartProducts.Sum(product => product.Price * product.Quantity)
 		</div>
 		<div>
-			<h5>Delivery Address</h5>
+			<h5>Delivery Address
+				<MudTooltip Text="In case you want to have the Physical Book">
+					<MudIconButton Icon="@Icons.Material.Outlined.Info" Size="Size.Small" aria-label="info" />
+				</MudTooltip>
+			</h5>
 			<AddressForm />
 		</div>
 		<div class="d-flex justify-content-end mt-5">

@@ -1,5 +1,20 @@
 ﻿.home-button {
 	white-space : nowrap;
 	margin-right : 10px;
-	transform : rotate(-5deg);
+	transform : rotate(-4deg);
+	padding: 0px 4px;
+}
+
+.mobile-home-button {
+	display: none;
+}
+
+@media (max-width: 641.98px) {
+	.brand span, .home-button {
+		display: none;
+	}
+
+	.mobile-home-button {
+		display: block;
+	}
 }

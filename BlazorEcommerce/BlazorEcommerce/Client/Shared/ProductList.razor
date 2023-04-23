@@ -25,22 +25,23 @@
 							}
 						</a>
 					</div>
-					<MudCardContent Class="d-flex flex-column position-relative py-0">
+					<MudCardContent Class="d-flex flex-column position-relative py-0 px-2 px-md-4">
 						<div class="product-text">
-							<MudText>
+							<MudText id="rate">
 								@if(GetProductRatingCount(product.Id) > 0) {
 									<div class="d-flex text-secondary gap-1 align-items-center">
 										<div class="">
-											<MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Style="font-size: 1.1rem" Title="Rate"/>
+											<i class="oi oi-star icon-rate text-warning"></i>
 										</div>
-										<div class="d-flex gap-1 align-items-center" style="font-size: .8rem; padding-top: 3px">
+										<div class="d-flex gap-1 align-items-center text">
 											<span>@rate.ToString("#.0").Replace(',', '.')</span>
 											<span>|</span>
-											<span>@ratingCount</span>
+											@*<span>@ratingCount user</span>*@
+											<span>@RateToString(ratingCount) user</span>
 										</div>
 									</div>
 								}
-								<a class="mb-1" href="/product/@product.Id">
+								<a class="mb-1 product-title" href="/product/@product.Id">
 									<p class="mb-0 product-title">@product.Title</p>
 								</a>
 							</MudText>
@@ -112,4 +113,13 @@
 		decimal minPrice = variants.Min(v => v.Price);
 		return $"Starting at ${minPrice}";
 	} 
+
+	private string RateToString(int count)
+	{
+		if (count < 100) return count.ToString();
+		else if (count <= 250) return "100+";
+		else if (count < 500) return "250+";
+		else if (count < 1000) return "500+";
+		else return "1000+";
+	}
 }
