@@ -21,9 +21,11 @@ public class AuthRepository : Repository<User>, IAuthRepository
 		_configuration = configuration;
 		_httpContextAccessor = httpContextAccessor;
 	}
+
 	public string GetUserEmail() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
+
 	public int GetUserId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-	
+
 	public async Task<string> Login(string email, string password)
 	{
 		string message = "";
@@ -61,7 +63,6 @@ public class AuthRepository : Repository<User>, IAuthRepository
 
 	public async Task<bool> UserExists(string email)
 	{
-
 		return await _db.Users.AnyAsync(user => user.Email.ToLower().Equals(email.ToLower()));
 	}
 
@@ -136,12 +137,12 @@ public class AuthRepository : Repository<User>, IAuthRepository
 		return await _db.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
 	}
 
-    public async Task<IEnumerable<User>> GetUsers()
-    {
+	public async Task<IEnumerable<User>> GetUsers()
+	{
 		return await _db.Users
 			.Include(u => u.Address)
-            .OrderBy(u => u.DateCreated)
+			.OrderBy(u => u.DateCreated)
 			.OrderBy(u => u.Role)
-            .ToListAsync();
-    }
+			.ToListAsync();
+	}
 }

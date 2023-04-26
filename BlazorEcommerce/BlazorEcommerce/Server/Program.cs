@@ -10,14 +10,21 @@ using BlazorEcommerce.Server.Services.Repositories.IRepositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+	.MinimumLevel.Information()
+	.WriteTo.Console()
+	.WriteTo.File("F:\\File_Mahasiswa\\Programming\\dotnet\\BlazorE-Commerce\\BlazorEcommerce\\BlazorEcommerce\\Server\\Logs\\log.txt", rollingInterval: RollingInterval.Day)
+	.CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(
-    options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+	options =>
+	options.UseSqlServer(
+		builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -27,47 +34,46 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
-            ValidateIssuer = false,
-            ValidateAudience = false,
-        };
-    });
+	.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+	.AddJwtBearer(options =>
+	{
+		options.TokenValidationParameters = new TokenValidationParameters
+		{
+			ValidateIssuerSigningKey = true,
+			IssuerSigningKey = new SymmetricSecurityKey(
+				System.Text.Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+			ValidateIssuer = false,
+			ValidateAudience = false,
+		};
+	});
 builder.Services.AddMemoryCache();
 
 // email config
 var emailConfig = builder.Configuration
-            .GetSection("EmailConfiguration")
-            .Get<EmailConfiguration>();
+			.GetSection("EmailConfiguration")
+			.Get<EmailConfiguration>();
 builder.Services.AddSingleton(emailConfig);
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddResponseCompression(opts =>
 {
-    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-        new[] { "application/octet-stream" });
+	opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+		new[] { "application/octet-stream" });
 });
 
 var app = builder.Build();
-
 
 app.UseSwaggerUI();
 // Configure the HTTP request pipeline.
 if(app.Environment.IsDevelopment())
 {
-    app.UseWebAssemblyDebugging();
+	app.UseWebAssemblyDebugging();
 } else
 {
-    //app.UseResponseCompression();
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+	//app.UseResponseCompression();
+	app.UseExceptionHandler("/Error");
+	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+	app.UseHsts();
 }
 
 app.UseSwagger();

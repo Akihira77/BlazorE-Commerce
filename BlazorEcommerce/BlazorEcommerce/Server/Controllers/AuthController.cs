@@ -6,17 +6,23 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace BlazorEcommerce.Server.Controllers;
+
 [Route("api/v1/[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
 {
 	private readonly IUnitOfWork _unitOfWork;
 	private readonly IEmailSender _emailSender;
+	private readonly ILogger<AuthController> _logger;
 
-	public AuthController(IUnitOfWork unitOfWork, IEmailSender emailSender)
+	public AuthController(
+		IUnitOfWork unitOfWork,
+		IEmailSender emailSender,
+		ILogger<AuthController> logger)
 	{
 		_unitOfWork = unitOfWork;
 		_emailSender = emailSender;
+		_logger = logger;
 	}
 
 	[HttpPost("register")]
@@ -41,7 +47,8 @@ public class AuthController : ControllerBase
 		await _unitOfWork.Auth.Add(user);
 		await _unitOfWork.SaveAsync();
 
-        return Ok(response);
+		_logger.LogInformation($"User{user.Email} has been registered");
+		return Ok(response);
 	}
 
 	[HttpPost("login")]
@@ -61,6 +68,7 @@ public class AuthController : ControllerBase
 			response.Data = result;
 		}
 
+		_logger.LogInformation($"User {request.Email} has login");
 		return Ok(response);
 	}
 
@@ -73,11 +81,9 @@ public class AuthController : ControllerBase
 			Message = "User not found."
 		};
 
-
 		var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 		var result = await _unitOfWork.Auth.ChangePassword(int.Parse(userId), newPassword);
-
 
 		if(result == null)
 		{
@@ -89,6 +95,7 @@ public class AuthController : ControllerBase
 		response.Success = true;
 		response.Message = "Password has been changed.";
 
+		_logger.LogInformation($"User {User.FindFirstValue(ClaimTypes.Name)} has changed password");
 		return Ok(response);
 	}
 
@@ -96,10 +103,10 @@ public class AuthController : ControllerBase
 	public async Task<ActionResult<ServiceResponse<string>>> ForgotPassword([FromBody] string email)
 	{
 		var response = new ServiceResponse<string>();
-		
+
 		var user = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Email.Equals(email)));
 
-		if (user == null)
+		if(user == null)
 		{
 			response.Success = false;
 			response.Message = "User is not found";
@@ -116,22 +123,23 @@ public class AuthController : ControllerBase
 	[HttpGet("get-role/{email}")]
 	public async Task<ActionResult<ServiceResponse<string>>> GetRole(string email)
 	{
-		var response = new ServiceResponse<string>(); 
+		var response = new ServiceResponse<string>();
 		var result = await _unitOfWork.Auth.GetUserByEmail(email);
 
-		if (result == null)
+		if(result == null)
 		{
 			response.Success = false;
 			response.Message = "User is not found";
 
 			return BadRequest(response);
-		} 
+		}
 		response.Data = result.Role;
 		response.Success = true;
 		response.Message = $"User {email} is found";
 
 		return Ok(response);
 	}
+
 	[HttpGet("get-all-user")]
 	public async Task<ActionResult<ServiceResponse<IEnumerable<UserDto>>>> GetAllUsers()
 	{
@@ -142,24 +150,26 @@ public class AuthController : ControllerBase
 		{
 			userList.Add(new UserDto { Nr = idx++, User = user });
 		}
-		return Ok(new ServiceResponse<IEnumerable<UserDto>>() { Data = userList });	
+		return Ok(new ServiceResponse<IEnumerable<UserDto>>() { Data = userList });
 	}
+
 	[HttpGet("get-user/{userId}")]
 	public async Task<ActionResult<ServiceResponse<User>>> GetUser(int userId)
 	{
 		var user = await _unitOfWork.Auth
 				.GetFirstOrDefault((u => u.Id == userId), includeProperties: "Address");
 		var response = new ServiceResponse<User>();
-		
-		if (user == null)
+
+		if(user == null)
 		{
 			response.Success = false;
 			response.Message = "User is not found";
-		} 
+		}
 
 		response.Data = user;
 		return Ok(response);
 	}
+
 	[HttpPut("change-role")]
 	public async Task<ActionResult<ServiceResponse<string>>> ChangeRole(User user)
 	{
@@ -179,12 +189,13 @@ public class AuthController : ControllerBase
 		}
 		return Ok(response);
 	}
+
 	[HttpDelete("delete/{userId}")]
 	public async Task<ActionResult<ServiceResponse<bool>>> DeleteUser(int userId)
 	{
 		var user = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Id == userId));
 
-		if (user == null)
+		if(user == null)
 		{
 			return Ok(new ServiceResponse<bool>
 			{
@@ -196,10 +207,12 @@ public class AuthController : ControllerBase
 		await _unitOfWork.SaveAsync();
 		return Ok(new ServiceResponse<bool>());
 	}
+
 	private static string CreateRandomToken()
 	{
 		return Convert.ToHexString(RandomNumberGenerator.GetBytes(3));
 	}
+
 	[HttpGet("get-name")]
 	public async Task<ActionResult<ServiceResponse<string>>> GetNameUser()
 	{
@@ -208,7 +221,7 @@ public class AuthController : ControllerBase
 
 		var response = new ServiceResponse<string>();
 
-		if (userAddress != null)
+		if(userAddress != null)
 		{
 			response.Data = userAddress.FirstName + " " + userAddress.LastName;
 		}

@@ -14,6 +14,7 @@ public class Repository<T> : IRepository<T> where T : class
 		//_db = db;
 		_dbSet = db.Set<T>();
 	}
+
 	public async Task Add(T entity)
 	{
 		await _dbSet.AddAsync(entity);
@@ -25,8 +26,8 @@ public class Repository<T> : IRepository<T> where T : class
 	}
 
 	public async Task<IEnumerable<T>> GetAll(
-		Expression<Func<T, bool>>? filter = null, 
-		string? includeProperties = null, 
+		Expression<Func<T, bool>>? filter = null,
+		string? includeProperties = null,
 		bool track = true)
 	{
 		IQueryable<T> query = (track ? _dbSet : _dbSet.AsNoTracking());
@@ -47,8 +48,8 @@ public class Repository<T> : IRepository<T> where T : class
 	}
 
 	public async Task<T> GetFirstOrDefault(
-		Expression<Func<T, bool>> filter, 
-		string? includeProperties = null, 
+		Expression<Func<T, bool>> filter,
+		string? includeProperties = null,
 		bool track = true)
 	{
 		IQueryable<T> query = (track ? _dbSet : _dbSet.AsNoTracking());

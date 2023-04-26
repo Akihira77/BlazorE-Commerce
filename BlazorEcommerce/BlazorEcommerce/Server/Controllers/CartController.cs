@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers;
+
 [Route("api/v1/[controller]")]
 [ApiController]
 public class CartController : ControllerBase

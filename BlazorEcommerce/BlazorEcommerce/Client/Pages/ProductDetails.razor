@@ -122,8 +122,10 @@
 		{
 			product = result.Data;
 			ratingCount = product.Ratings.Count();
-			rate = product.Ratings.Average(pr => pr.Rate);
-			
+			if (ratingCount > 0) {
+				rate = product.Ratings.Average(pr => pr.Rate);
+			}
+
 			var variants = product.Variants.ToList();
 			if (product.Variants.Any())
 			{

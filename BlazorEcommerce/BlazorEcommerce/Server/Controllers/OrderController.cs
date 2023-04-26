@@ -3,6 +3,7 @@ using BlazorEcommerce.Server.Services.Repositories.IRepositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers;
+
 [Route("api/v1/[controller]")]
 [ApiController]
 public class OrderController : ControllerBase
@@ -67,6 +68,7 @@ public class OrderController : ControllerBase
 		await _emailSender.SendEmailAsync(message);
 		return true;
 	}
+
 	[HttpGet("admin-orders")]
 	public async Task<ActionResult<ServiceResponse<IEnumerable<OrderDto>>>> GetAdminOrders()
 	{
@@ -87,6 +89,7 @@ public class OrderController : ControllerBase
 			Data = orderDtos
 		});
 	}
+
 	[HttpGet("admin/get-order/{orderId}")]
 	public async Task<ActionResult<ServiceResponse<OrderOverviewDto>>> GetOrder(int orderId)
 	{
@@ -110,6 +113,7 @@ public class OrderController : ControllerBase
 
 		return Ok(response);
 	}
+
 	[HttpPut("admin/update-order-status/{orderId}")]
 	public async Task<ActionResult<ServiceResponse<IEnumerable<OrderOverviewDto>>>> UpdateOrderStatus(int orderId, [FromBody] int status)
 	{
@@ -144,6 +148,7 @@ public class OrderController : ControllerBase
 		response.Data = orderDtos;
 		return Ok(response);
 	}
+
 	[HttpPost("admin/send-order")]
 	public async Task SendOrder([FromBody] SendOrder sendOrder)
 	{

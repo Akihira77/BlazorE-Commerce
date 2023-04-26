@@ -14,10 +14,11 @@ public class ProductRepository : Repository<Product>, IProductRepository
 		_db = db;
 		_httpContextAccessor = httpContextAccessor;
 	}
+
 	public async Task<Product> GetProduct(int id)
 	{
 		Product product = null;
-		if (_httpContextAccessor.HttpContext.User.IsInRole("Admin")) 
+		if(_httpContextAccessor.HttpContext.User.IsInRole("Admin"))
 		{
 			product = await _db.Products
 				.Include(p => p.Images)
@@ -34,7 +35,7 @@ public class ProductRepository : Repository<Product>, IProductRepository
 						.Where(v => v.Visible && !v.Deleted))
 				.ThenInclude(p => p.ProductType)
 				.FirstOrDefaultAsync(p => p.Id == id && p.Visible && !p.Deleted);
-		} 
+		}
 
 		return product;
 	}
@@ -48,7 +49,8 @@ public class ProductRepository : Repository<Product>, IProductRepository
 				.Include(p => p.Ratings)
 				.Include(p => p.Variants
 					.Where(v => v.Visible && !v.Deleted))
-				.ThenInclude(p => p.ProductType)
+					.ThenInclude(p => p.ProductType)
+				.AsSplitQuery()
 				.ToListAsync();
 	}
 
@@ -145,7 +147,8 @@ public class ProductRepository : Repository<Product>, IProductRepository
 					.Include(p => p.Images)
 					.Include(p => p.Ratings)
 					.Include(p => p.Variants
-							.Where(v => v.Visible && !v.Deleted))
+						.Where(v => v.Visible && !v.Deleted))
+					.AsSplitQuery()
 					.ToListAsync();
 
 		return products;
@@ -158,7 +161,8 @@ public class ProductRepository : Repository<Product>, IProductRepository
 			.Include(p => p.Images)
 			.Include(p => p.Ratings)
 			.Include(p => p.Variants
-					.Where(v => v.Visible && !v.Deleted))
+				.Where(v => v.Visible && !v.Deleted))
+			.AsSplitQuery()
 			.ToListAsync();
 
 		return products;
@@ -171,6 +175,7 @@ public class ProductRepository : Repository<Product>, IProductRepository
 			.Include(p => p.Category)
 			.Include(p => p.Variants)
 				.ThenInclude(v => v.ProductType)
+			.AsSplitQuery()
 			.ToListAsync();
 
 		return products;

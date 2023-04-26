@@ -2,5 +2,5 @@
 
 public interface IProductTypeRepository : IRepository<ProductType>
 {
-    void Update(ProductType productType);
+	void Update(ProductType productType);
 }

@@ -11,7 +11,7 @@ public class PaymentRepository : IPaymentRepository
 
 	// just for 90 day
 	// need to re-authenticate use strip cli to get another secret strings
-	const string secret = "whsec_d8ad074fdaa62c2a85136958b93cf6657fa863fd8e0146af3d8d542ab3a7f2db";
+	private const string secret = "whsec_d8ad074fdaa62c2a85136958b93cf6657fa863fd8e0146af3d8d542ab3a7f2db";
 
 	public PaymentRepository(
 		ICartRepository cartRepository
@@ -22,6 +22,7 @@ public class PaymentRepository : IPaymentRepository
 		_cartRepository = cartRepository;
 		_authRepository = authRepository;
 	}
+
 	public async Task<Session> CreateCheckoutSession()
 	{
 		var cartItems = await _cartRepository.GetAll(c => c.UserId == _authRepository.GetUserId());
@@ -46,7 +47,7 @@ public class PaymentRepository : IPaymentRepository
 			});
 		}
 
-        var options = new SessionCreateOptions
+		var options = new SessionCreateOptions
 		{
 			CustomerEmail = _authRepository.GetUserEmail(),
 			PaymentMethodTypes = new List<string>
@@ -76,7 +77,6 @@ public class PaymentRepository : IPaymentRepository
 					request.Headers["Stripe-Signature"],
 					secret
 				);
-
 
 			var session = stripeEvent.Data.Object as Session;
 			if(stripeEvent.Type == Events.CheckoutSessionCompleted)

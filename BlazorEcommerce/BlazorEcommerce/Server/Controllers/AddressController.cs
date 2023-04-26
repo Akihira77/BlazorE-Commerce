@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers;
+
 [Route("api/v1/[controller]")]
 [ApiController]
 [Authorize]
@@ -37,14 +38,14 @@ public class AddressController : ControllerBase
 	{
 		var response = new ServiceResponse<Address>();
 
-		if (userId == null)
+		if(userId == null)
 		{
 			response.Data = await _unitOfWork.Address
 							.GetFirstOrDefault((a => a.UserId == _unitOfWork.Auth.GetUserId()));
 		} else
 		{
 			response.Data = await _unitOfWork.Address
-							.GetFirstOrDefault((a => a.UserId ==  userId));
+							.GetFirstOrDefault((a => a.UserId == userId));
 		}
 		return Ok(response);
 	}

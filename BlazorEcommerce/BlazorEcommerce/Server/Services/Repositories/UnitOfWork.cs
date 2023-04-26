@@ -1,5 +1,4 @@
 ﻿using BlazorEcommerce.Server.Data;
-using BlazorEcommerce.Server.Services.EmailService;
 using BlazorEcommerce.Server.Services.Repositories.IRepositories;
 
 namespace BlazorEcommerce.Server.Services.Repositories;
@@ -14,11 +13,11 @@ public class UnitOfWork : IUnitOfWork
 	public IAuthRepository Auth { get; private set; }
 	public IOrderRepository Order { get; private set; }
 	public IPaymentRepository Payment { get; private set; }
-    public IAddressRepository Address { get; private set; }
+	public IAddressRepository Address { get; private set; }
 	public IProductTypeRepository ProductType { get; private set; }
 	public IProductVariantRepository ProductVariant { get; private set; }
 	public IImagesRepository Images { get; private set; }
-    public IOrderHeaderRepository OrderHeader { get; private set; }
+	public IOrderHeaderRepository OrderHeader { get; private set; }
 
 	public ISendOrderRepository SendOrder { get; private set; }
 
@@ -40,6 +39,8 @@ public class UnitOfWork : IUnitOfWork
 		OrderHeader = new OrderHeaderRepository(_db);
 		SendOrder = new SendOrderRepository(_db);
 	}
+
 	public void Save() => _db.SaveChanges();
+
 	public async Task SaveAsync() => await _db.SaveChangesAsync();
 }
