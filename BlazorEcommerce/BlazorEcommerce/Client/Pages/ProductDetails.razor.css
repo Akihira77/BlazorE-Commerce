@@ -45,10 +45,19 @@
 	.container {
 		padding-bottom: 75px !important;
 	}
+
+	.media-img {
+		max-width: 100px;
+	}
+
 	.container-right {
 		position: fixed;
 		bottom: 0;
 		left: 0;
 		right: 0;
+	}
+
+	.product-title, .form-select, .original-price, .price {
+		font-size: .95rem;
 	}
 }

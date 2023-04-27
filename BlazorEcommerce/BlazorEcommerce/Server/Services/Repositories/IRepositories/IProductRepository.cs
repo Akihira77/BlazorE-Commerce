@@ -17,4 +17,6 @@ public interface IProductRepository : IRepository<Product>
 	Task<IEnumerable<Product>> GetFeaturedProducts();
 
 	Task<IEnumerable<Product>> GetAdminProducts();
+
+	Task<IEnumerable<ProductRatings>> GetProductRatings(int id);
 }

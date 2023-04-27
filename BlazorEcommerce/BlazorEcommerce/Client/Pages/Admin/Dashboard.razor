@@ -101,8 +101,8 @@
     public double[] users = new double[1];
     public string[] userLabels = { "Available" };
 
-    public double[] orders = new double[3];
-    public string[] orderLabels = { "Processing", "Cancelled", "Succeeded" };
+    public double[] orders = new double[2];
+    public string[] orderLabels = { "Succeeded", "Cancelled" };
 
     public ChartOptions chartOptions = new();
     public List<ChartSeries> Series = new List<ChartSeries>();
@@ -148,12 +148,6 @@
 
         users[0] = userCount;
 
-        // order processing
-        orders[0] = dashboardService
-                    .PropertyCount
-                    .Orders
-                    .Where(o => o.OrderStatus == 0)
-                    .Count();
         // order cancelled
         orders[1] = dashboardService
                     .PropertyCount
@@ -161,7 +155,7 @@
                     .Where(o => o.OrderStatus == -1)
                     .Count();
         // order succeeded
-        orders[2] = dashboardService
+        orders[0] = dashboardService
                     .PropertyCount
                     .Orders
                     .Where(o => o.OrderStatus == 1)

@@ -10,24 +10,25 @@
 	<span>@message</span>
 } else
 {
-	<div class="container pb-5 d-flex flex-column flex-lg-row flex-wrap flex-lg-nowrap overflow-hidden">
-		<div class="container-left">
-			<div class="media-img-wrapper mr-2 ">
-				@if (!string.IsNullOrEmpty(product.ImageUrl))
-				{
-					<img class="media-img" src="@product.ImageUrl" alt="@product.Title" />
-				} else
-				{
-					<MudCarousel Class="mud-width-full" ItemsSource="product.Images" Style="height: 250px;" AutoCycle="false">
-						<ItemTemplate>
-							<MudImage Src="@context.Data" Style="height: 200px; width: 140px"></MudImage>
-						</ItemTemplate>
-					</MudCarousel>
-				}
+	<div class="bg-light container pb-5 d-flex flex-column flex-lg-row flex-wrap flex-lg-nowrap overflow-hidden">
+		<div class="d-flex flex-column flex-lg-row flex-wrap flex-lg-nowrap">
+			<div class="container-left">
+				<div class="media-img-wrapper mr-2 ">
+					@if (!string.IsNullOrEmpty(product.ImageUrl))
+					{
+						<img class="media-img" src="@product.ImageUrl" alt="@product.Title" />
+					} else
+					{
+						<MudCarousel Class="mud-width-full" ItemsSource="product.Images" Style="max-height: 250px;" AutoCycle="false">
+							<ItemTemplate>
+								<MudImage Src="@context.Data" Style="max-height: 200px; max-width: 140px"></MudImage>
+							</ItemTemplate>
+						</MudCarousel>
+					}
+				</div>
 			</div>
-		</div>
-		<div class="ms-1 media-body mr-4">
-			<h2 class="mb-0">@product.Title</h2>
+			<div class="ms-1 media-body mr-4">
+			<h2 class="mb-0 product-title">@product.Title</h2>
 			@if(rate > 0)
 			{
 				<div class="d-flex text-secondary gap-1 align-items-center">
@@ -71,6 +72,93 @@
 				</div>
 			</div>
 		</div>
+			<div>
+				<h5>Reviews</h5>
+				<div class="d-flex flex-column flex-lg-row" style="min-height: 500px">
+					<div class="w-100">
+						<div class="percentage d-flex flex-column">
+							<div class="d-flex mx-auto align-items-center">
+								<MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Style="font-size: 1.2rem" Title="Rate" />
+								<span class="ps-2 pe-1 fs-3">
+									@rate.ToString("#.0").Replace(',', '.') <span style="font-size: 1rem !important;">/5.0</span>
+								</span>
+							</div>
+							<div class="mx-auto">
+								<span>@ratingCount rating</span>
+							</div>
+							<div class="d-flex flex-column px-5 pt-3">
+								<div class="rate-5 d-flex flex-row align-items-center">
+									<MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Style="font-size: .9rem" Title="Rate" />
+									<span class="px-2">5</span>
+									<MudProgressLinear Color="Color.Success" Rounded="true" Value="@Rate[4]" Max="@ratingCount" Size="Size.Medium" />
+									<span class="ps-2">@Rate[4]</span>
+								</div>
+								<div class="rate-4 d-flex flex-row align-items-center">
+									<MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Style="font-size: .9rem" Title="Rate" />
+									<span class="px-2">4</span>
+									<MudProgressLinear Color="Color.Success" Rounded="true" Value="@Rate[3]" Max="@ratingCount" Size="Size.Medium" />
+									<span class="ps-2">@Rate[3]</span>
+								</div>
+								<div class="rate-3 d-flex flex-row align-items-center">
+									<MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Style="font-size: .9rem" Title="Rate" />
+									<span class="px-2">3</span>
+									<MudProgressLinear Color="Color.Success" Rounded="true" Value="@Rate[2]" Max="@ratingCount" Size="Size.Medium" />
+									<span class="ps-2">@Rate[2]</span>
+								</div>
+								<div class="rate-2 d-flex flex-row align-items-center">
+									<MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Style="font-size: .9rem" Title="Rate" />
+									<span class="px-2">2</span>
+									<MudProgressLinear Color="Color.Success" Rounded="true" Value="@Rate[1]" Max="@ratingCount" Size="Size.Medium" />
+									<span class="ps-2">@Rate[1]</span>
+								</div>
+								<div class="rate-1 d-flex flex-row align-items-center">
+									<MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Style="font-size: .9rem" Title="Rate" />
+									<span class="px-2">1</span>
+									<MudProgressLinear Color="Color.Success" Rounded="true" Value="@Rate[0]" Max="@ratingCount" Size="Size.Medium" />
+									<span class="ps-2">@Rate[0]</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="w-100">
+						<MudForm @ref="form" Class="py-3 d-flex flex-column">
+							<MudRating @bind-SelectedValue="starReviews" ReadOnly="_isReadOnly" />
+							<MudTextField T="string" @bind-Value="textReviews" Lines="3" Variant="Variant.Text" Label="Give reviews" Clearable="_isClearable" ReadOnly="_isReadOnly"></MudTextField>
+							<MudButton Class="ms-auto mt-3" Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitReviews">Submit</MudButton>
+						</MudForm>
+						<div>
+							@if(_pr != null)
+							{
+								<ul>
+									@foreach(var item in _pr)
+									{
+										<li>
+											<div class="d-flex flex-column">
+												<div class="d-flex align-items-center">
+													<MudRating ReadOnly="true" SelectedValue="item.Rate" Size="Size.Small" />
+													<span class="ps-2">
+														@GetTimeCreatedOn(item.CreatedOn) ago
+													</span>
+												</div>
+												<div class="fw-bold">@item.UserName</div>
+												<div>@item.TextReviews</div>
+											</div>
+										</li>
+									}
+								</ul>
+
+								<div class="d-flex flex-column align-center">
+									<MudPagination ShowFirstButton="true" ShowLastButton="true" Count="sizedPage" Class="mt-4" Selected="currentPage" SelectedChanged="((int value) => UpdatePagedData(value))" />
+								</div>
+							} else
+							{
+								<p>No reviews.</p>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div class="container-right">
 			<MudCard Class="p-3 d-flex flex-column" Style="width: 100%">
 @*			<MudCardContent>
@@ -99,31 +187,60 @@
 		</MudCard>
 		</div>
 	</div>
+	
 }
 
 @code {
-
 	private Product? product = null;
 	private string message = "Loading product...";
 	private int currentTypeId = 1;
+	private int[] Rate = new int[5];
+	List<string> pagedReviews;
+	List<string> allData = new List<string>();
+	List<ProductRatingsDto> _pr = new List<ProductRatingsDto>();
+	private int currentPage = 1;
+	private int sizedPage;
 
 	int ratingCount;
 	double rate = 0;
 
+	string textReviews = string.Empty;
+	int starReviews = 0;
+	bool _isReadOnly = false;
+	bool _isClearable = true;
+
+	MudForm? form;
 	[Parameter]
 	public int Id { get; set; }
 
 	protected override async Task OnParametersSetAsync()
 	{
-		var result = await productService.GetProduct(Id);
+		var productResult = await productService.GetProduct(Id);
+		var productRatingsResult = await productService.GetProductRatings(Id);
 
-		message = result.Message;
-		if (result.Success)
+		//for(int i = 1; i <= 100; i++)
+		//{
+		//	allData.Add($"Item {i}");
+		//}
+		//sizedPage = (allData.Count / 10) + 1;
+
+		message = productResult.Message;
+		if(productResult.Success)
 		{
-			product = result.Data;
+			product = productResult.Data;
 			ratingCount = product.Ratings.Count();
+
+			sizedPage = (ratingCount / 10) + 1;
 			if (ratingCount > 0) {
 				rate = product.Ratings.Average(pr => pr.Rate);
+
+				for (int i = 0; i < 5; i++)
+				{
+					Rate[i] = productRatingsResult.Data.Count(pr => pr.Rate == (i + 1));
+				}
+
+				_pr = productRatingsResult.Data.ToList();
+				UpdatePagedData(1);
 			}
 
 			var variants = product.Variants.ToList();
@@ -132,6 +249,12 @@
 				currentTypeId = variants[0].ProductTypeId;
 			}
 		}
+	}
+
+	private void SubmitReviews()
+	{
+		_isReadOnly = true;
+		_isClearable = false;
 	}
 
 	private ProductVariant GetSelectedVariant()
@@ -154,5 +277,42 @@
 		snackbar.Configuration.SnackbarVariant = Variant.Text;
 		snackbar.Configuration.MaxDisplayedSnackbars = 2;
 		snackbar.Add($"Added {title} ({GetSelectedVariant().ProductType.Name}) to cart", Severity.Success);
+	}
+
+	private void UpdatePagedData(int value)
+	{
+		currentPage = value;
+		int pageSize = 10; // Change this to set the number of items per page
+		int startIndex = (currentPage - 1) * pageSize;
+		int endIndex = Math.Min(startIndex + pageSize, allData.Count);
+
+		pagedReviews = allData.GetRange(startIndex, endIndex - startIndex);
+	}
+
+	private string GetTimeCreatedOn(DateTime dateTime)
+	{
+		var createdOn = (DateTime.Now - dateTime); 
+		if(createdOn.TotalDays > 365)
+		{
+			return createdOn.Humanize(maxUnit: Humanizer.Localisation.TimeUnit.Year);
+		} else if(createdOn.TotalDays > 30)
+		{
+			return createdOn.Humanize(maxUnit: Humanizer.Localisation.TimeUnit.Month);
+		} else if(createdOn.TotalDays > 7)
+		{
+			return createdOn.Humanize(maxUnit: Humanizer.Localisation.TimeUnit.Week);
+		} else if(createdOn.TotalDays >= 1)
+		{
+			return createdOn.Humanize(maxUnit: Humanizer.Localisation.TimeUnit.Day);
+		} else if(createdOn.TotalHours >= 1)
+		{
+			return createdOn.Humanize(maxUnit: Humanizer.Localisation.TimeUnit.Hour);
+		} else if(createdOn.TotalMinutes >= 1)
+		{
+			return createdOn.Humanize(maxUnit: Humanizer.Localisation.TimeUnit.Minute);
+		} else
+		{
+			return createdOn.Humanize(maxUnit: Humanizer.Localisation.TimeUnit.Second);
+		}
 	}
 }

@@ -13,5 +13,5 @@ public class Order
 	// 0 for processing
 	// -1 for canceled
 	// 1 for shipped
-	public int OrderStatus { get; set; } = 0;
+	public int OrderStatus { get; set; } = 1;
 }

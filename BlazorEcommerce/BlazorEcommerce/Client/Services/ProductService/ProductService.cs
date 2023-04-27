@@ -22,6 +22,12 @@ public class ProductService : IProductService
 		return result;
 	}
 
+	public async Task<ServiceResponse<IEnumerable<ProductRatingsDto>>> GetProductRatings(int id)
+	{
+		var result = await _http.GetFromJsonAsync<ServiceResponse<IEnumerable<ProductRatingsDto>>>($"api/v1/Product/Get-product-ratings/{id}");
+		return result;
+	}
+
 	public async Task GetProducts(string? url = null)
 	{
 		string to = (url == null ?

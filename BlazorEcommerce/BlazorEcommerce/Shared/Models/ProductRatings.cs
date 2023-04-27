@@ -14,4 +14,5 @@ public class ProductRatings
     [Range(0, 5)]
     public int Rate { get; set; } = 0;
     public string? Reviews { get; set; } = string.Empty;
+    public DateTime CreatedOn { get; set; } = DateTime.Now;
 }

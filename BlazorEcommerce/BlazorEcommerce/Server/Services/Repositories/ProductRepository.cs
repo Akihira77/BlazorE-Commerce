@@ -34,9 +34,8 @@ public class ProductRepository : Repository<Product>, IProductRepository
 				.Include(p => p.Variants
 						.Where(v => v.Visible && !v.Deleted))
 				.ThenInclude(p => p.ProductType)
-				.FirstOrDefaultAsync(p => p.Id == id && p.Visible && !p.Deleted);
-		}
-
+				.FirstOrDefaultAsync(p => p.Id == id && !p.Deleted && p.Visible);
+		} 
 		return product;
 	}
 
@@ -179,5 +178,15 @@ public class ProductRepository : Repository<Product>, IProductRepository
 			.ToListAsync();
 
 		return products;
+	}
+
+	public async Task<IEnumerable<ProductRatings>> GetProductRatings(int id)
+	{
+		var productRatings = await _db.ProductRatings
+						.Where(pr => pr.ProductId == id)
+						.Include(pr => pr.User)
+						.ToListAsync();
+
+		return productRatings;
 	}
 }

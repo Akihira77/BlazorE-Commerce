@@ -11,6 +11,7 @@ public interface IProductService
 	string LastSearchText { get; set; }
 	Task GetProducts(string? url = null);
 	Task<ServiceResponse<Product>> GetProduct(int id);
+	Task<ServiceResponse<IEnumerable<ProductRatingsDto>>> GetProductRatings(int id);
 	Task SearchProducts(string searchText, int page);
 	Task<IEnumerable<string>> SearchProductSuggestion(string searchText);
 	Task GetAdminProducts();

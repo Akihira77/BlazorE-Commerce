@@ -9,10 +9,12 @@ namespace BlazorEcommerce.Server.Controllers;
 public class ProductController : ControllerBase
 {
 	private readonly IUnitOfWork _unitOfWork;
+	private readonly ILogger<ProductController> _logger;
 
-	public ProductController(IUnitOfWork unitOfWork)
+	public ProductController(IUnitOfWork unitOfWork, ILogger<ProductController> logger)
 	{
 		_unitOfWork = unitOfWork;
+		_logger = logger;
 	}
 
 	[HttpGet("admin"), Authorize(Roles = "Admin")]
@@ -149,6 +151,40 @@ public class ProductController : ControllerBase
 			response.Success = true;
 			response.Data = result;
 			response.Message = $"Get product {id} is success";
+		}
+
+		return Ok(response);
+	}
+
+	[HttpGet("Get-product-ratings/{id}")]
+	public async Task<ActionResult<ServiceResponse<IEnumerable<ProductRatingsDto>>>> GetProductRatings(int id)
+	{
+		var response = new ServiceResponse<List<ProductRatingsDto>>()
+		{
+			Success = false,
+			Message = $"Sorry but this product does not exist.",
+		};
+
+		var result = await _unitOfWork.Product
+				.GetProductRatings(id);
+
+		if(result != null)
+		{
+			response.Success = true;
+
+			var pr = new List<ProductRatingsDto>();
+
+			foreach(var productRatings in result)
+			{
+				pr.Add(new ProductRatingsDto
+				{
+					Rate = productRatings.Rate,
+					TextReviews = productRatings.Reviews,
+					UserName = productRatings.User.Email
+				});
+			}
+			response.Data = pr;
+			response.Message = $"Get product {id} with ratings is success";
 		}
 
 		return Ok(response);

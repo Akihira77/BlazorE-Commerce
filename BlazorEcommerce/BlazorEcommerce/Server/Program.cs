@@ -15,7 +15,6 @@ using Serilog;
 Log.Logger = new LoggerConfiguration()
 	.MinimumLevel.Information()
 	.WriteTo.Console()
-	.WriteTo.File("F:\\File_Mahasiswa\\Programming\\dotnet\\BlazorE-Commerce\\BlazorEcommerce\\BlazorEcommerce\\Server\\Logs\\log.txt", rollingInterval: RollingInterval.Day)
 	.CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
