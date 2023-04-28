@@ -156,8 +156,18 @@ public class AuthController : ControllerBase
 	[HttpGet("get-user/{userId}")]
 	public async Task<ActionResult<ServiceResponse<User>>> GetUser(int userId)
 	{
-		var user = await _unitOfWork.Auth
-				.GetFirstOrDefault((u => u.Id == userId), includeProperties: "Address");
+		User user;
+		if (userId == 0)
+		{
+			user = await _unitOfWork.Auth
+					.GetFirstOrDefault((u => u.Id == _unitOfWork.Auth.GetUserId()));
+			user.PasswordSalt = null;
+			user.PasswordHash = null;
+		} else
+		{
+			user = await _unitOfWork.Auth
+					.GetFirstOrDefault((u => u.Id == userId), includeProperties: "Address");
+		} 
 		var response = new ServiceResponse<User>();
 
 		if(user == null)

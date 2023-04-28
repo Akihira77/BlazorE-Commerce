@@ -4,12 +4,10 @@ using System.Text.Json.Serialization;
 namespace BlazorEcommerce.Shared.Models;
 public class ProductRatings
 {
-    public User User { get; set; }
-	[Required]
+    public User? User { get; set; }
     public int UserId { get; set; }
 	[JsonIgnore]
-	public Product Product { get; set; }
-	[Required]
+	public Product? Product { get; set; }
     public int ProductId { get; set; }
     [Range(0, 5)]
     public int Rate { get; set; } = 0;

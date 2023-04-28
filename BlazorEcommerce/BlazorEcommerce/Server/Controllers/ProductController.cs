@@ -180,7 +180,8 @@ public class ProductController : ControllerBase
 				{
 					Rate = productRatings.Rate,
 					TextReviews = productRatings.Reviews,
-					UserName = productRatings.User.Email
+					UserName = productRatings.User.Email,
+					CreatedOn = productRatings.CreatedOn
 				});
 			}
 			response.Data = pr;
@@ -247,5 +248,48 @@ public class ProductController : ControllerBase
 
 		response.Data = result;
 		return Ok(response);
+	}
+
+	[HttpPost("submit-reviews")]
+	public async Task<ActionResult<ServiceResponse<bool>>> SubmitReviews(ProductRatings productRatings)
+	{
+		var userId = _unitOfWork.Auth.GetUserId();
+		var productRatingsDb = await _unitOfWork.ProductRatings
+								.GetFirstOrDefault((pr => pr.UserId == userId
+													&& pr.ProductId == productRatings.ProductId));
+
+		if(productRatingsDb == null)
+		{
+			productRatings.UserId = userId;
+			productRatings.User = await _unitOfWork.Auth.GetFirstOrDefault((u => u.Id == userId));
+
+			try
+			{
+				await _unitOfWork.ProductRatings.Add(productRatings);
+				await _unitOfWork.SaveAsync();
+
+				return new ServiceResponse<bool>
+				{
+					Success = true,
+					Message = "Reviews Added"
+				};
+			} catch(Exception ex)
+			{
+				_logger.LogError(ex.Message);
+
+				return new ServiceResponse<bool>
+				{
+					Success = false,
+					Message = "Got Error while saving reviews"
+				};
+			}
+		} else
+		{
+			return new ServiceResponse<bool>
+			{
+				Success = false,
+				Message = "Sorry, You're already give reviews for this product"
+			};
+		} 
 	}
 }

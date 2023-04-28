@@ -10,6 +10,11 @@
 	text-align : center;
 }
 
+
+.container-right {
+	width: 20%;
+}
+
 .description {
 	white-space: pre-wrap;
 	font-family: 'Lato', sans-serif;
@@ -22,6 +27,11 @@
 
 .original-price {
 	text-decoration: line-through;
+	font-size: .9rem;
+}
+
+.price {
+	font-size: 1.25rem;
 }
 
 @media (max-width : 1023.98px) {
@@ -33,7 +43,15 @@
 		width : 100%;
 		height: auto;
 	}
-	
+
+	.container-right {
+		width: auto;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+	}
+
 	.action {
 		display : flex;
 		flex-direction : row;
@@ -47,7 +65,8 @@
 	}
 
 	.media-img {
-		max-width: 100px;
+		max-height: 200px;
+		max-width: 120px
 	}
 
 	.container-right {
@@ -55,9 +74,18 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
+		width: auto;
 	}
 
-	.product-title, .form-select, .original-price, .price {
+	.product-title, .form-select {
 		font-size: .95rem;
+	}
+
+	.original-price {
+		font-size: .75rem;
+	}
+	
+	.price {
+		font-size: .9rem;
 	}
 }

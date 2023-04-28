@@ -2,7 +2,7 @@
 @inject ISnackbar snackbar
 @inject IProductService productService
 @inject ICartService cartService
-@inject AuthenticationStateProvider authenticationStateProvider
+@inject IAuthService authService
 @inject NavigationManager navigationManager
 
 @if (product == null)
@@ -10,24 +10,25 @@
 	<span>@message</span>
 } else
 {
-	<div class="bg-light container pb-5 d-flex flex-column flex-lg-row flex-wrap flex-lg-nowrap overflow-hidden">
-		<div class="d-flex flex-column flex-lg-row flex-wrap flex-lg-nowrap">
-			<div class="container-left">
-				<div class="media-img-wrapper mr-2 ">
-					@if (!string.IsNullOrEmpty(product.ImageUrl))
-					{
-						<img class="media-img" src="@product.ImageUrl" alt="@product.Title" />
-					} else
-					{
-						<MudCarousel Class="mud-width-full" ItemsSource="product.Images" Style="max-height: 250px;" AutoCycle="false">
-							<ItemTemplate>
-								<MudImage Src="@context.Data" Style="max-height: 200px; max-width: 140px"></MudImage>
-							</ItemTemplate>
-						</MudCarousel>
-					}
+	<div class="container pb-5 d-flex flex-column flex-lg-row flex-wrap flex-lg-nowrap overflow-hidden">
+		<div class="container">
+			<div class="row">
+				<div class="col-12 col-lg-3 container-left">
+					<div class="media-img-wrapper">
+						@if (!string.IsNullOrEmpty(product.ImageUrl))
+						{
+							<img class="media-img" src="@product.ImageUrl" alt="@product.Title" />
+						} else
+						{
+							<MudCarousel Class="mud-width-full" ItemsSource="product.Images" Style="height: 220px;" AutoCycle="false">
+								<ItemTemplate>
+									<MudImage Src="@context.Data" Style="max-height: 200px; max-width: 120px"></MudImage>
+								</ItemTemplate>
+							</MudCarousel>
+						}
+					</div>
 				</div>
-			</div>
-			<div class="ms-1 media-body mr-4">
+				<div class="col-12 col-lg-9 media-body mr-4">
 			<h2 class="mb-0 product-title">@product.Title</h2>
 			@if(rate > 0)
 			{
@@ -72,21 +73,29 @@
 				</div>
 			</div>
 		</div>
-			<div>
+			</div>
+			<div class="reviews-section row mt-4">
 				<h5>Reviews</h5>
-				<div class="d-flex flex-column flex-lg-row" style="min-height: 500px">
-					<div class="w-100">
+				<div class="row" style="min-height: 500px">
+					<div class="col-12 col-lg-3">
 						<div class="percentage d-flex flex-column">
 							<div class="d-flex mx-auto align-items-center">
 								<MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Style="font-size: 1.2rem" Title="Rate" />
 								<span class="ps-2 pe-1 fs-3">
-									@rate.ToString("#.0").Replace(',', '.') <span style="font-size: 1rem !important;">/5.0</span>
+									@if (rate > 0)
+									{
+										@rate.ToString("#.0").Replace(',', '.')
+									} else
+									{
+										@rate
+									}
+									<span style="font-size: 1rem !important;">/5.0</span>
 								</span>
 							</div>
 							<div class="mx-auto">
 								<span>@ratingCount rating</span>
 							</div>
-							<div class="d-flex flex-column px-5 pt-3">
+							<div class="d-flex flex-column px-5 pt-3 text-secondary">
 								<div class="rate-5 d-flex flex-row align-items-center">
 									<MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Style="font-size: .9rem" Title="Rate" />
 									<span class="px-2">5</span>
@@ -120,10 +129,10 @@
 							</div>
 						</div>
 					</div>
-					<div class="w-100">
+					<div class="col-12 col-lg-9">
 						<MudForm @ref="form" Class="py-3 d-flex flex-column">
-							<MudRating @bind-SelectedValue="starReviews" ReadOnly="_isReadOnly" />
-							<MudTextField T="string" @bind-Value="textReviews" Lines="3" Variant="Variant.Text" Label="Give reviews" Clearable="_isClearable" ReadOnly="_isReadOnly"></MudTextField>
+							<MudRating @bind-SelectedValue="productRatings.Rate" ReadOnly="_isReadOnly" />
+							<MudTextField T="string" @bind-Value="productRatings.Reviews" Lines="3" Variant="Variant.Text" Label="Give reviews" Clearable="_isClearable" ReadOnly="_isReadOnly"></MudTextField>
 							<MudButton Class="ms-auto mt-3" Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitReviews">Submit</MudButton>
 						</MudForm>
 						<div>
@@ -160,7 +169,7 @@
 			</div>
 		</div>
 		<div class="container-right">
-			<MudCard Class="p-3 d-flex flex-column" Style="width: 100%">
+			<MudCard Class="p-3 d-flex flex-column" Style="width: 100%;">
 @*			<MudCardContent>
 				<MudText>Add to Cart</MudText>
 			</MudCardContent>*@
@@ -170,7 +179,7 @@
 						<MudButton FullWidth="true" Variant="Variant.Filled"
 							   Color="Color.Success"
 							   @onclick="@(() => AddToCart(product.Title))"
-							   StartIcon="@Icons.Material.Filled.AddShoppingCart">
+							   StartIcon="@Icons.Material.Filled.Add" Style="text-transform: none">
 							Add to Cart
 						</MudButton>
 					</Authorized>
@@ -204,8 +213,9 @@
 	int ratingCount;
 	double rate = 0;
 
-	string textReviews = string.Empty;
-	int starReviews = 0;
+	ProductRatings productRatings = new ProductRatings();
+	//string textReviews = string.Empty;
+	//int starReviews = 0;
 	bool _isReadOnly = false;
 	bool _isClearable = true;
 
@@ -218,18 +228,24 @@
 		var productResult = await productService.GetProduct(Id);
 		var productRatingsResult = await productService.GetProductRatings(Id);
 
-		//for(int i = 1; i <= 100; i++)
-		//{
-		//	allData.Add($"Item {i}");
-		//}
-		//sizedPage = (allData.Count / 10) + 1;
-
 		message = productResult.Message;
 		if(productResult.Success)
 		{
 			product = productResult.Data;
 			ratingCount = product.Ratings.Count();
+			var user = await authService.GetUser(0);
 
+			if (productRatingsResult.Data.Any(pr => pr.UserName == user.Email))
+			{
+				productRatings.Rate = productRatingsResult.Data
+									.FirstOrDefault(pr => pr.UserName == user.Email).Rate;
+				productRatings.Reviews = productRatingsResult.Data
+									.FirstOrDefault(pr => pr.UserName == user.Email).TextReviews;
+			} else
+			{
+				productRatings.ProductId = Id;
+				productRatings.Product = productResult.Data;
+			}
 			sizedPage = (ratingCount / 10) + 1;
 			if (ratingCount > 0) {
 				rate = product.Ratings.Average(pr => pr.Rate);
@@ -239,7 +255,7 @@
 					Rate[i] = productRatingsResult.Data.Count(pr => pr.Rate == (i + 1));
 				}
 
-				_pr = productRatingsResult.Data.ToList();
+				_pr = productRatingsResult.Data.Where(pr => pr.UserName != user.Email).ToList();
 				UpdatePagedData(1);
 			}
 
@@ -251,10 +267,25 @@
 		}
 	}
 
-	private void SubmitReviews()
+	private async Task SubmitReviews()
 	{
+
+		if (rate == 0)
+		{
+			snackbar.Add("Give rate first", Severity.Warning);
+			return;
+		}
+
 		_isReadOnly = true;
 		_isClearable = false;
+		var response = await productService.SubmitReviews(productRatings);
+		if (response.Success)
+		{
+			snackbar.Add(response.Message, Severity.Success);
+		} else
+		{
+			snackbar.Add(response.Message, Severity.Error);
+		}
 	}
 
 	private ProductVariant GetSelectedVariant()

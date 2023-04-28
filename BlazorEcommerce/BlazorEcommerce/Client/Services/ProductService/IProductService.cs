@@ -18,4 +18,5 @@ public interface IProductService
 	Task<Product> CreateProduct(Product product);
 	Task<Product> UpdateProduct(Product product);
 	Task<ServiceResponse<bool>> DeleteProduct(Product product);
+	Task<ServiceResponse<bool>> SubmitReviews(ProductRatings productRatings);
 }

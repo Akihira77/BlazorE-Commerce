@@ -114,4 +114,11 @@ public class ProductService : IProductService
 		return (await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>());
 
 	}
+
+	public async Task<ServiceResponse<bool>> SubmitReviews(ProductRatings productRatings)
+	{
+		var result = await _http.PostAsJsonAsync("api/v1/product/submit-reviews", productRatings);
+
+		return (await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>());
+	}
 }

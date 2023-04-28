@@ -14,6 +14,7 @@ public interface IUnitOfWork
 	IImagesRepository Images { get; }
 	IOrderHeaderRepository OrderHeader { get; }
 	ISendOrderRepository SendOrder { get; }
+	IProductRatingsRepository ProductRatings { get; }
 
 	Task SaveAsync();
 

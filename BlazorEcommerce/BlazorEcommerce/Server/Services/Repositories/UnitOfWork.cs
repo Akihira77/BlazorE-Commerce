@@ -18,10 +18,10 @@ public class UnitOfWork : IUnitOfWork
 	public IProductVariantRepository ProductVariant { get; private set; }
 	public IImagesRepository Images { get; private set; }
 	public IOrderHeaderRepository OrderHeader { get; private set; }
-
 	public ISendOrderRepository SendOrder { get; private set; }
+    public IProductRatingsRepository ProductRatings { get; private set; }
 
-	public UnitOfWork(AppDbContext db
+    public UnitOfWork(AppDbContext db
 		, IConfiguration configuration
 		, IHttpContextAccessor httpContextAccessor)
 	{
@@ -38,6 +38,7 @@ public class UnitOfWork : IUnitOfWork
 		Images = new ImagesRepository(_db);
 		OrderHeader = new OrderHeaderRepository(_db);
 		SendOrder = new SendOrderRepository(_db);
+		ProductRatings = new ProductRatingsRepository(_db);
 	}
 
 	public void Save() => _db.SaveChanges();
