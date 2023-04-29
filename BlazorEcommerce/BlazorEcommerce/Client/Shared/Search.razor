@@ -19,7 +19,7 @@
 		}
 	</datalist>
 	<div class="input-group-append">
-		<button class="btn btn-primary" @onclick="SearchProucts">
+		<button class="btn btn-primary" @onclick="SearchProducts">
 			<span class="oi oi-magnifying-glass"></span>
 		</button>
 	</div>
@@ -39,7 +39,7 @@
 		}
 	}
 
-	public void SearchProucts()
+	public void SearchProducts()
 	{
 		navigationManager.NavigateTo($"search/{searchText}/1");
 		searchText = "";
@@ -49,7 +49,7 @@
 	{
 		if (keyArgs.Key == null || keyArgs.Key.Equals("Enter"))
 		{
-			SearchProucts();
+			SearchProducts();
 		} else if (searchText.Length > 1)
 		{
 			var sug = await productService.SearchProductSuggestion(searchText);

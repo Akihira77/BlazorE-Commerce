@@ -3,6 +3,7 @@
 @inject IProductService productService
 @inject ICartService cartService
 @inject IAuthService authService
+@inject ILocalStorageService localStorage
 @inject NavigationManager navigationManager
 
 @if (product == null)
@@ -13,22 +14,22 @@
 	<div class="container pb-5 d-flex flex-column flex-lg-row flex-wrap flex-lg-nowrap overflow-hidden">
 		<div class="container">
 			<div class="row">
-				<div class="col-12 col-lg-3 container-left">
+				<div class="col-12 col-lg-4 container-left">
 					<div class="media-img-wrapper">
 						@if (!string.IsNullOrEmpty(product.ImageUrl))
 						{
 							<img class="media-img" src="@product.ImageUrl" alt="@product.Title" />
 						} else
 						{
-							<MudCarousel Class="mud-width-full" ItemsSource="product.Images" Style="height: 220px;" AutoCycle="false">
+							<MudCarousel Class="" ItemsSource="product.Images" Style="height: 300px;" AutoCycle="false">
 								<ItemTemplate>
-									<MudImage Src="@context.Data" Style="max-height: 200px; max-width: 120px"></MudImage>
+									<MudImage Src="@context.Data" Style="max-height: 250px;"></MudImage>
 								</ItemTemplate>
 							</MudCarousel>
 						}
 					</div>
 				</div>
-				<div class="col-12 col-lg-9 media-body mr-4">
+				<div class="col-12 col-lg-8 media-body mr-4">
 			<h2 class="mb-0 product-title">@product.Title</h2>
 			@if(rate > 0)
 			{
@@ -74,9 +75,9 @@
 			</div>
 		</div>
 			</div>
-			<div class="reviews-section row mt-4">
+			<div class="reviews-section row mt-5">
 				<h5>Reviews</h5>
-				<div class="row" style="min-height: 500px">
+				<div class="row justify-content-between" style="min-height: 500px">
 					<div class="col-12 col-lg-3">
 						<div class="percentage d-flex flex-column">
 							<div class="d-flex mx-auto align-items-center">
@@ -129,14 +130,17 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-12 col-lg-9">
-						<MudForm @ref="form" Class="py-3 d-flex flex-column">
-							<MudRating @bind-SelectedValue="productRatings.Rate" ReadOnly="_isReadOnly" />
-							<MudTextField T="string" @bind-Value="productRatings.Reviews" Lines="3" Variant="Variant.Text" Label="Give reviews" Clearable="_isClearable" ReadOnly="_isReadOnly"></MudTextField>
-							<MudButton Class="ms-auto mt-3" Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitReviews">Submit</MudButton>
-						</MudForm>
+					<div class="col-12  col-lg-8">
+						@if (authUser != null)
+						{
+							<MudForm @ref="form" Class="py-3 d-flex flex-column">
+								<MudRating @bind-SelectedValue="productRatings.Rate" ReadOnly="_isReadOnly" />
+								<MudTextField T="string" @bind-Value="productRatings.Reviews" Lines="3" Variant="Variant.Text" Label="Give reviews" Clearable="_isClearable" ReadOnly="_isReadOnly"></MudTextField>
+								<MudButton Class="ms-auto mt-3" Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitReviews">Submit</MudButton>
+							</MudForm>
+						}
 						<div>
-							@if(_pr != null)
+							@if(_pr.Count > 0)
 							{
 								<ul>
 									@foreach(var item in _pr)
@@ -170,9 +174,6 @@
 		</div>
 		<div class="container-right">
 			<MudCard Class="p-3 d-flex flex-column" Style="width: 100%;">
-@*			<MudCardContent>
-				<MudText>Add to Cart</MudText>
-			</MudCardContent>*@
 			<MudCardActions Class="mt-auto">
 				<AuthorizeView>
 					<Authorized>
@@ -200,6 +201,9 @@
 }
 
 @code {
+	[Parameter]
+	public int Id { get; set; }
+
 	private Product? product = null;
 	private string message = "Loading product...";
 	private int currentTypeId = 1;
@@ -214,56 +218,66 @@
 	double rate = 0;
 
 	ProductRatings productRatings = new ProductRatings();
-	//string textReviews = string.Empty;
-	//int starReviews = 0;
 	bool _isReadOnly = false;
 	bool _isClearable = true;
+	string? authUser;
 
 	MudForm? form;
-	[Parameter]
-	public int Id { get; set; }
 
 	protected override async Task OnParametersSetAsync()
 	{
 		var productResult = await productService.GetProduct(Id);
-		var productRatingsResult = await productService.GetProductRatings(Id);
 
 		message = productResult.Message;
-		if(productResult.Success)
-		{
-			product = productResult.Data;
-			ratingCount = product.Ratings.Count();
-			var user = await authService.GetUser(0);
+		if (!productResult.Success) return;
 
-			if (productRatingsResult.Data.Any(pr => pr.UserName == user.Email))
+		var productRatingsResult = await productService.GetProductRatings(Id);
+		User user;
+		product = productResult.Data;
+		ratingCount = product.Ratings.Count();
+		authUser = await localStorage.GetItemAsStringAsync("authToken");
+		if (authUser != null)
+		{
+			user = await authService.GetUser(0);
+
+			if(productRatingsResult.Data.Any(pr => pr.UserName == user.Email))
 			{
 				productRatings.Rate = productRatingsResult.Data
 									.FirstOrDefault(pr => pr.UserName == user.Email).Rate;
 				productRatings.Reviews = productRatingsResult.Data
 									.FirstOrDefault(pr => pr.UserName == user.Email).TextReviews;
-			} else
+
+				_pr = productRatingsResult.Data
+						.Where(pr => pr.UserName != user.Email)
+						.ToList();
+
+			}
+
+		} else
+		{
+			_pr = productRatingsResult.Data.ToList();
+		}
+
+		productRatings.ProductId = Id;
+		productRatings.Product = productResult.Data;
+		sizedPage = (ratingCount / 10) + 1;
+
+		if (ratingCount > 0) {
+			rate = product.Ratings.Average(pr => pr.Rate);
+
+			for (int i = 0; i < 5; i++)
 			{
-				productRatings.ProductId = Id;
-				productRatings.Product = productResult.Data;
-			}
-			sizedPage = (ratingCount / 10) + 1;
-			if (ratingCount > 0) {
-				rate = product.Ratings.Average(pr => pr.Rate);
-
-				for (int i = 0; i < 5; i++)
-				{
-					Rate[i] = productRatingsResult.Data.Count(pr => pr.Rate == (i + 1));
-				}
-
-				_pr = productRatingsResult.Data.Where(pr => pr.UserName != user.Email).ToList();
-				UpdatePagedData(1);
+				Rate[i] = productRatingsResult.Data.Count(pr => pr.Rate == (i + 1));
 			}
 
-			var variants = product.Variants.ToList();
-			if (product.Variants.Any())
-			{
-				currentTypeId = variants[0].ProductTypeId;
-			}
+			
+			UpdatePagedData(1);
+		}
+
+		var variants = product.Variants.ToList();
+		if (product.Variants.Any())
+		{
+			currentTypeId = variants[0].ProductTypeId;
 		}
 	}
 

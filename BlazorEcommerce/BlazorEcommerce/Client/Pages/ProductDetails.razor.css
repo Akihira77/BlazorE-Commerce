@@ -1,12 +1,12 @@
 ﻿.media-img {
-	max-height : 500px;
-	width : 210px;
+	max-height : 250px;
+/*	width : 210px;*/
 	border-radius : 6px;
 	margin : 0 10px 10px 10px;
 }
 
 .media-img-wrapper {
-	max-height : 500px;
+	max-height : 250px;
 	text-align : center;
 }
 

@@ -8,5 +8,6 @@ public class ResetPassword
 	public string Email { get; set; } = string.Empty;
 	public string? Token { get; set; } = string.Empty;
 
-    public UserChangePassword UserChange { get; set; }
+	public UserChangePassword UserChange { get; set; }
 }
+

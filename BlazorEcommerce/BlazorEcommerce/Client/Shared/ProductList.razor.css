@@ -34,7 +34,12 @@
 }
 
 .product-price {
-	font-size: .75rem;
+	font-size: .9rem;
+	color: #008000;
+}
+
+.original-price {
+	font-size: .7rem;
 }
 
 .product-text {

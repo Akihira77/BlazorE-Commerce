@@ -22,15 +22,34 @@
 		{
 			<h3>Create a new Product</h3>
 		}
-		<MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Success" @onclick=@(() => navigationManager.NavigateTo("admin/products")) Size="Size.Small" StartIcon="@Icons.Material.Filled.ArrowBack">Back</MudButton>
+		<MudButton 
+			ButtonType="ButtonType.Button" 
+			Variant="Variant.Filled" 
+			Color="Color.Success" 
+			@onclick=@(() => navigationManager.NavigateTo("admin/products")) 
+			Size="Size.Small" 
+			StartIcon="@Icons.Material.Filled.ArrowBack"
+			Style="max-height: 40px">Back</MudButton>
 	</div>
 	<EditForm Model="product" OnValidSubmit="AddOrUpdateProduct">
 		<DataAnnotationsValidator></DataAnnotationsValidator>
 		<div class="mb-3">
-			<MudTextField Margin="Margin.Dense" @bind-Value="product.Title" Label="Title" Variant="Variant.Outlined"></MudTextField>
+			<MudTextField 
+				Margin="Margin.Dense" 
+				@bind-Value="product.Title" 
+				Label="Title" 
+				Variant="Variant.Outlined"
+				Clearable="true"
+				Immediate="true"></MudTextField>
 		</div>
 		<div class="mb-3">
-			<MudTextField Margin="Margin.Dense" @bind-Value="product.ImageUrl" Label="Image Url" Variant="Variant.Outlined"></MudTextField>
+			<MudTextField 
+				Margin="Margin.Dense" 
+				@bind-Value="product.ImageUrl" 
+				Label="Image Url" 
+				Variant="Variant.Outlined"
+				Clearable="true"
+				Immediate="true"></MudTextField>
 		</div>
 		<div class="mb-3 d-flex flex-wrap flex-row justify-content-center gap-3">
 			@if (!string.IsNullOrEmpty(product.ImageUrl))
@@ -61,7 +80,12 @@
 			}
 		</div>
 		<div class="mb-3">
-			<InputFile id="fileInput" OnChange="OnFilesChange" hidden multiple accept=".jpg,.png,.jpeg" />
+			<InputFile 
+				id="fileInput" 
+				OnChange="OnFilesChange" 
+				hidden 
+				multiple 
+				accept=".jpg,.png,.jpeg" />
 			<MudButton HtmlTag="label"
 					Variant="Variant.Filled"
 					Color="Color.Primary"
@@ -77,11 +101,23 @@
 		</div>
 		<div class="mb-3">
 			<label for="description">Description</label>
-			<InputTextArea style="min-height: 250px;" id="description" @bind-Value="product.Description" class="form-control"></InputTextArea>
+			<InputTextArea 
+				style="min-height: 250px;" 
+				id="description" 
+				@bind-Value="product.Description" 
+				class="form-control"
+				></InputTextArea>
 		</div>
 
 		<div class="mb-3">
-			<MudSelect Margin="Margin.Dense" T="int" Value="@product.CategoryId" ValueChanged="@((int value) => CategoryChange(value))" Label="Category" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+			<MudSelect 
+				Margin="Margin.Dense" 
+				T="int" 
+				Value="@product.CategoryId" 
+				ValueChanged="@((int value) => CategoryChange(value))" 
+				Label="Category" 
+				Variant="Variant.Outlined" 
+				AnchorOrigin="Origin.BottomCenter">
 				@foreach(var category in categoryService.AdminCategories)
 				{
 					<MudSelectItem Value="@category.Id">@category.Name</MudSelectItem>
@@ -97,7 +133,14 @@
 			{
 				<div class="row">
 					<div class="col">
-						<MudSelect Margin="Margin.Dense" T="int" @bind-Value="@variant.ProductTypeId" Label="Variant" Variant="Variant.Outlined" Disabled="@variant.Deleted" AnchorOrigin="Origin.BottomCenter">
+						<MudSelect 
+							Margin="Margin.Dense" 
+							T="int" 
+							@bind-Value="@variant.ProductTypeId" 
+							Label="Variant"
+							Variant="Variant.Outlined" 
+							Disabled="@variant.Deleted" 
+							AnchorOrigin="Origin.BottomCenter">
 							@foreach (var productType in productTypeService.ProductTypes)
 							{
 								<MudSelectItem Value="@productType.Id">@productType.Name</MudSelectItem>
@@ -105,21 +148,47 @@
 						</MudSelect>
 					</div>
 					<div class="col">
-						<MudNumericField Margin="Margin.Dense" Min="0" Disabled="@variant.Deleted" @bind-Value="variant.Price" Label="Price($)" Variant="Variant.Outlined"></MudNumericField>
+						<MudNumericField 
+							Margin="Margin.Dense" 
+							Min="0" 
+							Disabled="@variant.Deleted" 
+							@bind-Value="variant.Price" 
+							Label="Price($)" 
+							Variant="Variant.Outlined"></MudNumericField>
 					</div>
 					<div class="col">
-						<MudNumericField Margin="Margin.Dense" Min="0" Disabled="@variant.Deleted" @bind-Value="variant.OriginalPrice" Label="Original Price($)" Variant="Variant.Outlined"></MudNumericField>
+						<MudNumericField 
+							Margin="Margin.Dense" 
+							Min="0" 
+							Disabled="@variant.Deleted" 
+							@bind-Value="variant.OriginalPrice" 
+							Label="Original Price($)" 
+							Variant="Variant.Outlined"></MudNumericField>
 					</div>
 					<div class="col col-visible d-flex align-items-center justify-content-center">
-						<MudCheckBox Disabled="@variant.Deleted" @bind-Checked="variant.Visible" Color="Color.Primary" UnCheckedColor="Color.Default" Label="Visible"></MudCheckBox>
+						<MudCheckBox 
+							Disabled="@variant.Deleted" 
+							@bind-Checked="variant.Visible" 
+							Color="Color.Primary" 
+							UnCheckedColor="Color.Default" 
+							Label="Visible"></MudCheckBox>
 					</div>
 					<div class="col col-visible d-flex align-items-center justify-content-center">
-						<MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Size="Size.Medium" OnClick="@(() => RemoveVariant(variant.ProductTypeId))" />
+						<MudIconButton 
+							Icon="@Icons.Material.Filled.Delete" 
+							Variant="Variant.Filled" 
+							Color="Color.Error" 
+							Size="Size.Medium" 
+							OnClick="@(() => RemoveVariant(variant.ProductTypeId))" />
 					</div>
 				</div>
 			}
 			<div class="mb-3">
-				<MudButton OnClick="AddVariant" Color="Color.Info" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add">
+				<MudButton 
+					OnClick="AddVariant" 
+					Color="Color.Info" 
+					Variant="Variant.Filled" 
+					StartIcon="@Icons.Material.Filled.Add">
 				Add Variant
 			</MudButton>
 			</div>
@@ -127,10 +196,18 @@
 
 		<hr />
 		<div class="">
-			<MudCheckBox @bind-Checked="product.Featured" Color="Color.Primary" UnCheckedColor="Color.Default" Label="Featured"></MudCheckBox>
+			<MudCheckBox 
+				@bind-Checked="product.Featured" 
+				Color="Color.Primary" 
+				UnCheckedColor="Color.Default" 
+				Label="Featured"></MudCheckBox>
 		</div>
 		<div class="">
-			<MudCheckBox @bind-Checked="product.Visible" Color="Color.Primary" UnCheckedColor="Color.Default" Label="Visible"></MudCheckBox>
+			<MudCheckBox 
+				@bind-Checked="product.Visible" 
+				Color="Color.Primary" 
+				UnCheckedColor="Color.Default" 
+				Label="Visible"></MudCheckBox>
 		</div>
 		<hr />
 		<button type="submit" class="btn btn-primary float-end">@btnText</button>
@@ -237,7 +314,7 @@
 			snackbar.Add($"Update {product.Title} is success", Severity.Success);
 
 			await Task.Delay(1000);
-			navigationManager.NavigateTo($"admin/product/{product.Id}", true);
+			navigationManager.NavigateTo($"admin/edit-product/{product.Id}/{categoryId}", true);
 		}
 	}
 

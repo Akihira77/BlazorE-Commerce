@@ -43,7 +43,7 @@
 					<img src="@context.Images[0].Data" />
 				}
 			</MudTd>
-			<MudTd DataLabel="Product">@context.Title</MudTd>
+			<MudTd DataLabel="Product" Style="width: 400px">@context.Title</MudTd>
 			<MudTd DataLabel="Category" Class="text-center">@context.Category.Name</MudTd>
 			<MudTd DataLabel="Variants" Class="text-center">
 				@foreach(var variant in context.Variants)

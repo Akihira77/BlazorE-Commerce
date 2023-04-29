@@ -9,7 +9,7 @@
 				</div>
 			} else
 			{
-				<h3>Order from @order.OrderDate.ToString("f")</h3>
+				<h3>Order from @order.OrderDate.ToString("f", new CultureInfo("en-US"))</h3>
 				<div class="pb-5">
 					@foreach(var product in order.Products)
 					{
@@ -18,10 +18,8 @@
 								<img src="@product.ImageUrl" class="image" style="height: 130px; width: 100px;" />
 							</div>
 							<div class="name flex-grow-1 p-1">
-								<h6>
-									<a href="/product/@product.ProductId" class="link-primary text-decoration-underline">
-										@product.Title
-									</a>
+								<h6 class="fw-bold">
+									@product.Title
 								</h6>
 								<span>@product.ProductType</span>
 								<br />

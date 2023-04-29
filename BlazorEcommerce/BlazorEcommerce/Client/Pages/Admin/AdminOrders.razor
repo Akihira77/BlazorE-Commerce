@@ -44,7 +44,9 @@
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Email">@context.User.Email</MudTd>
-            <MudTd Class="text-center" DataLabel="DateCreated">@context.Order.OrderDate.ToString("f")</MudTd>
+            <MudTd Class="text-center" DataLabel="DateCreated">
+                @context.Order.OrderDate.ToString("f", new CultureInfo("en-US"))
+            </MudTd>
             <MudTd Class="text-center fw-bold" DataLabel="Price">
                 @(context.Order.TotalPrice.ToString("c", new CultureInfo("en-US")))
             </MudTd>
@@ -63,7 +65,7 @@
                 }
             </MudTd>
             <MudTd DataLabel="Actions" Class="text-center">
-                <MudTooltip Text="See Details">
+                <MudTooltip Text="See Details" ShowOnFocus="false">
                     <button @onclick="(() => OrderDetail(context.Order.Id))">
                         <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Large"></MudIcon>
                     </button>

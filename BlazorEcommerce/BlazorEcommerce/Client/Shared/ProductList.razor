@@ -25,28 +25,31 @@
 							}
 						</a>
 					</div>
-					<MudCardContent Class="d-flex flex-column position-relative py-0 px-2 px-md-4">
-						<div class="product-text">
-							<MudText id="rate">
-								@if(GetProductRatingCount(product.Id) > 0) {
-									<div class="d-flex text-secondary gap-1 align-items-center">
-										<div class="">
-											<i class="oi oi-star icon-rate text-warning"></i>
-										</div>
-										<div class="d-flex gap-1 align-items-center text">
-											<span>@rate.ToString("#.0").Replace(',', '.')</span>
-											<span>|</span>
-											@*<span>@ratingCount user</span>*@
-											<span>@RateToString(ratingCount) user</span>
-										</div>
-									</div>
-								}
-								<a class="mb-1 product-title" href="/product/@product.Id">
-									<p class="mb-0 product-title">@product.Title</p>
-								</a>
-							</MudText>
-							<MudText Class="price position-absolute bottom-0 end-0 pb-1 pe-1">
+					<MudCardContent Class="pt-2 pb-0 px-2">
+						<div class="product-text d-flex flex-column">
+							<a class="mb-1 product-title" href="/product/@product.Id">
+								<p class="mb-0 product-title">@product.Title</p>
+							</a>
+							<MudText Class="d-flex flex-column pb-1 pe-1">
 								<span class="product-price">@GetPriceText(product)</span>
+								<span class="original-price text-decoration-line-through">@GetOriginalPriceText(product)</span>
+							</MudText>
+							<MudText id="rate" Class="align-items-end">
+								<span class="">
+									@if(GetProductRatingCount(product.Id) > 0)
+									{
+										<div class="d-flex text-secondary gap-1 align-items-center">
+											<div class="">
+												<i class="oi oi-star icon-rate text-warning"></i>
+											</div>
+											<div class="d-flex gap-1 align-items-center text">
+												<span>@rate.ToString("#.0").Replace(',', '.')</span>
+												<span>|</span>
+												<span>@RateToString(ratingCount) user</span>
+											</div>
+										</div>
+									}
+								</span>
 							</MudText>
 						</div>
 					</MudCardContent>
@@ -111,8 +114,20 @@
 		}
 
 		decimal minPrice = variants.Min(v => v.Price);
-		return $"Starting at ${minPrice}";
+		return $"${minPrice}";
 	} 
+
+	private string GetOriginalPriceText(Product product)
+	{
+		var variants = product.Variants.ToList();
+		if(!variants.Any())
+		{
+			return string.Empty;
+		}
+
+		decimal originalPrice = variants.Min(p => p.OriginalPrice);
+		return (originalPrice > 0? $"${originalPrice}" : string.Empty);
+	}
 
 	private string RateToString(int count)
 	{
