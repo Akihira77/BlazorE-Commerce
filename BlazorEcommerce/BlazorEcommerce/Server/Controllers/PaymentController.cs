@@ -1,5 +1,6 @@
 ﻿using BlazorEcommerce.Server.Services.EmailService;
 using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+using BlazorEcommerce.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stripe.Checkout;
@@ -75,6 +76,12 @@ public class PaymentController : ControllerBase
 		orderHeader.SessionId = session.Id;
 
 		await _unitOfWork.OrderHeader.Add(orderHeader);
+
+		await _unitOfWork.Log.Add(new Logs
+		{
+			LogEvent = $"User '{_unitOfWork.Auth.GetUserEmail()}' Click the Checkout",
+		});
+
 		await _unitOfWork.SaveAsync();
 
 		return session.Url;
@@ -113,6 +120,11 @@ public class PaymentController : ControllerBase
 				_unitOfWork.Save();
 				orderHeader.OrderId = order.Id;
 				orderHeader.IsPaid = true;
+
+				await _unitOfWork.Log.Add(new Logs
+				{
+					LogEvent = $"User '{user.Email}' success fulfill the order",
+				});
 
 				await _unitOfWork.SaveAsync();
 

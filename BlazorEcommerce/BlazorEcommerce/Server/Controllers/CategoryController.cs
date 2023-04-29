@@ -46,7 +46,6 @@ public class CategoryController : ControllerBase
 	{
 		category.Editing = category.IsNew = false;
 		await _unitOfWork.Category.Add(category);
-		await _unitOfWork.SaveAsync();
 		var response = new ServiceResponse<IEnumerable<Category>>
 		{
 			Data = await _unitOfWork.Category
@@ -54,6 +53,12 @@ public class CategoryController : ControllerBase
 			Message = $"Adding Category {category.Name} is success"
 		};
 
+		await _unitOfWork.Log.Add(new Logs
+		{
+			LogEvent = $"User '{_unitOfWork.Auth.GetUserEmail()}' Adding new 'Category : {category.Name}'",
+		});
+
+		await _unitOfWork.SaveAsync();
 		return Ok(response);
 	}
 
@@ -68,6 +73,12 @@ public class CategoryController : ControllerBase
 			response.Message = "Deleting category is success";
 			category.Deleted = true;
 			//_unitOfWork.Category.Remove(category);
+
+			await _unitOfWork.Log.Add(new Logs
+			{
+				LogEvent = $"User '{_unitOfWork.Auth.GetUserEmail()}' Deleting 'Category : {category.Name}'",
+			});
+
 			await _unitOfWork.SaveAsync();
 		} else
 		{
@@ -90,6 +101,12 @@ public class CategoryController : ControllerBase
 			response.Message = "Updating category is success";
 			category.Editing = false;
 			_unitOfWork.Category.Update(category);
+
+			await _unitOfWork.Log.Add(new Logs
+			{
+				LogEvent = $"User '{_unitOfWork.Auth.GetUserEmail()}' Updating 'Category : {category.Name}'",
+			});
+
 			await _unitOfWork.SaveAsync();
 		} else
 		{

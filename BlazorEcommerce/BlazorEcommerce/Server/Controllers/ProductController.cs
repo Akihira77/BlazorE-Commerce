@@ -1,4 +1,5 @@
 ﻿using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+using BlazorEcommerce.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,6 +42,11 @@ public class ProductController : ControllerBase
 			variant.ProductType = null;
 		}
 		await _unitOfWork.Product.Add(product);
+		await _unitOfWork.Log.Add(new Logs
+		{
+			LogEvent = $"User '{_unitOfWork.Auth.GetUserEmail()}' Adding new 'Product : {product.Title}'",
+		});
+
 		await _unitOfWork.SaveAsync();
 
 		var response = new ServiceResponse<Product>
@@ -87,6 +93,10 @@ public class ProductController : ControllerBase
 			_unitOfWork.Images.RemoveRange(dbProduct.Images);
 
 			_unitOfWork.Product.Update(product);
+			await _unitOfWork.Log.Add(new Logs
+			{
+				LogEvent = $"User '{_unitOfWork.Auth.GetUserEmail()}' Updating a 'Product : {product.Title}'",
+			});
 			await _unitOfWork.SaveAsync();
 			response.Data = product;
 		} else
@@ -116,6 +126,10 @@ public class ProductController : ControllerBase
 		{
 			//_unitOfWork.Product.Remove(product);
 			product.Deleted = true;
+			await _unitOfWork.Log.Add(new Logs
+			{
+				LogEvent = $"User '{_unitOfWork.Auth.GetUserEmail()}' Deleting a 'Product : {product.Title}'",
+			});
 			await _unitOfWork.SaveAsync();
 		}
 		return Ok(response);

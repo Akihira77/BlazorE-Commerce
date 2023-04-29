@@ -20,6 +20,7 @@ public class UnitOfWork : IUnitOfWork
 	public IOrderHeaderRepository OrderHeader { get; private set; }
 	public ISendOrderRepository SendOrder { get; private set; }
     public IProductRatingsRepository ProductRatings { get; private set; }
+	public ILogRepository Log { get; private set; }
 
     public UnitOfWork(AppDbContext db
 		, IConfiguration configuration
@@ -39,6 +40,7 @@ public class UnitOfWork : IUnitOfWork
 		OrderHeader = new OrderHeaderRepository(_db);
 		SendOrder = new SendOrderRepository(_db);
 		ProductRatings = new ProductRatingsRepository(_db);
+		Log = new LogRepository(_db);
 	}
 
 	public void Save() => _db.SaveChanges();

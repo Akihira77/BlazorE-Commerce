@@ -19,6 +19,7 @@ public class AppDbContext : DbContext
 	public DbSet<OrderHeader> OrderHeaders { get; set; }
 	public DbSet<SendOrder> SendOrders { get; set; }
 	public DbSet<ProductRatings> ProductRatings { get; set; }
+	public DbSet<Logs> Logs { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

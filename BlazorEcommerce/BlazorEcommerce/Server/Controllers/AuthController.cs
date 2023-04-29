@@ -1,5 +1,6 @@
 ﻿using BlazorEcommerce.Server.Services.EmailService;
 using BlazorEcommerce.Server.Services.Repositories.IRepositories;
+using BlazorEcommerce.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -45,6 +46,10 @@ public class AuthController : ControllerBase
 			return BadRequest(response);
 		}
 		await _unitOfWork.Auth.Add(user);
+		await _unitOfWork.Log.Add(new Logs
+		{
+			LogEvent = $"User '{user.Email}:{user.Role}' has been registered"
+		});
 		await _unitOfWork.SaveAsync();
 
 		_logger.LogInformation($"User{user.Email} has been registered");
@@ -69,6 +74,12 @@ public class AuthController : ControllerBase
 		}
 
 		_logger.LogInformation($"User {request.Email} has login");
+		await _unitOfWork.Log.Add(new Logs
+		{
+			LogEvent = $"User '{request.Email}' has login"
+		});
+		await _unitOfWork.SaveAsync();
+
 		return Ok(response);
 	}
 
