@@ -12,11 +12,20 @@
         <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
     </div>
 } else {
-    <MudTable Items="@authService.AdminUsers" Hover="true" Filter="new Func<UserDto, bool>(SearchUserCommand)">
+    <MudTable 
+        Items="@authService.AdminUsers" 
+        Hover="true" 
+        Filter="new Func<UserDto, bool>(SearchUserCommand)">
         <ToolBarContent>
             <MudText Typo="Typo.h4">User List</MudText>
             <MudSpacer />
-            <MudTextField @bind-Value="search" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField 
+                @bind-Value="search" 
+                Placeholder="Search User By Name, Email, or Address" 
+                Adornment="Adornment.Start" 
+                AdornmentIcon="@Icons.Material.Filled.Search" 
+                IconSize="Size.Medium" 
+                Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
             <MudTh Class="text-center fw-bold">Nr</MudTh>

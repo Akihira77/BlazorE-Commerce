@@ -1,4 +1,6 @@
-﻿namespace BlazorEcommerce.Client.Services.AuthService;
+﻿using BlazorEcommerce.Shared.Dto.UserDTO;
+
+namespace BlazorEcommerce.Client.Services.AuthService;
 
 public class AuthService : IAuthService
 {

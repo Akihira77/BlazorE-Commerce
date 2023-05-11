@@ -1,4 +1,6 @@
-﻿namespace BlazorEcommerce.Client.Services.DashboardService;
+﻿using BlazorEcommerce.Shared.Dto.AdminDTO;
+
+namespace BlazorEcommerce.Client.Services.DashboardService;
 
 public class DashboardService : IDashboardService
 {

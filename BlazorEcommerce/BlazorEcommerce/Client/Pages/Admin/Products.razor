@@ -17,11 +17,21 @@
 		<MudText>Add New Product</MudText>
 	</MudButton>
 
-	<MudTable Hover="true" Virtualize="true" Items="@items" Filter="new Func<Product,bool>(SearchProductCommand)">
+	<MudTable 
+		Hover="true" 
+		Virtualize="true" 
+		Items="@items" 
+		Filter="new Func<Product,bool>(SearchProductCommand)">
 		<ToolBarContent>
 			<MudText Typo="Typo.h4">Product List</MudText>
 			<MudSpacer />
-			<MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+			<MudTextField 
+				@bind-Value="searchString" 
+				Placeholder="Search Product by Title or Category Name" 
+				Adornment="Adornment.Start" 
+				AdornmentIcon="@Icons.Material.Filled.Search" 
+				IconSize="Size.Medium" 
+				Class="mt-0"></MudTextField>
 		</ToolBarContent>
 		<HeaderContent>
 			<MudTh Class="text-center fw-bold">Image</MudTh>
@@ -121,7 +131,7 @@
 @code {
 	private Product item = null;
 	private IEnumerable<Product> items = new List<Product>();
-	private string searchString1 = "";
+	private string searchString = "";
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -152,7 +162,7 @@
 		}
 	}
 
-	private bool SearchProductCommand(Product element) => SearchProduct(element, searchString1);
+	private bool SearchProductCommand(Product element) => SearchProduct(element, searchString);
 
 	private bool SearchProduct(Product element, string searchString)
 	{

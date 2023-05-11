@@ -5,8 +5,8 @@ global using BlazorEcommerce.Client.Services.CategoryService;
 global using BlazorEcommerce.Client.Services.ProductService;
 global using BlazorEcommerce.Client.Services.AddressService;
 global using BlazorEcommerce.Client.Services.DashboardService;
+global using BlazorEcommerce.Client.Services.LogService;
 global using BlazorEcommerce.Shared;
-global using BlazorEcommerce.Shared.Dto;
 global using BlazorEcommerce.Shared.Models;
 global using Microsoft.AspNetCore.Components.Authorization;
 global using System.Net.Http.Json;
@@ -36,6 +36,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAddressService, AddressService>();	
 builder.Services.AddScoped<IProductTypeService, ProductTypeService>();	
 builder.Services.AddScoped<IDashboardService, DashboardService>();	
+builder.Services.AddScoped<ILogService, LogService>();	
 builder.Services.AddScoped<LazyAssemblyLoader>();
 
 builder.Services.AddMudServices(config =>

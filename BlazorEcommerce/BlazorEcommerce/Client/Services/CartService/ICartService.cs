@@ -1,4 +1,6 @@
-﻿namespace BlazorEcommerce.Client.Services.CartService;
+﻿using BlazorEcommerce.Shared.Dto.CartDTO;
+
+namespace BlazorEcommerce.Client.Services.CartService;
 
 public interface ICartService
 {

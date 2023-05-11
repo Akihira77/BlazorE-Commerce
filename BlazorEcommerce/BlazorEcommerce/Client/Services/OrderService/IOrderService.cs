@@ -1,4 +1,6 @@
-﻿namespace BlazorEcommerce.Client.Services.OrderService;
+﻿using BlazorEcommerce.Shared.Dto.OrderDTO;
+
+namespace BlazorEcommerce.Client.Services.OrderService;
 
 public interface IOrderService
 {

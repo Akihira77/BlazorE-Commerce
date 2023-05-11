@@ -1,0 +1,73 @@
+﻿@page "/admin/logs"
+@inject ILogService logService
+@implements IDisposable
+@attribute [Authorize(Roles = "Admin")]
+
+<PageTitle>Dashboard | Logs</PageTitle>
+
+@if (logService.Logs.Count == 0)
+{
+    <span>no logs available</span>
+} else {
+    <MudTable 
+        Items="@LogList" 
+        Dense="true" 
+        Hover="true"
+        Bordered="true"
+        Filter="new Func<Logs,bool>(FilterLogsCommand)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">LogEvent List</MudText>
+            <MudSpacer />
+            <MudTextField 
+                @bind-Value="searchString" 
+                Placeholder="Search LogEvent" 
+                Adornment="Adornment.Start" 
+                AdornmentIcon="@Icons.Material.Filled.Search" 
+                IconSize="Size.Medium" 
+                Class="mt-0"
+            ></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh Class="text-center fw-bold">Date Created</MudTh>
+            <MudTh Class="text-center fw-bold">Log Event</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Date Created" Class="text-center" Style="width: 300px">
+                @context.LogCreated.ToString("f", new CultureInfo("en-US"))
+            </MudTd>
+            <MudTd DataLabel="Log Event">@context.LogEvent</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+}
+
+
+@code {
+    IEnumerable<Logs> LogList = new List<Logs>();
+    string? searchString;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await logService.GetAllLogs();
+        LogList = logService.Logs;
+        logService.LogsChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        logService.LogsChanged -= StateHasChanged;
+    }
+
+    private bool FilterLogsCommand(Logs element) => FilterLogs(element, searchString);
+
+    private bool FilterLogs(Logs element, string? searchString)
+    {
+        if(string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if(element.LogEvent.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}
