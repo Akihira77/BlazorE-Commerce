@@ -3,6 +3,7 @@ global using BlazorEcommerce.Shared.Dto;
 global using BlazorEcommerce.Shared.Models;
 global using Microsoft.EntityFrameworkCore;
 using BlazorEcommerce.Server.Data;
+using BlazorEcommerce.Server.DbInitializer;
 using BlazorEcommerce.Server.Features.Base;
 using BlazorEcommerce.Server.Features.Emails;
 using BlazorEcommerce.Server.Hubs;
@@ -52,6 +53,7 @@ var emailConfig = builder.Configuration
 			.Get<EmailConfiguration>();
 builder.Services.AddSingleton(emailConfig);
 builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddResponseCompression(opts =>
 {
@@ -85,9 +87,19 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+SeedDatabase();
 app.MapRazorPages();
 app.MapControllers();
 app.MapHub<UserHub>("/hubs/user");
 app.MapFallbackToFile("index.html");
 
 app.Run();
+
+
+void SeedDatabase()
+{
+	using var scope = app.Services.CreateScope();
+
+	var dbInit = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+	dbInit.Initialize();
+}
