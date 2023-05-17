@@ -284,7 +284,7 @@
 	private async Task SubmitReviews()
 	{
 
-		if (rate == 0)
+		if (productRatings.Rate == 0)
 		{
 			snackbar.Add("Give rate first", Severity.Warning);
 			return;

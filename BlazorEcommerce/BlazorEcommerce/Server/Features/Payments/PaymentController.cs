@@ -14,9 +14,7 @@ public class PaymentController : ControllerBase
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEmailSender _emailSender;
 
-    private const string secret = "whsec_d8ad074fdaa62c2a85136958b93cf6657fa863fd8e0146af3d8d542ab3a7f2db";
-
-    public PaymentController(IUnitOfWork unitOfWork,
+	public PaymentController(IUnitOfWork unitOfWork,
         IEmailSender emailSender)
     {
         _unitOfWork = unitOfWork;
@@ -66,8 +64,10 @@ public class PaymentController : ControllerBase
                 },
             LineItems = lineItems,
             Mode = "payment",
-            SuccessUrl = $"https://localhost:7155/order-success",
-            CancelUrl = "https://localhost:7155/cart"
+            //SuccessUrl = $"https://localhost:7155/order-success",
+            //CancelUrl = "https://localhost:7155/cart"
+            SuccessUrl = "https://blazoreco.azurewebsites.net/order-success",
+            CancelUrl = "https://blazoreco.azurewebsites.net/cart"
         };
 
         var service = new SessionService();

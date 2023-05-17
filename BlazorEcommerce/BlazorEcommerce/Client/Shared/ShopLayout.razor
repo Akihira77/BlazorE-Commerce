@@ -1,7 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@inject NavigationManager navigationManager
-@implements IDisposable
-
 
 <div class="page">
     <MudThemeProvider />
@@ -53,46 +50,3 @@
         </NotAuthorized>
     </AuthorizeView>
 </div>
-
-@code {
-    private HubConnection? _hubConnection;
-
-    protected override async Task OnInitializedAsync()
-    {
-        // create connection
-        _hubConnection = new HubConnectionBuilder()
-                        .WithUrl(navigationManager.ToAbsoluteUri("/hubs/user"))
-                        .WithAutomaticReconnect()
-                        .Build();
-
-        // start connections
-        await _hubConnection.StartAsync();
-
-        // invoke hub methods aka send notifications to hub
-        if (_hubConnection.State == HubConnectionState.Connected)
-        {
-            await _hubConnection.SendAsync("CalculateUserView");
-        }
-    }
-
-    public void Dispose()
-    {
-        _hubConnection?.DisposeAsync();
-    }
-    //private bool _isDarkMode;
-    //private MudThemeProvider _mudThemeProvider;
-
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    if(firstRender)
-    //    {
-    //        _isDarkMode = await _mudThemeProvider.GetSystemPreference();
-    //        StateHasChanged();
-    //    }
-    //}
-
-    //private void ChangeState(bool state)
-    //{
-    //    _isDarkMode = state;
-    //}
-}

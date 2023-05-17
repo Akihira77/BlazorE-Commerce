@@ -5,7 +5,7 @@ namespace BlazorEcommerce.Shared.Models;
 public class User
 {
 	public int Id { get; set; }
-	[MaxLength(25)]
+	[Required, EmailAddress]
 	public string Email { get; set; } = string.Empty;
 	public byte[] PasswordHash { get; set; }
 	public byte[] PasswordSalt { get; set; }

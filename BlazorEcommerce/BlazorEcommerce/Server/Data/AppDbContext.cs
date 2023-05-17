@@ -57,16 +57,16 @@ public class AppDbContext : DbContext
 			});
 
 		modelBuilder.Entity<ProductType>().HasData(
-					new ProductType { Id = 1, Name = "Default" },
-					new ProductType { Id = 2, Name = "Paperback" },
-					new ProductType { Id = 3, Name = "E-Book" },
-					new ProductType { Id = 4, Name = "Audiobook" },
-					new ProductType { Id = 5, Name = "Stream" },
-					new ProductType { Id = 6, Name = "Blu-ray" },
-					new ProductType { Id = 7, Name = "VHS" },
-					new ProductType { Id = 8, Name = "PC" },
-					new ProductType { Id = 9, Name = "PlayStation" },
-					new ProductType { Id = 10, Name = "Xbox" }
+					new ProductType { Id = 1, Name = "Default", CategoryId = 1 },
+					new ProductType { Id = 2, Name = "Paperback", CategoryId = 1 },
+					new ProductType { Id = 3, Name = "E-Book", CategoryId = 1 },
+					new ProductType { Id = 4, Name = "Audiobook", CategoryId = 1 },
+					new ProductType { Id = 5, Name = "Stream", CategoryId = 2 },
+					new ProductType { Id = 6, Name = "Blu-ray", CategoryId = 2 },
+					new ProductType { Id = 7, Name = "VHS", CategoryId = 2 },
+					new ProductType { Id = 8, Name = "PC", CategoryId = 3 },
+					new ProductType { Id = 9, Name = "PlayStation", CategoryId = 3 },
+					new ProductType { Id = 10, Name = "Xbox", CategoryId = 3 }
 				);
 
 		modelBuilder.Entity<Category>()

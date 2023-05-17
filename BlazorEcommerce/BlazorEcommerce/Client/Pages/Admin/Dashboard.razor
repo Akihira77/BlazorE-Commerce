@@ -180,13 +180,6 @@
                         .Build();
 
         // connect to methods that hubs invokes aka receive notifications from hub
-        _hubConnection.On<int>("updateUserViewCount", (incomingTotalViews) =>
-        {
-            _totalViews = incomingTotalViews;
-            Console.WriteLine(incomingTotalViews);
-            InvokeAsync(StateHasChanged);
-        });
-
         _hubConnection.On<string>("userCheckout", (incomingMessage) =>
         {
             snackbar.Add(incomingMessage, Severity.Info, config =>
