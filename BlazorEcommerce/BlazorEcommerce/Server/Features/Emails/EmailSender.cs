@@ -1,4 +1,7 @@
 ﻿using BlazorEcommerce.Server.Features.Base;
+using BlazorEcommerce.Server.StaticFiles.Invoice;
+using BlazorEcommerce.Server.StaticFiles.OrderNotification;
+
 using MailKit.Net.Smtp;
 using MimeKit;
 using System.Text;
@@ -8,12 +11,19 @@ namespace BlazorEcommerce.Server.Features.Emails;
 public class EmailSender : IEmailSender
 {
     private readonly EmailConfiguration _emailConfiguration;
-    private readonly IUnitOfWork _unitOfWork;
+	private readonly IWebHostEnvironment _webHostEnvironment;
+	private readonly IUnitOfWork _unitOfWork;
+    private readonly string _directoryPath;
 
-    public EmailSender(EmailConfiguration emailConfiguration, IUnitOfWork unitOfWork)
+    public EmailSender(
+        IUnitOfWork unitOfWork,
+        EmailConfiguration emailConfiguration,
+        IWebHostEnvironment webHostEnvironment)
     {
-        _emailConfiguration = emailConfiguration;
         _unitOfWork = unitOfWork;
+		_emailConfiguration = emailConfiguration;
+		_webHostEnvironment = webHostEnvironment;
+		_directoryPath = Directory.GetCurrentDirectory();
     }
 
     public async Task SendEmailAsync(Message message)
@@ -37,14 +47,14 @@ public class EmailSender : IEmailSender
     private MimeMessage CreateOTPMessage(Message message)
     {
         var emailMessage = new MimeMessage();
-        emailMessage.From.Add(new MailboxAddress("email", _emailConfiguration.From));
+        emailMessage.From.Add(new MailboxAddress("Blazor ECommerce - OTP", _emailConfiguration.From));
         emailMessage.To.AddRange(message.To);
 
         emailMessage.Subject = "One Time Password";
         emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
         {
             Text = $"<p>This is your OTP <span style='font-weight: 600'>{message.Content}</span></p>" +
-                $"<br /> <p>This code can be use just for <span style='font-weight: 600'>3 minutes</span></p>"
+                $"<br /> <p>This OTP can be use just for <span style='font-weight: 600'>3 minutes</span></p>"
         };
 
         return emailMessage;
@@ -53,13 +63,16 @@ public class EmailSender : IEmailSender
     private async Task<MimeMessage> CreateInvoiceMessage(Message message)
     {
         var emailMessage = new MimeMessage();
-        emailMessage.From.Add(new MailboxAddress("email", _emailConfiguration.From));
+        emailMessage.From.Add(new MailboxAddress("Blazor ECommerce", _emailConfiguration.From));
         emailMessage.To.AddRange(message.To);
 
         emailMessage.Subject = "Blazor ECommerce Order Notification";
 
         var order = await _unitOfWork.Order.GetOrderDetails(int.Parse(message.Content));
-        var file = File.ReadAllText("F:\\File_Mahasiswa\\Programming\\dotnet\\BlazorE-Commerce\\BlazorEcommerce\\BlazorEcommerce\\Server\\StaticFiles\\Html\\InvoiceTop.html");
+        var fileName = "InvoiceTop.html";
+        //var file = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "StaticFiles", "Html", fileName));
+        //var file = File.ReadAllText(Path.Combine(_directoryPath, "StaticFiles", "Html", fileName));
+        var file = Invoice.InvoiceText;
         var htmlOrderItems = "<tr class=\"item\">\r\n    <td>{0}</td>\r\n\r\n    <td>{1}</td>\r\n</tr>\r\n\r\n";
 
         var sb = new StringBuilder();
@@ -86,11 +99,14 @@ public class EmailSender : IEmailSender
     {
         var userEmail = message.To[0].Address;
         var emailMessage = new MimeMessage();
-        emailMessage.From.Add(new MailboxAddress("email", userEmail));
-        emailMessage.To.Add(new MailboxAddress("email", _emailConfiguration.From));
+        emailMessage.From.Add(new MailboxAddress("Transaction Successful", userEmail));
+        emailMessage.To.Add(new MailboxAddress("Blazor ECommerce", _emailConfiguration.From));
 
         emailMessage.Subject = message.Subject;
-        var file = File.ReadAllText("F:\\File_Mahasiswa\\Programming\\dotnet\\BlazorE-Commerce\\BlazorEcommerce\\BlazorEcommerce\\Server\\StaticFiles\\Html\\OrderNotification.html");
+		var fileName = "OrderNotification.html";
+        //var file = File.ReadAllText(Path.Combine(_webHostEnvironment.ContentRootPath, "StaticFiles", "Html", fileName));
+        //var file = File.ReadAllText(Path.Combine(_directoryPath, "StaticFiles", "Html", fileName));
+        var file = OrderNotification.OrderNotificationText;
         file = file.Replace("{{0}}", message.Content);
 
         emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)

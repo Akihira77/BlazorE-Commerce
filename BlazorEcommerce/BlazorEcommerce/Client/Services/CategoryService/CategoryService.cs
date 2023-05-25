@@ -42,11 +42,15 @@ public class CategoryService : ICategoryService
 	public async Task AddCategory(Category category)
 	{
 		var response = await _http.PostAsJsonAsync("api/v1/category/admin", category);
-		AdminCategories = (await response.Content
-							.ReadFromJsonAsync<ServiceResponse<IEnumerable<Category>>>()).Data.ToList();
+		var result = await response.Content.ReadFromJsonAsync<ServiceResponse<IEnumerable<Category>>>();
 
-		await GetCategories();
-		OnChange?.Invoke();
+		if(result.Success)
+		{
+			AdminCategories = result.Data.ToList();
+
+			await GetCategories();
+			OnChange?.Invoke();
+		} 
 	}
 
 	public async Task UpdateCategory(Category category)

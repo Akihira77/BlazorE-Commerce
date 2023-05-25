@@ -52,7 +52,7 @@
             <MudTd DataLabel="Email">@context.User.Email</MudTd>
             <MudTd DataLabel="DateCreated" Class="text-center">@(context.User.DateCreated.ToShortDateString())
             </MudTd>
-            <MudTd DataLabel="Address" Class="text-center" Style="width: 400px">
+            <MudTd DataLabel="Address" Class="text-center" Style="width: 350px">
                 @if (context.User.Address == null)
                 {
                     <span><em>User have not input Address</em></span>

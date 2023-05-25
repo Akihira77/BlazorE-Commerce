@@ -44,6 +44,15 @@ public class CategoryController : ControllerBase
     [HttpPost("admin"), Authorize(Roles = "Admin")]
     public async Task<ActionResult<ServiceResponse<IEnumerable<Category>>>> AddCategory(Category category)
     {
+        if (await _unitOfWork.Category.GetFirstOrDefault((c => c.Name.ToLower().Equals(category.Name.ToLower()))) != null)
+        {
+            return BadRequest(new ServiceResponse<string>
+            {
+                Message = "Name of The Category is Already Exists",
+                Success = false
+            });
+        } 
+
         category.Editing = category.IsNew = false;
         await _unitOfWork.Category.Add(category);
         var response = new ServiceResponse<IEnumerable<Category>>
