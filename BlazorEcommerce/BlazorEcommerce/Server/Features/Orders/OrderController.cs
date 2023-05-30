@@ -150,17 +150,6 @@ public class OrderController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("admin/send-order")]
-    public async Task SendOrder([FromBody] SendOrder sendOrder)
-    {
-        var order = await _unitOfWork.Order
-                .GetFirstOrDefault(o => o.Id == sendOrder.OrderId);
-        order.OrderStatus = 1;
-
-        //await _unitOfWork.SendOrder.Add(sendOrder);
-        await _unitOfWork.SaveAsync();
-    }
-
     [HttpDelete("cancel-order/{orderId}")]
     public async Task<ActionResult<ServiceResponse<IEnumerable<OrderDto>>>> CancelOrder(int orderId)
     {

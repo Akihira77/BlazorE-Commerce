@@ -2,5 +2,5 @@
 
 public interface IEmailSender
 {
-    Task SendEmailAsync(Message message);
+    Task<bool> SendEmailAsync(Message message);
 }

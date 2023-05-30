@@ -26,7 +26,7 @@ public class EmailSender : IEmailSender
 		_directoryPath = Directory.GetCurrentDirectory();
     }
 
-    public async Task SendEmailAsync(Message message)
+    public async Task<bool> SendEmailAsync(Message message)
     {
         var emailMessage = new MimeMessage();
         if (message.Subject.ToLower().Equals("invoice"))
@@ -41,7 +41,7 @@ public class EmailSender : IEmailSender
         {
             emailMessage = CreateOTPMessage(message);
         }
-        await SendAsync(emailMessage);
+        return await SendAsync(emailMessage);
     }
 
     private MimeMessage CreateOTPMessage(Message message)
@@ -117,7 +117,7 @@ public class EmailSender : IEmailSender
         return emailMessage;
     }
 
-    private async Task SendAsync(MimeMessage mailMessage)
+    private async Task<bool> SendAsync(MimeMessage mailMessage)
     {
         using var client = new SmtpClient();
         try
@@ -126,11 +126,12 @@ public class EmailSender : IEmailSender
             client.AuthenticationMechanisms.Remove("XOAUTH2");
             await client.AuthenticateAsync(_emailConfiguration.Username, _emailConfiguration.Password);
             await client.SendAsync(mailMessage);
+            return true;
         }
         catch (Exception ex)
         {
             //log an error message or throw an exception or both.
-            Console.WriteLine(ex.Message);
+            return false;
         }
         finally
         {

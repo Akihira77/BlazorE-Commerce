@@ -15,11 +15,10 @@ public class AppDbContext : DbContext
 	public DbSet<OrderItem> OrderItems { get; set; }
 	public DbSet<Order> Orders { get; set; }
 	public DbSet<Address> Addresses { get; set; }
-	public DbSet<Image> Images { get; set; }
 	public DbSet<OrderHeader> OrderHeaders { get; set; }
-	public DbSet<SendOrder> SendOrders { get; set; }
 	public DbSet<ProductRatings> ProductRatings { get; set; }
-	public DbSet<Logs> Logs { get; set; }
+    public DbSet<Image> Images { get; set; }
+    public DbSet<Logs> Logs { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

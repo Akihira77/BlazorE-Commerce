@@ -66,7 +66,10 @@
 		var result = await orderService.Invoice(orderId);
 		if (result)
 		{
-			snackbar.Add("Invoice has been send to your Email", Severity.Success);
+			snackbar.Add("Invoice has been sent to your Email", Severity.Success);
+		} else
+		{
+			snackbar.Add("Sending Invoice failed", Severity.Error);
 		}
 	}
 
