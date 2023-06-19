@@ -55,12 +55,6 @@ public class CategoryController : ControllerBase
 
         category.Editing = category.IsNew = false;
         await _unitOfWork.Category.Add(category);
-        var response = new ServiceResponse<IEnumerable<Category>>
-        {
-            Data = await _unitOfWork.Category
-            .GetAll(c => !c.Deleted),
-            Message = $"Adding Category {category.Name} is success"
-        };
 
         await _unitOfWork.Log.Add(new Logs
         {
@@ -68,6 +62,12 @@ public class CategoryController : ControllerBase
         });
 
         await _unitOfWork.SaveAsync();
+        var response = new ServiceResponse<IEnumerable<Category>>
+        {
+            Data = await _unitOfWork.Category
+            .GetAll(c => !c.Deleted),
+            Message = $"Adding Category {category.Name} is success"
+        };
         return Ok(response);
     }
 

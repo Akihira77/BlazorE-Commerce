@@ -209,15 +209,15 @@
 	private int currentTypeId = 1;
 	private int[] Rate = new int[5];
 	List<string> pagedReviews;
-	List<string> allData = new List<string>();
-	List<ProductRatingsDto> _pr = new List<ProductRatingsDto>();
+	List<string> allData = new();
+	List<ProductRatingsDto> _pr = new();
 	private int currentPage = 1;
 	private int sizedPage;
 
 	int ratingCount;
 	double rate = 0;
 
-	ProductRatings productRatings = new ProductRatings();
+	ProductRatings productRatings = new();
 	bool _isReadOnly = false;
 	bool _isClearable = true;
 	string? authUser;
@@ -231,7 +231,7 @@
 		message = productResult.Message;
 		if (!productResult.Success) return;
 
-		var productRatingsResult = await productService.GetProductRatings(Id);
+		var productRatingsResult = await GetProductRatings();
 		User user;
 		product = productResult.Data;
 		ratingCount = product.Ratings.Count();
@@ -240,38 +240,16 @@
 		{
 			user = await authService.GetUser(0);
 
-			if(productRatingsResult.Data.Any(pr => pr.UserName == user.Email))
-			{
-				productRatings.Rate = productRatingsResult.Data
-									.FirstOrDefault(pr => pr.UserName == user.Email).Rate;
-				productRatings.Reviews = productRatingsResult.Data
-									.FirstOrDefault(pr => pr.UserName == user.Email).TextReviews;
-
-				_pr = productRatingsResult.Data
-						.Where(pr => pr.UserName != user.Email)
-						.ToList();
-
-			}
-
-		} else
-		{
-			_pr = productRatingsResult.Data.ToList();
+			SearchUserReview(user, productRatingsResult);
 		}
+		_pr = productRatingsResult.ToList();
 
 		productRatings.ProductId = Id;
 		productRatings.Product = productResult.Data;
 		sizedPage = (ratingCount / 10) + 1;
 
 		if (ratingCount > 0) {
-			rate = product.Ratings.Average(pr => pr.Rate);
-
-			for (int i = 0; i < 5; i++)
-			{
-				Rate[i] = productRatingsResult.Data.Count(pr => pr.Rate == (i + 1));
-			}
-
-			
-			UpdatePagedData(1);
+			CountingRatings(productRatingsResult);
 		}
 
 		var variants = product.Variants.ToList();
@@ -279,6 +257,31 @@
 		{
 			currentTypeId = variants[0].ProductTypeId;
 		}
+	}
+
+	private async Task<IEnumerable<ProductRatingsDto>?> GetProductRatings()
+	{
+		return (await productService.GetProductRatings(Id)).Data;
+	}
+
+	private void CountingRatings(IEnumerable<ProductRatingsDto> productRatingsResult)
+	{
+		rate = product.Ratings.Average(pr => pr.Rate);
+
+		for (int i = 0; i < 5; i++)
+		{
+			Rate[i] = productRatingsResult.Count(pr => pr.Rate == (i + 1));
+		}
+			
+		UpdatePagedData(1);
+	}
+
+	private void SearchUserReview(User user, IEnumerable<ProductRatingsDto> productRatingsResult)
+	{
+		productRatings.Rate = productRatingsResult
+			.FirstOrDefault(pr => pr.UserName == user.Email).Rate;
+		productRatings.Reviews = productRatingsResult
+			.FirstOrDefault(pr => pr.UserName == user.Email).TextReviews;
 	}
 
 	private async Task SubmitReviews()
@@ -296,6 +299,9 @@
 		if (response.Success)
 		{
 			snackbar.Add(response.Message, Severity.Success);
+			_pr = (await GetProductRatings()).ToList();
+			CountingRatings(_pr);
+
 		} else
 		{
 			snackbar.Add(response.Message, Severity.Error);

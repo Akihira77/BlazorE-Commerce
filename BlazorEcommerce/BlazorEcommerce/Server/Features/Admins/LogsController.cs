@@ -21,7 +21,7 @@ public class LogsController : ControllerBase
         var result = await _unitOfWork.Log.GetAll();
         return Ok(new ServiceResponse<IEnumerable<Logs>>
         {
-            Data = result.OrderBy(logs => logs.LogCreated)
+            Data = result.OrderByDescending(logs => logs.LogCreated)
         });
     }
 }

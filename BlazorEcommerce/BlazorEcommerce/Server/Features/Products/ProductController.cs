@@ -305,11 +305,27 @@ public class ProductController : ControllerBase
         }
         else
         {
-            return new ServiceResponse<bool>
-            {
-                Success = false,
-                Message = "Sorry, You're already give reviews for this product"
-            };
+	        try
+	        {
+		        productRatingsDb.Reviews = productRatings.Reviews;
+                productRatingsDb.Rate = productRatings.Rate;
+                await _unitOfWork.SaveAsync();
+
+                return new ServiceResponse<bool>
+                {
+	                Success = true,
+	                Message = "Reviews Updated"
+                };
+			} catch (Exception ex)
+	        {
+				_logger.LogError(ex.Message);
+
+				return new ServiceResponse<bool>
+				{
+					Success = false,
+					Message = "Got Error while updating reviews"
+				};
+			}
         }
     }
 }
